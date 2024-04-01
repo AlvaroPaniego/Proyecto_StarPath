@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:starpath/windows//login.dart';
+import 'package:starpath/windows/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+SharedPreferences? prefs; // Variable global para SharedPreferences
+
+void main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Para asegurarse de que SharedPreferences esté inicializado
+  prefs = await initSharedPreferences();
   runApp(const MainApp());
+}
+
+Future<SharedPreferences> initSharedPreferences() async {
+  return await SharedPreferences.getInstance();
 }
 
 class MainApp extends StatelessWidget {
@@ -10,8 +20,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Login()
-    );
+    return const MaterialApp(home: Login());
   }
 }
