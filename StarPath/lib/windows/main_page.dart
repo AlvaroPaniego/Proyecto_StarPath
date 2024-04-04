@@ -18,6 +18,9 @@ class _MainPageState extends State<MainPage> {
         backgroundColor: BACKGROUND,
         body: Column(
           children: [
+            SizedBox(
+              height: MediaQuery.of(context).viewPadding.top,
+            ),
             Expanded(
               flex: 1,
               child: Container(
@@ -64,15 +67,18 @@ class _MainPageState extends State<MainPage> {
               ),
             ),
             //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
-            Expanded(flex: 8,child: ListView(
-              children: [
-                Post(),
-                Post(),
-                Post(),
-                Post(),
-                Post(),
-                Post(),
-              ],
+            Expanded(flex: 8,child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListView(
+                children: const [
+                  Post(),
+                  Post(),
+                  Post(),
+                  Post(),
+                  Post(),
+                  Post(),
+                ],
+              ),
             )
             ),
             Expanded(

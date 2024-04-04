@@ -14,7 +14,7 @@ class _PostState extends State<Post> {
   int numComments = 0;
   @override
   Widget build(BuildContext context) {
-    return Padding(padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+    return Padding(padding: EdgeInsets.symmetric(vertical: 5.0),
       child: Column(
         children: [
           Container(
