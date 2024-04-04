@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:starpath/windows/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:starpath/windows/main_page.dart';
 
 SharedPreferences? prefs; // Variable global para SharedPreferences
 
@@ -20,6 +21,9 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: Login());
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MainPage()
+    );
   }
 }
