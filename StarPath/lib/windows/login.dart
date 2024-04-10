@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:starpath/misc/constants.dart';
-import 'menu.dart';
-import 'register.dart';
+import 'package:starpath/windows/menu.dart';
+import 'package:starpath/windows/register.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+  const Login({Key? key}) : super(key: key);
 
   @override
   State<Login> createState() => _LoginState();
@@ -12,6 +13,7 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool remember = false;
 
@@ -31,14 +33,13 @@ class _LoginState extends State<Login> {
               const Text("LOGIN", style: TextStyle(color: TEXT)),
               Image.asset("assets/images/logo.png"),
               TextFormField(
+                controller: _emailController,
                 autofocus: false,
                 style: const TextStyle(color: TEXT),
                 decoration: InputDecoration(
-                  // errorText: "Usuario incorrecto",
-                  // Leer base de datos
-                  hintText: "Introduzca nombre de usuario",
+                  hintText: "Introduzca correo electrónico",
                   hintStyle: const TextStyle(color: HINT),
-                  labelText: "Usuario",
+                  labelText: "Correo electrónico",
                   labelStyle: const TextStyle(color: TEXT),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
@@ -52,7 +53,7 @@ class _LoginState extends State<Login> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'El nombre de usuario está vacío';
+                    return 'El correo electrónico está vacío';
                   }
                   return null;
                 },
@@ -63,8 +64,6 @@ class _LoginState extends State<Login> {
                 style: const TextStyle(color: TEXT),
                 obscureText: true,
                 decoration: InputDecoration(
-                  // errorText: "Contraseña incorrecta",
-                  // Leer base de datos
                   hintText: "Introduzca contraseña",
                   hintStyle: const TextStyle(color: HINT),
                   labelText: "Contraseña",
@@ -82,8 +81,6 @@ class _LoginState extends State<Login> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Contraseña requerida';
-                  } else if (value.length < 6) {
-                    return 'La contraseña debe ser mayor o igual a 6 caracteres';
                   }
                   return null;
                 },
@@ -118,13 +115,29 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        //Hacer el navegar a la pantalla de menú
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const Menu()),
+                        final supabaseClient = SupabaseClient(
+                          'https://ybebufmjnvzatnywturc.supabase.co',
+                          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InliZWJ1Zm1qbnZ6YXRueXd0dXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE0NzQ1MjQsImV4cCI6MjAyNzA1MDUyNH0.eyFUwoEqNnKlwgG1UjWul_uX8snw8lsmqDNvRIEzDsE',
+                          authOptions: AuthClientOptions(
+                              authFlowType: AuthFlowType.implicit),
                         );
+                        final response =
+                            await supabaseClient.auth.signInWithPassword(
+                          email: _emailController.text.trim(),
+                          password: _passwordController.text.trim(),
+                        );
+                        if (response.session == null || response.user == null) {
+                          print('Error al logear usuario');
+                        } else {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const Menu(),
+                            ),
+                          );
+                        }
                       }
                     },
                     child: Container(
@@ -147,7 +160,9 @@ class _LoginState extends State<Login> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const Register()),
+                        MaterialPageRoute(
+                          builder: (context) => const Register(),
+                        ),
                       );
                     },
                     child: Container(

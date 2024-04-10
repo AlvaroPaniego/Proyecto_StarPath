@@ -65,7 +65,7 @@ class _MainPageState extends State<MainPage> {
             ),
             //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
             Expanded(flex: 8,child: ListView(
-              children: [
+              children: const [
                 Post(),
                 Post(),
                 Post(),
