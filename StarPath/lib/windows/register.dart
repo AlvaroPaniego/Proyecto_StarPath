@@ -3,6 +3,7 @@ import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/login.dart';
+import 'package:flutter/cupertino.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -15,6 +16,8 @@ class _RegisterState extends State<Register> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String? _validatePassword(String? value) {
@@ -27,10 +30,32 @@ class _RegisterState extends State<Register> {
   }
 
   Future<void> _registerUser() async {
+    // Verificar contraseñas
+    if (_passwordController.text != _repeatPasswordController.text) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Error'),
+            content: Text('Las contraseñas no coinciden.'),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Aceptar'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     // Inicializar SupabaseClient
     final supabaseClient = SupabaseClient(
-      'https://ybebufmjnvzatnywturc.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InliZWJ1Zm1qbnZ6YXRueXd0dXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE0NzQ1MjQsImV4cCI6MjAyNzA1MDUyNH0.eyFUwoEqNnKlwgG1UjWul_uX8snw8lsmqDNvRIEzDsE',
+      supabaseURL,
+      supabaseKey,
       authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit),
     );
 
@@ -38,22 +63,21 @@ class _RegisterState extends State<Register> {
     final response = await supabaseClient.auth.signUp(
       email: _emailController.text.trim(),
       password: _passwordController.text.trim(),
+      data: {
+        'username': _usernameController.text.trim(),
+        'email': _emailController.text.trim()
+      },
     );
 
     if (response.session == null || response.user == null) {
       print('Error al registrar usuario');
     } else {
-      // Insertar datos del usuario en la tabla 'user'
-      final user = await supabaseClient
-          .from('user')
-          .insert({'username': _usernameController.text.trim()});
       print('Usuario registrado con éxito');
 
       // Enviar correo de confirmación
       final Email email = Email(
-        body:
-            'Haz clic en el siguiente enlace para confirmar tu registro: [URL de confirmación]',
-        subject: 'Confirmación de registro',
+        body: '¡Te has registrado exitosamente en nuestra aplicación!',
+        subject: 'Registro exitoso',
         recipients: [_emailController.text],
       );
       await FlutterEmailSender.send(email);
@@ -155,6 +179,35 @@ class _RegisterState extends State<Register> {
                   ),
                 ),
                 validator: _validatePassword,
+              ),
+              TextFormField(
+                controller: _repeatPasswordController,
+                autofocus: false,
+                style: const TextStyle(color: TEXT),
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: "Introduzca de nuevo la contraseña",
+                  hintStyle: const TextStyle(color: HINT),
+                  labelText: "Repetir Contraseña",
+                  labelStyle: const TextStyle(color: TEXT),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(color: BLACK, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide:
+                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Repetir contraseña requerida';
+                  } else if (value != _passwordController.text) {
+                    return 'Las contraseñas no coinciden';
+                  }
+                  return null;
+                },
               ),
               ElevatedButton(
                 onPressed: _registerUser,

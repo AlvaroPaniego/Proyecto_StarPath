@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/misc/constants.dart';
-import 'package:starpath/windows/menu.dart';
+import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/register.dart';
 
 class Login extends StatefulWidget {
@@ -16,6 +17,24 @@ class _LoginState extends State<Login> {
   final TextEditingController _emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool remember = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberStatus();
+  }
+
+  void _loadRememberStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      remember = prefs.getBool('remember') ?? false;
+    });
+  }
+
+  void _saveRememberStatus(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('remember', value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,38 +77,75 @@ class _LoginState extends State<Login> {
                   return null;
                 },
               ),
-              TextFormField(
-                controller: _passwordController,
-                autofocus: false,
-                style: const TextStyle(color: TEXT),
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "Introduzca contraseña",
-                  hintStyle: const TextStyle(color: HINT),
-                  labelText: "Contraseña",
-                  labelStyle: const TextStyle(color: TEXT),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(color: BLACK, width: 1.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide:
-                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Contraseña requerida';
-                  }
-                  return null;
-                },
-              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          final TextEditingController _emailController =
+                              TextEditingController();
+                          return AlertDialog(
+                            title: const Text("Recuperar contraseña"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextFormField(
+                                  controller: _emailController,
+                                  decoration: const InputDecoration(
+                                      labelText: "Correo electrónico"),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'El correo electrónico está vacío';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text("Cancelar"),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    final supabaseClient =
+                                        Supabase.instance.client;
+                                    /* final response = await supabaseClient
+                                        .auth.api
+                                        .resetPasswordForEmail(
+                                      _emailController.text.trim(),
+                                      redirectTo: '',
+
+                                      
+const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+  redirectTo: 'https://example.com/update-password',
+}) 
+                                    );
+                                    if (response.error != null) {
+                                      // Handle error
+                                      print(
+                                          'Error al enviar correo de recuperación: ${response.error!.message}');
+                                    } else {
+                                      // Show success message
+                                      print(
+                                          'Correo de recuperación enviado correctamente.');
+                                    } */
+                                  }
+                                },
+                                child: const Text("Recuperar"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                     child: const Text("Recuperar contraseña"),
                   ),
                   Row(
@@ -103,7 +159,8 @@ class _LoginState extends State<Login> {
                         value: remember,
                         onChanged: (value) {
                           setState(() {
-                            remember = !remember;
+                            remember = value!;
+                            _saveRememberStatus(value);
                           });
                         },
                       ),
@@ -118,9 +175,9 @@ class _LoginState extends State<Login> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         final supabaseClient = SupabaseClient(
-                          'https://ybebufmjnvzatnywturc.supabase.co',
-                          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InliZWJ1Zm1qbnZ6YXRueXd0dXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTE0NzQ1MjQsImV4cCI6MjAyNzA1MDUyNH0.eyFUwoEqNnKlwgG1UjWul_uX8snw8lsmqDNvRIEzDsE',
-                          authOptions: AuthClientOptions(
+                          supabaseURL,
+                          supabaseKey,
+                          authOptions: const AuthClientOptions(
                               authFlowType: AuthFlowType.implicit),
                         );
                         final response =
@@ -134,7 +191,7 @@ class _LoginState extends State<Login> {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const Menu(),
+                              builder: (context) => const MainPage(),
                             ),
                           );
                         }
