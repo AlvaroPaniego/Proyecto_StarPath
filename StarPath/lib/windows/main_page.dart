@@ -6,6 +6,7 @@ import 'package:starpath/widgets/camera_button.dart';
 import 'package:starpath/widgets/post.dart';
 import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
+import 'package:starpath/windows/options.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -32,7 +33,6 @@ class _MainPageState extends State<MainPage> {
                 ]),
 
             //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
-<<<<<<< HEAD
             Expanded(flex: 8,child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView(
@@ -45,17 +45,6 @@ class _MainPageState extends State<MainPage> {
                   Post(),
                 ],
               ),
-=======
-            Expanded(flex: 8,child: ListView(
-              children: const [
-                Post(),
-                Post(),
-                Post(),
-                Post(),
-                Post(),
-                Post(),
-              ],
->>>>>>> main
             )
             ),
             Expanded(
@@ -70,7 +59,7 @@ class _MainPageState extends State<MainPage> {
                     children: [
                       GestureDetector(
                         onTap: () {
-
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const OptionsMainPage(),));
                         },
                         child: const Icon(Icons.settings),
                       ),

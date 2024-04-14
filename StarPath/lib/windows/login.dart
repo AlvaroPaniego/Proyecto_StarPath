@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/misc/constants.dart';
-import 'register.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/register.dart';
 

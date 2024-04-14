@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase/supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/login.dart';
@@ -219,33 +221,4 @@ class _RegisterState extends State<Register> {
       ),
     );
   }
-<<<<<<< HEAD
-
-  void _registerUser() async {
-    final email = _emailController.text;
-    final password = _passwordController.text;
-    final username = _usernameController.text;
-    final dateOfBirth = selectedDate;
-
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final supabaseClient = SupabaseClient(
-        'https://yhjunduffguoboqbsqae.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InloanVuZHVmZmd1b2JvcWJzcWFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDM3ODEwMTMsImV4cCI6MjAxOTM1NzAxM30.ebBPtXmpowC4iPIaHFkmSoieowV9dT9OZyfmf4G1rgk',
-      );
-      await supabaseClient.auth.signUp(password: password, email: email);
-
-      supabaseClient.from('user').insert({
-        'username': username,
-        'email': email,
-        'birth_date': dateOfBirth,
-      });
-
-      print('Usuario registrado con éxito');
-    } catch (error) {
-      print('Error al registrar usuario: $error');
-    }
-  }
-=======
->>>>>>> main
 }
