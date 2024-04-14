@@ -1,7 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:starpath/misc/constants.dart';
+import 'package:starpath/widgets/avatar_button.dart';
+import 'package:starpath/widgets/camera_button.dart';
 import 'package:starpath/widgets/post.dart';
+import 'package:starpath/widgets/search_bar.dart';
+import 'package:starpath/widgets/upper_app_bar.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -21,51 +25,12 @@ class _MainPageState extends State<MainPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                decoration: const BoxDecoration(
-                    color: BUTTON_BAR_BACKGROUND,
-                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(30.0))
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: GestureDetector(
-                          onTap: () {
+             const UpperAppBar(content: [
+                  AvatarButton(),
+                  SerachBar(),
+                  CameraButton()
+                ]),
 
-                          },
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(45.0),
-                            child: Image.asset("assets/images/placeholder-avatar.jpg"),
-                          ),
-                        ),
-                      ),
-                      const Expanded(
-                        flex: 5,
-                        child: TextField(
-                            style: TextStyle(color: TEXT),
-                            decoration: InputDecoration(hintText: "Buscar", border: OutlineInputBorder())
-                        ),
-                      ),
-                      Flexible(
-                        flex: 1,
-                        child: GestureDetector(
-                          onTap: () {
-
-                          },
-                          child: const Icon(Icons.camera_alt),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ),
             //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
             Expanded(flex: 8,child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -124,3 +89,8 @@ class _MainPageState extends State<MainPage> {
     );
   }
 }
+
+
+
+
+
