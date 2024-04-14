@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:starpath/misc/constants.dart';
-import 'package:supabase/supabase.dart';
+import 'package:starpath/windows/login.dart';
+import 'package:flutter/cupertino.dart';
 
 class Register extends StatefulWidget {
-  const Register({super.key});
+  const Register({Key? key}) : super(key: key);
 
   @override
   State<Register> createState() => _RegisterState();
 }
 
 class _RegisterState extends State<Register> {
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
-
-  bool hasSelectedDate = false;
-  DateTime selectedDate = DateTime.now();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String? _validatePassword(String? value) {
@@ -28,9 +29,71 @@ class _RegisterState extends State<Register> {
     return null;
   }
 
+  Future<void> _registerUser() async {
+    // Verificar contraseñas
+    if (_passwordController.text != _repeatPasswordController.text) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Error'),
+            content: Text('Las contraseñas no coinciden.'),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Aceptar'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    // Inicializar SupabaseClient
+    final supabaseClient = SupabaseClient(
+      supabaseURL,
+      supabaseKey,
+      authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit),
+    );
+
+    // Registrar usuario en Supabase
+    final response = await supabaseClient.auth.signUp(
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+      data: {
+        'username': _usernameController.text.trim(),
+        'email': _emailController.text.trim()
+      },
+    );
+
+    if (response.session == null || response.user == null) {
+      print('Error al registrar usuario');
+    } else {
+      print('Usuario registrado con éxito');
+
+      // Enviar correo de confirmación
+      final Email email = Email(
+        body: '¡Te has registrado exitosamente en nuestra aplicación!',
+        subject: 'Registro exitoso',
+        recipients: [_emailController.text],
+      );
+      await FlutterEmailSender.send(email);
+
+      // Redirigir a la pantalla de inicio de sesión
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Login(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    hasSelectedDate = false;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: BACKGROUND,
@@ -43,33 +106,6 @@ class _RegisterState extends State<Register> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               const Text("REGISTRARSE", style: TextStyle(color: TEXT)),
-              TextFormField(
-                controller: _emailController,
-                autofocus: false,
-                style: const TextStyle(color: TEXT),
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: "Introduzca un correo electrónico",
-                  hintStyle: const TextStyle(color: HINT),
-                  labelText: "Correo",
-                  labelStyle: const TextStyle(color: TEXT),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(color: BLACK, width: 1.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide:
-                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Correo requerido';
-                  }
-                  return null;
-                },
-              ),
               TextFormField(
                 controller: _usernameController,
                 autofocus: false,
@@ -97,6 +133,32 @@ class _RegisterState extends State<Register> {
                 },
               ),
               TextFormField(
+                controller: _emailController,
+                autofocus: false,
+                style: const TextStyle(color: TEXT),
+                decoration: InputDecoration(
+                  hintText: "Introduzca correo electrónico",
+                  hintStyle: const TextStyle(color: HINT),
+                  labelText: "Correo electrónico",
+                  labelStyle: const TextStyle(color: TEXT),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(color: BLACK, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide:
+                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Correo electrónico requerido';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
                 controller: _passwordController,
                 autofocus: false,
                 style: const TextStyle(color: TEXT),
@@ -119,13 +181,14 @@ class _RegisterState extends State<Register> {
                 validator: _validatePassword,
               ),
               TextFormField(
+                controller: _repeatPasswordController,
                 autofocus: false,
                 style: const TextStyle(color: TEXT),
                 obscureText: true,
                 decoration: InputDecoration(
-                  hintText: "Repita la contraseña",
+                  hintText: "Introduzca de nuevo la contraseña",
                   hintStyle: const TextStyle(color: HINT),
-                  labelText: "Repetir contraseña",
+                  labelText: "Repetir Contraseña",
                   labelStyle: const TextStyle(color: TEXT),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
@@ -146,36 +209,8 @@ class _RegisterState extends State<Register> {
                   return null;
                 },
               ),
-              Text(
-                "Fecha de nacimiento ${hasSelectedDate ? "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}" : "selecciona una fecha"}",
-                style: const TextStyle(color: TEXT),
-              ),
               ElevatedButton(
-                onPressed: () async {
-                  final DateTime? dateTime = await showDatePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime.now(),
-                  );
-                  if (dateTime != null) {
-                    setState(() {
-                      selectedDate = dateTime;
-                      hasSelectedDate = true;
-                    });
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: BUTTON_BACKGROUND),
-                child: const Text("Seleccionar fecha",
-                    style: TextStyle(color: BLACK)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _registerUser();
-                  }
-                },
+                onPressed: _registerUser,
                 child: const Text('Registrarse'),
               ),
             ],
@@ -184,6 +219,7 @@ class _RegisterState extends State<Register> {
       ),
     );
   }
+<<<<<<< HEAD
 
   void _registerUser() async {
     final email = _emailController.text;
@@ -210,4 +246,6 @@ class _RegisterState extends State<Register> {
       print('Error al registrar usuario: $error');
     }
   }
+=======
+>>>>>>> main
 }

@@ -15,9 +15,9 @@ class _VotesState extends State<Votes> {
       flex: 1,
       child: Row(
         children: [
-          Icon(Icons.arrow_upward_rounded),
+          const Icon(Icons.arrow_upward_rounded),
           Text("$upvotes"),
-          Icon(Icons.arrow_downward_rounded),
+          const Icon(Icons.arrow_downward_rounded),
           Text("$downvotes")
         ],
       ),
