@@ -18,12 +18,12 @@ class _FontSizeOptionState extends State<FontSizeOption> {
           setState(() {
             fontSize++;
           });
-        }, icon: const Icon(Icons.arrow_upward)),
+        }, icon: Icon(Icons.arrow_upward)),
         IconButton(onPressed: () {
           setState(() {
             fontSize--;
           });
-        }, icon: const Icon(Icons.arrow_downward)),
+        }, icon: Icon(Icons.arrow_downward)),
       ],
     );
   }

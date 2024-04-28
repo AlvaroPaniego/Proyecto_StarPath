@@ -1,9 +1,9 @@
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:starpath/model/user.dart';
-import 'package:starpath/windows/content_upload.dart';
-import 'package:supabase/supabase.dart';
+import 'package:starpath/Services/file_chooser.dart';
+import 'package:starpath/misc/constants.dart';
 
 class CameraButton extends StatelessWidget {
   const CameraButton({
@@ -16,7 +16,8 @@ class CameraButton extends StatelessWidget {
       flex: 1,
       child: GestureDetector(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const ContentUploadPage()));
+          FileChooser.uploadContent();
+          var user = supabase.auth.currentUser;
         },
         child: const Icon(Icons.camera_alt),
       ),
