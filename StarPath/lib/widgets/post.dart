@@ -26,8 +26,7 @@ class _PostState extends State<Post> {
                     flex: 2,
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(25.0),
-                        child: Image.asset(
-                            "assets/images/placeholder-image.jpg"))),
+                        child: Image.asset("assets/images/placeholder-image.jpg"))),
                 Flexible(
                   flex: 1,
                   child: Row(

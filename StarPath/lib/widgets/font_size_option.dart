@@ -8,8 +8,23 @@ class FontSizeOption extends StatefulWidget {
 }
 
 class _FontSizeOptionState extends State<FontSizeOption> {
+  double fontSize = 12;
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Row(
+      children: [
+        Text("Tamaño de la fuente: $fontSize"),
+        IconButton(onPressed: () {
+          setState(() {
+            fontSize++;
+          });
+        }, icon: Icon(Icons.arrow_upward)),
+        IconButton(onPressed: () {
+          setState(() {
+            fontSize--;
+          });
+        }, icon: Icon(Icons.arrow_downward)),
+      ],
+    );
   }
 }
