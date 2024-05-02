@@ -77,6 +77,39 @@ class _LoginState extends State<Login> {
                   return null;
                 },
               ),
+              TextFormField(
+                obscureText: true,
+                controller: _passwordController,
+                autofocus: false,
+                style: const TextStyle(color: TEXT),
+                decoration: InputDecoration(
+                  hintText: "Introduzca contraseña",
+                  hintStyle: const TextStyle(color: HINT),
+                  labelText: "Contraseña",
+                  labelStyle: const TextStyle(color: TEXT),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(color: BLACK, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide:
+                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'La contraseña está vacía';
+                  } else if (value.length < 6) {
+                    return 'La contraseña debe tener al menos 6 caracteres';
+                  } else if (!RegExp(
+                          r'^(?=.*?[a-zA-Z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~]).{6,}$')
+                      .hasMatch(value)) {
+                    return 'La contraseña debe contener al menos una letra, un número y un carácter especial';
+                  }
+                  return null;
+                },
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

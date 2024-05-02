@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:supabase/supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/login.dart';
@@ -24,9 +22,13 @@ class _RegisterState extends State<Register> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Contraseña requerida';
-    } else if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-      return 'La contraseña debe ser alfanumérica y puede contener barra baja';
+      return 'La contraseña está vacía';
+    } else if (value.length < 6) {
+      return 'La contraseña debe tener al menos 6 caracteres';
+    } else if (!RegExp(
+            r'^(?=.*?[a-zA-Z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~]).{6,}$')
+        .hasMatch(value)) {
+      return 'La contraseña debe contener al menos una letra, un número y un carácter especial';
     }
     return null;
   }
@@ -76,13 +78,13 @@ class _RegisterState extends State<Register> {
     } else {
       print('Usuario registrado con éxito');
 
-      // Enviar correo de confirmación
+      /* Enviar correo de confirmación
       final Email email = Email(
         body: '¡Te has registrado exitosamente en nuestra aplicación!',
         subject: 'Registro exitoso',
         recipients: [_emailController.text],
       );
-      //await FlutterEmailSender.send(email);
+      await FlutterEmailSender.send(email); */
 
       // Redirigir a la pantalla de inicio de sesión
       Navigator.pushReplacement(
