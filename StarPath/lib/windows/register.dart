@@ -82,7 +82,7 @@ class _RegisterState extends State<Register> {
         subject: 'Registro exitoso',
         recipients: [_emailController.text],
       );
-      await FlutterEmailSender.send(email);
+      //await FlutterEmailSender.send(email);
 
       // Redirigir a la pantalla de inicio de sesión
       Navigator.pushReplacement(
