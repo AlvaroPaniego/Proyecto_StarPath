@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase/supabase.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:starpath/misc/constants.dart';
@@ -8,7 +7,7 @@ import 'package:starpath/windows/login.dart';
 import 'package:flutter/cupertino.dart';
 
 class Register extends StatefulWidget {
-  const Register({Key? key}) : super(key: key);
+  const Register({super.key});
 
   @override
   State<Register> createState() => _RegisterState();
@@ -38,14 +37,14 @@ class _RegisterState extends State<Register> {
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
-            title: Text('Error'),
-            content: Text('Las contraseñas no coinciden.'),
+            title: const Text('Error'),
+            content: const Text('Las contraseñas no coinciden.'),
             actions: [
               CupertinoDialogAction(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Aceptar'),
+                child: const Text('Aceptar'),
               ),
             ],
           );
@@ -58,7 +57,7 @@ class _RegisterState extends State<Register> {
     final supabaseClient = SupabaseClient(
       supabaseURL,
       supabaseKey,
-      authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit),
+      authOptions: const AuthClientOptions(authFlowType: AuthFlowType.implicit),
     );
 
     // Registrar usuario en Supabase

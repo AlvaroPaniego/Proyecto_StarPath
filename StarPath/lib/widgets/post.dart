@@ -14,7 +14,7 @@ class _PostState extends State<Post> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.symmetric(vertical: 5.0),
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
         child: Column(children: [
           Container(
             decoration: BoxDecoration(

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 class FileManager{
   String getImage() {

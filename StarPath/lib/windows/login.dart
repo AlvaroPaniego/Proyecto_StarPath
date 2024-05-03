@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:starpath/model/user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/misc/constants.dart';
@@ -6,7 +8,7 @@ import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/register.dart';
 
 class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -77,6 +79,32 @@ class _LoginState extends State<Login> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: _passwordController,
+                autofocus: false,
+                style: const TextStyle(color: TEXT),
+                decoration: InputDecoration(
+                  hintText: "Introduzca contraseña",
+                  hintStyle: const TextStyle(color: HINT),
+                  labelText: "Contraseña",
+                  labelStyle: const TextStyle(color: TEXT),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(color: BLACK, width: 1.0),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide:
+                    const BorderSide(color: FOCUS_ORANGE, width: 1.0),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'La contraseña está vacío';
+                  }
+                  return null;
+                },
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -85,7 +113,7 @@ class _LoginState extends State<Login> {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          final TextEditingController _emailController =
+                          final TextEditingController emailController =
                               TextEditingController();
                           return AlertDialog(
                             title: const Text("Recuperar contraseña"),
@@ -93,7 +121,7 @@ class _LoginState extends State<Login> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 TextFormField(
-                                  controller: _emailController,
+                                  controller: emailController,
                                   decoration: const InputDecoration(
                                       labelText: "Correo electrónico"),
                                   validator: (value) {
@@ -188,6 +216,7 @@ const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
                         if (response.session == null || response.user == null) {
                           print('Error al logear usuario');
                         } else {
+                          context.read<UserProvider>().setLoggedUser(newUser: response.user!);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
