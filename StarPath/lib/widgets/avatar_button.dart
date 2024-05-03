@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:starpath/Services/file_chooser.dart';
 import 'package:starpath/misc/constants.dart';
-import 'package:starpath/model/profile_picture_manager.dart';
+import 'package:starpath/model/files.dart';
 import 'package:starpath/model/user.dart';
 import 'package:supabase/supabase.dart';
 
@@ -17,13 +18,12 @@ class _AvatarButtonState extends State<AvatarButton> {
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
     var profilePictureFuture = getProfilePicture(user);
-    ProfilePictureManager profilePictureManager = ProfilePictureManager();
 
     return Flexible(
       flex: 1,
       child: GestureDetector(
         onTap: ()  async{
-          await profilePictureManager.uploadContent(user);
+          await FileChooser.uploadContent(user, "pruebas", "user");
           setState(()  {
             profilePictureFuture = getProfilePicture(user);
 
