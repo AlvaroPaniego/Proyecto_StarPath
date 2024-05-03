@@ -33,7 +33,7 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
           ),
           const UpperAppBar(content: [
             BackArrow()
-            ]
+            ],
           ),
           // imagePreview(selectedImagePath),
           Expanded(
@@ -64,10 +64,7 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
                 style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
                 child: const Text("Seleccionar foto", style: TextStyle(color: TEXT))),
           ),
-          Expanded(flex: 1, child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(controller: _textController, decoration: const InputDecoration(hintText: "Introduce la descripcion")),
-          )),
+          Expanded(flex: 1, child: TextField(controller: _textController, decoration: const InputDecoration(hintText: "Introduce la descripcion"))),
           Expanded(
             flex: 1,
             child: ElevatedButton(
