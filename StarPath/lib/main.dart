@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/model/user.dart';
+import 'package:starpath/windows/create_profile.dart';
 import 'package:starpath/windows/login.dart';
 // import 'package:starpath/windows/main_page.dart';
 //1234,,._
@@ -22,7 +23,7 @@ class MainApp extends StatelessWidget {
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Login()
+        home: NewProfilePage()
       ),
     );
   }
