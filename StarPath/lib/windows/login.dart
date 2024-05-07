@@ -8,7 +8,7 @@ import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/register.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+  const Login({Key? key}) : super(key: key);
 
   @override
   State<Login> createState() => _LoginState();
@@ -80,6 +80,7 @@ class _LoginState extends State<Login> {
                 },
               ),
               TextFormField(
+                obscureText: true,
                 controller: _passwordController,
                 autofocus: false,
                 style: const TextStyle(color: TEXT),
@@ -95,106 +96,21 @@ class _LoginState extends State<Login> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide:
-                    const BorderSide(color: FOCUS_ORANGE, width: 1.0),
+                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
                   ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'La contraseña está vacío';
+                    return 'La contraseña está vacía';
+                  } else if (value.length < 6) {
+                    return 'La contraseña debe tener al menos 6 caracteres';
+                  } else if (!RegExp(
+                          r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
+                      .hasMatch(value)) {
+                    return 'La contraseña debe contener al menos un número y un carácter especial';
                   }
                   return null;
                 },
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          final TextEditingController emailController =
-                              TextEditingController();
-                          return AlertDialog(
-                            title: const Text("Recuperar contraseña"),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextFormField(
-                                  controller: emailController,
-                                  decoration: const InputDecoration(
-                                      labelText: "Correo electrónico"),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'El correo electrónico está vacío';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Cancelar"),
-                              ),
-                              TextButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    final supabaseClient =
-                                        Supabase.instance.client;
-                                    /* final response = await supabaseClient
-                                        .auth.api
-                                        .resetPasswordForEmail(
-                                      _emailController.text.trim(),
-                                      redirectTo: '',
-
-                                      
-const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: 'https://example.com/update-password',
-}) 
-                                    );
-                                    if (response.error != null) {
-                                      // Handle error
-                                      print(
-                                          'Error al enviar correo de recuperación: ${response.error!.message}');
-                                    } else {
-                                      // Show success message
-                                      print(
-                                          'Correo de recuperación enviado correctamente.');
-                                    } */
-                                  }
-                                },
-                                child: const Text("Recuperar"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: const Text("Recuperar contraseña"),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        "Recordarme",
-                        style: TextStyle(color: TEXT),
-                      ),
-                      Checkbox(
-                        value: remember,
-                        onChanged: (value) {
-                          setState(() {
-                            remember = value!;
-                            _saveRememberStatus(value);
-                          });
-                        },
-                      ),
-                    ],
-                  )
-                ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,7 +130,7 @@ const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
                           password: _passwordController.text.trim(),
                         );
                         if (response.session == null || response.user == null) {
-                          print('Error al logear usuario');
+                          _showErrorDialog();
                         } else {
                           context.read<UserProvider>().setLoggedUser(newUser: response.user!);
                           Navigator.pushReplacement(
@@ -273,6 +189,26 @@ const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
           ),
         ),
       ),
+    );
+  }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: const Text("La contraseña no es válida para este usuario."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

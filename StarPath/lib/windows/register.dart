@@ -7,7 +7,7 @@ import 'package:starpath/windows/login.dart';
 import 'package:flutter/cupertino.dart';
 
 class Register extends StatefulWidget {
-  const Register({super.key});
+  const Register({Key? key}) : super(key: key);
 
   @override
   State<Register> createState() => _RegisterState();
@@ -23,9 +23,12 @@ class _RegisterState extends State<Register> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Contraseña requerida';
-    } else if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-      return 'La contraseña debe ser alfanumérica y puede contener barra baja';
+      return 'La contraseña está vacía';
+    } else if (value.length < 6) {
+      return 'La contraseña debe tener al menos 6 caracteres';
+    } else if (!RegExp(r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
+        .hasMatch(value)) {
+      return 'La contraseña debe contener al menos un número y un carácter especial';
     }
     return null;
   }
@@ -37,14 +40,14 @@ class _RegisterState extends State<Register> {
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
-            title: const Text('Error'),
-            content: const Text('Las contraseñas no coinciden.'),
+            title: Text('Error'),
+            content: Text('Las contraseñas no coinciden.'),
             actions: [
               CupertinoDialogAction(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text('Aceptar'),
+                child: Text('Aceptar'),
               ),
             ],
           );
@@ -57,7 +60,7 @@ class _RegisterState extends State<Register> {
     final supabaseClient = SupabaseClient(
       supabaseURL,
       supabaseKey,
-      authOptions: const AuthClientOptions(authFlowType: AuthFlowType.implicit),
+      authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit),
     );
 
     // Registrar usuario en Supabase
@@ -75,13 +78,13 @@ class _RegisterState extends State<Register> {
     } else {
       print('Usuario registrado con éxito');
 
-      // Enviar correo de confirmación
+      /* Enviar correo de confirmación
       final Email email = Email(
         body: '¡Te has registrado exitosamente en nuestra aplicación!',
         subject: 'Registro exitoso',
         recipients: [_emailController.text],
       );
-      await FlutterEmailSender.send(email);
+      await FlutterEmailSender.send(email); */
 
       // Redirigir a la pantalla de inicio de sesión
       Navigator.pushReplacement(
