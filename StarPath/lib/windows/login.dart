@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/register.dart';
+import 'package:flutter/cupertino.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -124,21 +125,29 @@ class _LoginState extends State<Login> {
                           authOptions: const AuthClientOptions(
                               authFlowType: AuthFlowType.implicit),
                         );
-                        final response =
-                            await supabaseClient.auth.signInWithPassword(
-                          email: _emailController.text.trim(),
-                          password: _passwordController.text.trim(),
-                        );
-                        if (response.session == null || response.user == null) {
-                          _showErrorDialog();
-                        } else {
-                          context.read<UserProvider>().setLoggedUser(newUser: response.user!);
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainPage(),
-                            ),
+                        try {
+                          final response =
+                              await supabaseClient.auth.signInWithPassword(
+                            email: _emailController.text.trim(),
+                            password: _passwordController.text.trim(),
                           );
+                          if (response.session != null &&
+                              response.user != null) {
+                            context
+                                .read<UserProvider>()
+                                .setLoggedUser(newUser: response.user!);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MainPage(),
+                              ),
+                            );
+                          }
+                        } on AuthException catch (e) {
+                          if (e.message == 'Invalid login credentials') {
+                            _showErrorDialog(
+                                'El correo electrónico o la contraseña son incorrectos.');
+                          }
                         }
                       }
                     },
@@ -192,15 +201,15 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void _showErrorDialog() {
+  void _showErrorDialog(String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text("Error"),
-          content: const Text("La contraseña no es válida para este usuario."),
+          content: Text(message),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
