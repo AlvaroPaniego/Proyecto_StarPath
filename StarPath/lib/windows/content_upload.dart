@@ -4,9 +4,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
+import 'package:starpath/model/content_managet.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
+import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 
 class ContentUploadPage extends StatefulWidget {
@@ -18,11 +20,12 @@ class ContentUploadPage extends StatefulWidget {
 
 class _ContentUploadPageState extends State<ContentUploadPage> {
   final TextEditingController _textController = TextEditingController();
+  String fileName = "";
+  String filePath ="";
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
-    String selectedImagePath = "";
-    Future<String> selectedImageFuture = Future.error(Exception);
+    List<String> selectedImageFuture = [];
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: BACKGROUND,
@@ -37,28 +40,20 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
           ),
           // imagePreview(selectedImagePath),
           Expanded(
-            flex: 8,
-            child: FutureBuilder(future: selectedImageFuture, builder: (context, snapshot) {
-              if(snapshot.hasError){
-                print("error: ${snapshot.error}");
-                return const Center(child: Text("Ninguna imagen seleccionada para subir",
-                  style: TextStyle(color: TEXT),));
-              }else if(snapshot.hasData){
-                print("path: ${snapshot.data}");
-                return Center(child: Image.file(File(snapshot.data!)));
-              }
-              return const Center(child: Text("Ninguna imagen seleccionada para subir",
-                style: TextStyle(color: TEXT),));
-            },),
-          ),
+              flex: 4,
+              child: Text(fileName)),
+          Expanded(
+              flex: 4,
+              child: Text(filePath)),
           Expanded(
             flex: 1,
             child: ElevatedButton(
                 onPressed: () async{
                   FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.media);
+                  selectedImageFuture = await getPreviewImage(result!);
                   setState(() {
-                    selectedImageFuture = getPreviewImage(result!);
-                    selectedImageFuture.then((value) => print("contenido future: $value"));
+                    filePath = selectedImageFuture[0];
+                    fileName = selectedImageFuture[1];
                   });
                 },
                 style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
@@ -66,16 +61,22 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
           ),
           Expanded(flex: 1, child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(controller: _textController, decoration: const InputDecoration(hintText: "Introduce la descripcion")),
+            child: TextField(controller: _textController,
+                decoration: const InputDecoration(hintText: "Introduce la descripcion"),
+                style: const TextStyle(color: TEXT),
+            ),
           )),
           Expanded(
             flex: 1,
             child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-
-
-                  });
+                onPressed: () async{
+                  if(fileName.isNotEmpty && filePath.isNotEmpty){
+                    await uploadContent(user, filePath, fileName, _textController.text.trim());
+                    print("Todo correcto");
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const MainPage()));
+                  }else{
+                    print("faltan datos");
+                  }
                 },
                 style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
                 child: const Text("Subir imagen", style: TextStyle(color: TEXT))),
@@ -97,10 +98,23 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
           child: Image.file(File(selectedImagePath)));
     }
   }
-  Future<String> getPreviewImage(FilePickerResult result) async {
-    String path = "";
-    path = result!.files[0].path!;
-    return path;
+  Future<List<String>> getPreviewImage(FilePickerResult result) async {
+    List<String> info = ["", ""];
+    info[0] = result.files[0].path!;
+    info[1] = result.files[0].name;
+    return info;
+  }
+  Future<void> uploadContent(User user, String path, String fileName, String description) async {
+    {
+        await supabase.storage.from("publicacion").upload(fileName, File(path), fileOptions: const FileOptions(upsert: true));
+        var res = supabase.storage.from("publicacion").getPublicUrl(fileName);
+        // print(res);
+        await supabase.from("post").insert({
+          'id_user' : user.id,
+          'description' : description,
+          'content' : res
+        });
+    }
   }
 }
 

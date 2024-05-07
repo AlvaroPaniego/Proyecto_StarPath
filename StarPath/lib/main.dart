@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/windows/create_profile.dart';
 import 'package:starpath/windows/login.dart';
+import 'package:starpath/windows/main_page.dart';
 // import 'package:starpath/windows/main_page.dart';
 //1234,,._
 SharedPreferences? prefs; // Variable global para SharedPreferences
@@ -23,7 +24,7 @@ class MainApp extends StatelessWidget {
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: NewProfilePage()
+        home: Login()
       ),
     );
   }
