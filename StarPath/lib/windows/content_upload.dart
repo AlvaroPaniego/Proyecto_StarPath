@@ -11,7 +11,7 @@ import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 
 class ContentUploadPage extends StatefulWidget {
-  const ContentUploadPage({Key? key}) : super(key: key);
+  const ContentUploadPage({super.key});
 
   @override
   State<ContentUploadPage> createState() => _ContentUploadPageState();
@@ -52,23 +52,22 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
           Expanded(
             flex: 1,
             child: ElevatedButton(
-              onPressed: () async {
-                FilePickerResult? result =
-                    await FilePicker.platform.pickFiles(type: FileType.media);
-                if (result != null) {
-                  setState(() {
-                    filePath = result.files.single.path!;
-                    fileName = result.files.single.name!;
-                    isImageSelected = true;
-                  });
-                }
-              },
-              style: ElevatedButton.styleFrom(primary: BUTTON_BACKGROUND),
-              child: const Text(
-                "Seleccionar foto",
-                style: TextStyle(color: TEXT),
-              ),
-            ),
+                onPressed: () async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(type: FileType.media);
+                  if (result != null) {
+                    setState(() {
+                      filePath = result.files.single.path!; //nunca será nulo
+                      fileName = result.files.single.name!; //nunca será nulo
+                      isImageSelected = true;
+                    });
+                  }
+                },
+                style: const ButtonStyle(
+                    backgroundColor:
+                        MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                child: const Text("Seleccionar foto",
+                    style: TextStyle(color: TEXT))),
           ),
           Expanded(
             flex: 1,
@@ -86,7 +85,11 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
             flex: 1,
             child: ElevatedButton(
               onPressed: () {
-                _showConfirmationDialog(user);
+                if (!isImageSelected) {
+                  _showErrorDialog();
+                } else {
+                  _showConfirmationDialog(user);
+                }
               },
               style: const ButtonStyle(
                   backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
@@ -137,10 +140,31 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
     await supabase.storage.from("publicacion").upload(fileName, File(path),
         fileOptions: const FileOptions(upsert: true));
     var res = supabase.storage.from("publicacion").getPublicUrl(fileName);
+    // print(res);
     await supabase.from("post").insert({
       'id_user': user.id,
       'description': description,
       'content': res,
     });
+  }
+
+  Future<void> _showErrorDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: const Text('No se ha seleccionado ninguna foto.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
