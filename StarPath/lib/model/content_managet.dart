@@ -7,6 +7,9 @@ import 'package:starpath/Services/file_chooser.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:supabase/supabase.dart';
 
+
+//ESTA CLASE NO SE ESTA USANDO
+/*
 class ContentManager implements FileChooser{
   @override
   Future<PostgrestList> getContent(User user, String table, String field) async{
@@ -20,7 +23,7 @@ class ContentManager implements FileChooser{
   }
 
   @override
-  Future<void> uploadContent(User user) async {
+  Future<void> uploadContent(User user, String path, String fileName) async {
     {
       FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.media);
       //Si no es null el usuario ha escogido un archivo y si es null el usuario ha cancelado la seleccion
@@ -37,4 +40,4 @@ class ContentManager implements FileChooser{
     }
   }
 
-}
+}*/
