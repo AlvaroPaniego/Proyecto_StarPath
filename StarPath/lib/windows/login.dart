@@ -132,9 +132,7 @@ class _LoginState extends State<Login> {
                         if (response.session == null || response.user == null) {
                           _showErrorDialog();
                         } else {
-                          context
-                              .read<UserProvider>()
-                              .setLoggedUser(newUser: response.user!);
+                          context.read<UserProvider>().setLoggedUser(newUser: response.user!);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

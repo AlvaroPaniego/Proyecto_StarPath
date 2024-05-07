@@ -23,7 +23,7 @@ class _AvatarButtonState extends State<AvatarButton> {
       flex: 1,
       child: GestureDetector(
         onTap: ()  async{
-          await profilePictureManager.uploadContent(user);
+          await profilePictureManager.uploadContent(user, "", "");
           setState(()  {
             profilePictureFuture = getProfilePicture(user);
 

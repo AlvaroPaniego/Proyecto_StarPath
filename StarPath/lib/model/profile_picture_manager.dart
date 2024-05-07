@@ -1,14 +1,13 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:gotrue/src/types/user.dart';
 import 'package:starpath/Services/file_chooser.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:supabase/supabase.dart';
 
 class ProfilePictureManager implements FileChooser{
   @override
-  Future<void> uploadContent(User user) async {
+  Future<void> uploadContent(User user, String filePath, String fileName) async {
     {
       FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.media);
       //Si no es null el usuario ha escogido un archivo y si es null el usuario ha cancelado la seleccion

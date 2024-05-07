@@ -20,12 +20,12 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => UserProvider(),
-        )
+        ChangeNotifierProvider(create: (context) => UserProvider(),)
       ],
-      child:
-          const MaterialApp(debugShowCheckedModeBanner: false, home: Login()),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Login()
+      ),
     );
   }
 }
