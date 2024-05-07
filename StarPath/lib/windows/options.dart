@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/widgets/back_arrow.dart';

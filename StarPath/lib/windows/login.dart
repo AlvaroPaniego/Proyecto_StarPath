@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:starpath/model/user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/misc/constants.dart';
@@ -103,103 +105,12 @@ class _LoginState extends State<Login> {
                   } else if (value.length < 6) {
                     return 'La contraseña debe tener al menos 6 caracteres';
                   } else if (!RegExp(
-                          r'^(?=.*?[a-zA-Z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~]).{6,}$')
+                          r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
                       .hasMatch(value)) {
-                    return 'La contraseña debe contener al menos una letra, un número y un carácter especial';
+                    return 'La contraseña debe contener al menos un número y un carácter especial';
                   }
                   return null;
                 },
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          final TextEditingController _emailController =
-                              TextEditingController();
-                          return AlertDialog(
-                            title: const Text("Recuperar contraseña"),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextFormField(
-                                  controller: _emailController,
-                                  decoration: const InputDecoration(
-                                      labelText: "Correo electrónico"),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'El correo electrónico está vacío';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: const Text("Cancelar"),
-                              ),
-                              TextButton(
-                                onPressed: () async {
-                                  if (_formKey.currentState!.validate()) {
-                                    final supabaseClient =
-                                        Supabase.instance.client;
-                                    /* final response = await supabaseClient
-                                        .auth.api
-                                        .resetPasswordForEmail(
-                                      _emailController.text.trim(),
-                                      redirectTo: '',
-
-                                      
-const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: 'https://example.com/update-password',
-}) 
-                                    );
-                                    if (response.error != null) {
-                                      // Handle error
-                                      print(
-                                          'Error al enviar correo de recuperación: ${response.error!.message}');
-                                    } else {
-                                      // Show success message
-                                      print(
-                                          'Correo de recuperación enviado correctamente.');
-                                    } */
-                                  }
-                                },
-                                child: const Text("Recuperar"),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: const Text("Recuperar contraseña"),
-                  ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        "Recordarme",
-                        style: TextStyle(color: TEXT),
-                      ),
-                      Checkbox(
-                        value: remember,
-                        onChanged: (value) {
-                          setState(() {
-                            remember = value!;
-                            _saveRememberStatus(value);
-                          });
-                        },
-                      ),
-                    ],
-                  )
-                ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -219,8 +130,11 @@ const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
                           password: _passwordController.text.trim(),
                         );
                         if (response.session == null || response.user == null) {
-                          print('Error al logear usuario');
+                          _showErrorDialog();
                         } else {
+                          context
+                              .read<UserProvider>()
+                              .setLoggedUser(newUser: response.user!);
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -277,6 +191,26 @@ const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
           ),
         ),
       ),
+    );
+  }
+
+  void _showErrorDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Error"),
+          content: const Text("La contraseña no es válida para este usuario."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

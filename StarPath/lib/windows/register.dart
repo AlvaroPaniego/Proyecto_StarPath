@@ -25,10 +25,9 @@ class _RegisterState extends State<Register> {
       return 'La contraseña está vacía';
     } else if (value.length < 6) {
       return 'La contraseña debe tener al menos 6 caracteres';
-    } else if (!RegExp(
-            r'^(?=.*?[a-zA-Z])(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~]).{6,}$')
+    } else if (!RegExp(r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
         .hasMatch(value)) {
-      return 'La contraseña debe contener al menos una letra, un número y un carácter especial';
+      return 'La contraseña debe contener al menos un número y un carácter especial';
     }
     return null;
   }

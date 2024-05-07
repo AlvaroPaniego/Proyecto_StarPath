@@ -14,7 +14,7 @@ class _PostState extends State<Post> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.symmetric(vertical: 5.0),
+        padding: const EdgeInsets.symmetric(vertical: 5.0),
         child: Column(children: [
           Container(
             decoration: BoxDecoration(
@@ -26,8 +26,7 @@ class _PostState extends State<Post> {
                     flex: 2,
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(25.0),
-                        child: Image.asset(
-                            "assets/images/placeholder-image.jpg"))),
+                        child: Image.asset("assets/images/placeholder-image.jpg"))),
                 Flexible(
                   flex: 1,
                   child: Row(
