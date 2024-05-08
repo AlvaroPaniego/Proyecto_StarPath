@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Votes extends StatefulWidget {
-  const Votes({super.key});
+  int likes, dislikes;
+  Votes({super.key, required this.likes, required this.dislikes});
 
   @override
   State<Votes> createState() => _VotesState();
 }
 
 class _VotesState extends State<Votes> {
-  int upvotes = 0, downvotes = 0;
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -16,9 +16,9 @@ class _VotesState extends State<Votes> {
       child: Row(
         children: [
           const Icon(Icons.arrow_upward_rounded),
-          Text("$upvotes"),
+          Text("${widget.likes}"),
           const Icon(Icons.arrow_downward_rounded),
-          Text("$downvotes")
+          Text("${widget.dislikes}")
         ],
       ),
     );

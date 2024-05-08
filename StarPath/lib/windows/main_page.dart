@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:starpath/misc/constants.dart';
+import 'package:starpath/model/PostData.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/camera_button.dart';
 import 'package:starpath/widgets/post.dart';
@@ -18,6 +19,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
+    Future<List<PostData>> futurePost = getPostAsync();
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
@@ -35,16 +37,17 @@ class _MainPageState extends State<MainPage> {
             //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
             Expanded(flex: 8,child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ListView(
-                children: const [
-                  Post(),
-                  Post(),
-                  Post(),
-                  Post(),
-                  Post(),
-                  Post(),
-                ],
-              ),
+              child: FutureBuilder(future: futurePost, builder: (context, snapshot) {
+                if(snapshot.hasData){
+                  print("hay ${snapshot.data!.length} datos");
+                  return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return Post(postData: snapshot.data![index]);
+                    },);
+                }
+                return const Center(child: CircularProgressIndicator());
+              },)
             )
             ),
             Expanded(
@@ -89,6 +92,34 @@ class _MainPageState extends State<MainPage> {
         )
     );
   }
+}
+
+Future<List<PostData>> getPostAsync() async{
+  List<PostData> postList = [];
+  PostData post;
+  var res = await supabase.from('post').select("*").match({'deleted' : false});
+  if(res.isNotEmpty){
+    for (var data in res) {
+      post = PostData();
+      post.id_post = data['id_post'];
+      post.id_user = await getPostUsernameAsync(data['id_user']);
+      post.content = data['content'];
+      post.description = data['description'];
+      post.like = data['like'];
+      post.dislike = data['dislike'];
+      post.created_at = data['created_at'];
+
+      postList.add(post);
+    }
+  }
+  return postList;
+}
+
+Future<String> getPostUsernameAsync(String id_user) async{
+  String userName = "error";
+  var res = await supabase.from('user').select("username").match({'id_user' : id_user});
+  userName = res[0]['username'];
+  return userName;
 }
 
 
