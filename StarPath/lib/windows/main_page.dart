@@ -89,12 +89,11 @@ class _MainPageState extends State<MainPage> {
         ));
   }
 }
-
-Future<List<PostData>> getPostAsync() async {
+Future<List<PostData>> getPostAsync() async{
   List<PostData> postList = [];
   PostData post;
-  var res = await supabase.from('post').select("*").match({'deleted': false});
-  if (res.isNotEmpty) {
+  var res = await supabase.from('post').select("*").match({'deleted' : false});
+  if(res.isNotEmpty){
     for (var data in res.reversed) {
       post = PostData();
       post.id_post = data['id_post'];
@@ -111,12 +110,9 @@ Future<List<PostData>> getPostAsync() async {
   return postList;
 }
 
-Future<String> getPostUsernameAsync(String id_user) async {
+Future<String> getPostUsernameAsync(String id_user) async{
   String userName = "error";
-  var res = await supabase
-      .from('user')
-      .select("username")
-      .match({'id_user': id_user});
+  var res = await supabase.from('user').select("username").match({'id_user' : id_user});
   userName = res[0]['username'];
   return userName;
 }

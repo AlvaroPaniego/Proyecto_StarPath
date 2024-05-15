@@ -4,9 +4,10 @@ import 'package:starpath/widgets/up-down_votes.dart';
 import 'package:starpath/windows/comment_page.dart';
 
 class Post extends StatefulWidget {
-  final PostData postData;
 
-  const Post({Key? key, required this.postData}) : super(key: key);
+  PostData postData;
+  Post({super.key, required this.postData});
+
 
   @override
   State<Post> createState() => _PostState();
@@ -17,8 +18,9 @@ class _PostState extends State<Post> {
 
   @override
   Widget build(BuildContext context) {
-    String user = widget.postData.id_user,
-        description = widget.postData.description;
+
+    String user = widget.postData.id_user, description = widget.postData.description;
+
     bool hasValidImage = widget.postData.content.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -33,6 +35,7 @@ class _PostState extends State<Post> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
+
                   flex: 2,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.0),
@@ -60,8 +63,9 @@ class _PostState extends State<Post> {
                         ),
                       ),
                       Votes(
-                        likes: widget.postData.like,
-                        dislikes: widget.postData.dislike,
+                          likes: widget.postData.like,
+                          dislikes: widget.postData.dislike,
+                          id_post: widget.postData.id_post,
                       ),
                       Expanded(
                         flex: 1,
