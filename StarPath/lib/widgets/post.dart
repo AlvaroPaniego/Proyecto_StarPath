@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:starpath/model/PostData.dart';
 import 'package:starpath/widgets/up-down_votes.dart';
+import 'package:starpath/windows/comment_page.dart';
 
 class Post extends StatefulWidget {
-  PostData postData;
-  Post({super.key, required this.postData});
+  final PostData postData;
+
+  const Post({Key? key, required this.postData}) : super(key: key);
 
   @override
   State<Post> createState() => _PostState();
@@ -12,25 +14,33 @@ class Post extends StatefulWidget {
 
 class _PostState extends State<Post> {
   int numComments = 0;
+
   @override
   Widget build(BuildContext context) {
-    String user = widget.postData.id_user, description = widget.postData.description;
+    String user = widget.postData.id_user,
+        description = widget.postData.description;
     bool hasValidImage = widget.postData.content.isNotEmpty;
     return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5.0),
-        child: Column(children: [
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Column(
+        children: [
           Container(
             decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(25.0)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(25.0),
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
-                    flex: 2,
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: hasValidImage ?
-                        Image.network(widget.postData.content) : Image.asset("assets/images/placeholder-image.jpg"))),
+                  flex: 2,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25.0),
+                    child: hasValidImage
+                        ? Image.network(widget.postData.content)
+                        : Image.asset("assets/images/placeholder-image.jpg"),
+                  ),
+                ),
                 Flexible(
                   flex: 1,
                   child: Row(
@@ -42,26 +52,44 @@ class _PostState extends State<Post> {
                           padding: const EdgeInsets.symmetric(horizontal: 20.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [Text(user), Text(description)],
+                            children: [
+                              Text(user),
+                              Text(description),
+                            ],
                           ),
                         ),
                       ),
-                      Votes(likes: widget.postData.like, dislikes: widget.postData.dislike),
+                      Votes(
+                        likes: widget.postData.like,
+                        dislikes: widget.postData.dislike,
+                      ),
                       Expanded(
                         flex: 1,
-                        child: TextButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.comment,
-                            ),
-                            label: Text("$numComments")),
-                      )
+                        child: GestureDetector(
+                          onTap: () {
+                            // Obtener el ID del comentario específico
+                            String postId = widget.postData
+                                .id_post; // Suponiendo que id_post es el identificador único del comentario
+                            // Navegar a la página de comentarios con el ID del comentario
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    CommentPage(postId: postId),
+                              ),
+                            );
+                          },
+                          child: const Icon(Icons.comment),
+                        ),
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
-          )
-        ]));
+          ),
+        ],
+      ),
+    );
   }
 }
