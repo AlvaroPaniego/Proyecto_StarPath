@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:starpath/model/comment.dart';
 import 'package:starpath/model/user.dart';
 import 'package:provider/provider.dart';
@@ -86,7 +88,7 @@ class _CommentPageState extends State<CommentPage> {
       );
 
       try {
-        final idComment = Uuid().v4();
+        final idComment = const Uuid().v4();
 
         await supabase.from('comment').insert([
           {
@@ -125,7 +127,7 @@ class _CommentPageState extends State<CommentPage> {
               future: futureComments,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
@@ -134,26 +136,29 @@ class _CommentPageState extends State<CommentPage> {
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
                       final comment = comments[index];
-                      return ListTile(
-                        leading: AvatarButton(),
-                        title: Row(
+                      return Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Flexible(
+                            const AvatarButton(),
+                            Expanded(
+                              flex: 5,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   FutureBuilder<String>(
-                                    future:
-                                        getCommentUsernameAsync(comment.userId),
+                                    future: getCommentUsernameAsync(comment.userId),
                                     builder: (context, snapshot) {
                                       if (snapshot.hasData) {
                                         return Text(
                                           '${snapshot.data}',
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.bold),
                                         );
                                       } else {
-                                        return Text(
+                                        return const Text(
                                           'Usuario',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
@@ -161,32 +166,35 @@ class _CommentPageState extends State<CommentPage> {
                                       }
                                     },
                                   ),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   Text(
-                                    '${comment.comment}',
+                                    comment.comment,
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                // Implementar código para like
-                              },
-                              icon: Icon(Icons.thumb_up),
-                            ),
-                            Text('${comment.likes}'),
-                            IconButton(
-                              onPressed: () {
-                                // Implementar código para dislike
-                              },
-                              icon: Icon(Icons.thumb_down),
-                            ),
-                            Text('${comment.dislikes}'),
+                            Expanded(
+                              flex: 3,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      // Implementar código para like
+                                    },
+                                    icon: const Icon(Icons.thumb_up),
+                                  ),
+                                  Text('${comment.likes}'),
+                                  IconButton(
+                                    onPressed: () {
+                                      // Implementar código para dislike
+                                    },
+                                    icon: const Icon(Icons.thumb_down),
+                                  ),
+                                  Text('${comment.dislikes}'),
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       );
@@ -203,14 +211,14 @@ class _CommentPageState extends State<CommentPage> {
                 Expanded(
                   child: TextField(
                     controller: _commentController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Escribe un comentario...',
                     ),
                   ),
                 ),
                 IconButton(
                   onPressed: _addComment,
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
                 ),
               ],
             ),
