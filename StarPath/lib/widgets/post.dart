@@ -46,7 +46,11 @@ class _PostState extends State<Post> {
                           ),
                         ),
                       ),
-                      Votes(likes: widget.postData.like, dislikes: widget.postData.dislike),
+                      Votes(
+                          likes: widget.postData.like,
+                          dislikes: widget.postData.dislike,
+                          id_post: widget.postData.id_post,
+                      ),
                       Expanded(
                         flex: 1,
                         child: TextButton.icon(
