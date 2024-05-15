@@ -7,7 +7,7 @@ import 'package:starpath/windows/login.dart';
 
 // import 'package:starpath/windows/main_page.dart';
 //1234,,._
-SharedPreferences? prefs; // Variable global para SharedPreferences
+SharedPreferences? prefs;
 
 void main() async {
   runApp(const MainApp());
@@ -20,12 +20,12 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => UserProvider(),)
+        ChangeNotifierProvider(
+          create: (context) => UserProvider(),
+        )
       ],
-      child: const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Login()
-      ),
+      child:
+          const MaterialApp(debugShowCheckedModeBanner: false, home: Login()),
     );
   }
 }

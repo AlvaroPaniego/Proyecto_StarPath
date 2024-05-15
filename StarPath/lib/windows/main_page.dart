@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/PostData.dart';
@@ -28,72 +27,68 @@ class _MainPageState extends State<MainPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-             const UpperAppBar(content: [
-                  AvatarButton(),
-                  SerachBar(),
-                  CameraButton()
-                ]),
+            const UpperAppBar(
+                content: [AvatarButton(), SerachBar(), CameraButton()]),
 
             //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
-            Expanded(flex: 8,child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FutureBuilder(future: futurePost, builder: (context, snapshot) {
-                if(snapshot.hasData){
-                  print("hay ${snapshot.data!.length} datos");
-                  return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return Post(postData: snapshot.data![index]);
-                    },);
-                }
-                return const Center(child: CircularProgressIndicator());
-              },)
-            )
-            ),
+            Expanded(
+                flex: 8,
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FutureBuilder(
+                      future: futurePost,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          //print("hay ${snapshot.data!.length} datos");
+                          return ListView.builder(
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              return Post(postData: snapshot.data![index]);
+                            },
+                          );
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ))),
             Expanded(
                 flex: 1,
                 child: Container(
                   decoration: const BoxDecoration(
                       color: BUTTON_BAR_BACKGROUND,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(30.0))
-                  ),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(30.0))),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const OptionsMainPage(),));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const OptionsMainPage(),
+                              ));
                         },
                         child: const Icon(Icons.settings),
                       ),
                       GestureDetector(
-                        onTap: () {
-
-                        },
+                        onTap: () {},
                         child: const Icon(Icons.mail),
                       ),
                       GestureDetector(
-                        onTap: () {
-
-                        },
+                        onTap: () {},
                         child: const Icon(Icons.calendar_month),
                       ),
                       GestureDetector(
-                        onTap: () {
-
-                        },
+                        onTap: () {},
                         child: const Icon(Icons.chat),
                       ),
                     ],
                   ),
-                )
-            )
+                ))
           ],
-        )
-    );
+        ));
   }
 }
-
 Future<List<PostData>> getPostAsync() async{
   List<PostData> postList = [];
   PostData post;
@@ -121,8 +116,3 @@ Future<String> getPostUsernameAsync(String id_user) async{
   userName = res[0]['username'];
   return userName;
 }
-
-
-
-
-

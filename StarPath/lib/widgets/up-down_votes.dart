@@ -13,6 +13,7 @@ class Votes extends StatefulWidget {
 
 class _VotesState extends State<Votes> {
   bool pressedLike = false, pressedDislike = false;
+
   @override
   Widget build(BuildContext context) {
     return Expanded(

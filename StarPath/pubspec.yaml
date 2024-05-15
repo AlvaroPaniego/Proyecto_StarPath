@@ -21,6 +21,7 @@ dependencies:
   supabase: ^2.0.8  
   supabase_auth_ui: ^0.4.3
   uuid: ^3.0.4
+  flutter_keyboard_visibility: ^5.0.0
 
   
 dev_dependencies:
