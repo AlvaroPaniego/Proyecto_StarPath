@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:supabase/supabase.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/login.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,7 +32,6 @@ class _RegisterState extends State<Register> {
   }
 
   Future<void> _registerUser() async {
-    // Verificar contraseñas
     if (_passwordController.text != _repeatPasswordController.text) {
       showDialog(
         context: context,
@@ -56,15 +53,7 @@ class _RegisterState extends State<Register> {
       return;
     }
 
-    // Inicializar SupabaseClient
-    final supabaseClient = SupabaseClient(
-      supabaseURL,
-      supabaseKey,
-      authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit),
-    );
-
-    // Registrar usuario en Supabase
-    final response = await supabaseClient.auth.signUp(
+    final response = await supabase.auth.signUp(
       email: _emailController.text.trim(),
       password: _passwordController.text.trim(),
       data: {
@@ -77,14 +66,6 @@ class _RegisterState extends State<Register> {
       print('Error al registrar usuario');
     } else {
       print('Usuario registrado con éxito');
-
-      /* Enviar correo de confirmación
-      final Email email = Email(
-        body: '¡Te has registrado exitosamente en nuestra aplicación!',
-        subject: 'Registro exitoso',
-        recipients: [_emailController.text],
-      );
-      await FlutterEmailSender.send(email); */
 
       // Redirigir a la pantalla de inicio de sesión
       Navigator.pushReplacement(
@@ -99,127 +80,154 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: BACKGROUND,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 40.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              const Text("REGISTRARSE", style: TextStyle(color: TEXT)),
-              TextFormField(
-                controller: _usernameController,
-                autofocus: false,
-                style: const TextStyle(color: TEXT),
-                decoration: InputDecoration(
-                  hintText: "Introduzca nombre de usuario",
-                  hintStyle: const TextStyle(color: HINT),
-                  labelText: "Usuario",
-                  labelStyle: const TextStyle(color: TEXT),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(color: BLACK, width: 1.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide:
-                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Usuario requerido';
-                  }
-                  return null;
-                },
+      body: KeyboardVisibilityBuilder(
+        builder: (context, isKeyboardVisible) {
+          return SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.fromLTRB(
+                40.0,
+                30.0,
+                40.0,
+                isKeyboardVisible ? 20.0 : 30.0,
               ),
-              TextFormField(
-                controller: _emailController,
-                autofocus: false,
-                style: const TextStyle(color: TEXT),
-                decoration: InputDecoration(
-                  hintText: "Introduzca correo electrónico",
-                  hintStyle: const TextStyle(color: HINT),
-                  labelText: "Correo electrónico",
-                  labelStyle: const TextStyle(color: TEXT),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(color: BLACK, width: 1.0),
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "REGISTRARSE",
+                    style: TextStyle(color: TEXT),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide:
-                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
+                  const SizedBox(height: 30),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFormField(
+                          controller: _usernameController,
+                          autofocus: false,
+                          style: const TextStyle(color: TEXT),
+                          decoration: InputDecoration(
+                            hintText: "Introduzca nombre de usuario",
+                            hintStyle: const TextStyle(color: HINT),
+                            labelText: "Usuario",
+                            labelStyle: const TextStyle(color: TEXT),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide:
+                                  const BorderSide(color: BLACK, width: 1.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: const BorderSide(
+                                  color: FOCUS_ORANGE, width: 1.0),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Usuario requerido';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: _emailController,
+                          autofocus: false,
+                          style: const TextStyle(color: TEXT),
+                          decoration: InputDecoration(
+                            hintText: "Introduzca correo electrónico",
+                            hintStyle: const TextStyle(color: HINT),
+                            labelText: "Correo electrónico",
+                            labelStyle: const TextStyle(color: TEXT),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide:
+                                  const BorderSide(color: BLACK, width: 1.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: const BorderSide(
+                                  color: FOCUS_ORANGE, width: 1.0),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Correo electrónico requerido';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: _passwordController,
+                          autofocus: false,
+                          style: const TextStyle(color: TEXT),
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            hintText: "Introduzca contraseña",
+                            hintStyle: const TextStyle(color: HINT),
+                            labelText: "Contraseña",
+                            labelStyle: const TextStyle(color: TEXT),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide:
+                                  const BorderSide(color: BLACK, width: 1.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: const BorderSide(
+                                  color: FOCUS_ORANGE, width: 1.0),
+                            ),
+                          ),
+                          validator: _validatePassword,
+                        ),
+                        const SizedBox(height: 20),
+                        TextFormField(
+                          controller: _repeatPasswordController,
+                          autofocus: false,
+                          style: const TextStyle(color: TEXT),
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            hintText: "Introduzca de nuevo la contraseña",
+                            hintStyle: const TextStyle(color: HINT),
+                            labelText: "Repetir Contraseña",
+                            labelStyle: const TextStyle(color: TEXT),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide:
+                                  const BorderSide(color: BLACK, width: 1.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                              borderSide: const BorderSide(
+                                  color: FOCUS_ORANGE, width: 1.0),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Repetir contraseña requerida';
+                            } else if (value != _passwordController.text) {
+                              return 'Las contraseñas no coinciden';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: _registerUser,
+                          child: const Text('Registrarse'),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Correo electrónico requerido';
-                  }
-                  return null;
-                },
+                ],
               ),
-              TextFormField(
-                controller: _passwordController,
-                autofocus: false,
-                style: const TextStyle(color: TEXT),
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "Introduzca contraseña",
-                  hintStyle: const TextStyle(color: HINT),
-                  labelText: "Contraseña",
-                  labelStyle: const TextStyle(color: TEXT),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(color: BLACK, width: 1.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide:
-                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
-                  ),
-                ),
-                validator: _validatePassword,
-              ),
-              TextFormField(
-                controller: _repeatPasswordController,
-                autofocus: false,
-                style: const TextStyle(color: TEXT),
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: "Introduzca de nuevo la contraseña",
-                  hintStyle: const TextStyle(color: HINT),
-                  labelText: "Repetir Contraseña",
-                  labelStyle: const TextStyle(color: TEXT),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(color: BLACK, width: 1.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide:
-                        const BorderSide(color: FOCUS_ORANGE, width: 1.0),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Repetir contraseña requerida';
-                  } else if (value != _passwordController.text) {
-                    return 'Las contraseñas no coinciden';
-                  }
-                  return null;
-                },
-              ),
-              ElevatedButton(
-                onPressed: _registerUser,
-                child: const Text('Registrarse'),
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

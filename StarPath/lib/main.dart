@@ -4,11 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/windows/create_profile.dart';
 import 'package:starpath/windows/login.dart';
-import 'package:supabase/supabase.dart';
 
 // import 'package:starpath/windows/main_page.dart';
 //1234,,._
-SharedPreferences? prefs; // Variable global para SharedPreferences
+SharedPreferences? prefs;
 
 void main() async {
   runApp(const MainApp());

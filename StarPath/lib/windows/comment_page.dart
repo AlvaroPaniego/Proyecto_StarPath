@@ -161,9 +161,7 @@ class _CommentPageState extends State<CommentPage> {
                                       }
                                     },
                                   ),
-                                  SizedBox(
-                                      height:
-                                          4), // Espacio entre el nombre y el comentario
+                                  SizedBox(height: 4),
                                   Text(
                                     '${comment.comment}',
                                   ),
@@ -177,14 +175,14 @@ class _CommentPageState extends State<CommentPage> {
                           children: [
                             IconButton(
                               onPressed: () {
-                                // Implementar lógica para dar like al comentario
+                                // Implementar código para like
                               },
                               icon: Icon(Icons.thumb_up),
                             ),
                             Text('${comment.likes}'),
                             IconButton(
                               onPressed: () {
-                                // Implementar lógica para dar dislike al comentario
+                                // Implementar código para dislike
                               },
                               icon: Icon(Icons.thumb_down),
                             ),

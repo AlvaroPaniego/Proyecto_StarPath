@@ -67,10 +67,7 @@ class _PostState extends State<Post> {
                         flex: 1,
                         child: GestureDetector(
                           onTap: () {
-                            // Obtener el ID del comentario específico
-                            String postId = widget.postData
-                                .id_post; // Suponiendo que id_post es el identificador único del comentario
-                            // Navegar a la página de comentarios con el ID del comentario
+                            String postId = widget.postData.id_post;
                             Navigator.push(
                               context,
                               MaterialPageRoute(

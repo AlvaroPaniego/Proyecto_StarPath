@@ -1,9 +1,5 @@
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:starpath/model/user.dart';
 import 'package:starpath/windows/content_upload.dart';
-import 'package:supabase/supabase.dart';
 
 class CameraButton extends StatelessWidget {
   const CameraButton({
@@ -16,7 +12,10 @@ class CameraButton extends StatelessWidget {
       flex: 1,
       child: GestureDetector(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const ContentUploadPage()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const ContentUploadPage()));
         },
         child: const Icon(Icons.camera_alt),
       ),
