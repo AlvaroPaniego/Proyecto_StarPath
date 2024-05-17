@@ -7,6 +7,7 @@ import 'package:starpath/widgets/post.dart';
 import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/windows/options.dart';
+import 'package:supabase/supabase.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,9 +17,35 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  Future<List<PostData>> futurePost = getPostAsync();
+  @override
+  void initState() {
+    super.initState();
+    supabase
+        .channel('post_upvotes_changes')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.update,
+          schema: 'public',
+          table: 'post',
+          callback: (payload) {
+
+            futurePost.then((value) {
+              for (var post in value) {
+                if (post.id_post == payload.newRecord['id_post']) {
+                  setState(() {
+                    post.like = payload.newRecord['like'];
+                    post.dislike = payload.newRecord['dislike'];
+                  });
+                }
+              }
+            });
+          },
+        )
+        .subscribe();
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future<List<PostData>> futurePost = getPostAsync();
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
@@ -89,11 +116,12 @@ class _MainPageState extends State<MainPage> {
         ));
   }
 }
-Future<List<PostData>> getPostAsync() async{
+
+Future<List<PostData>> getPostAsync() async {
   List<PostData> postList = [];
   PostData post;
-  var res = await supabase.from('post').select("*").match({'deleted' : false});
-  if(res.isNotEmpty){
+  var res = await supabase.from('post').select("*").match({'deleted': false});
+  if (res.isNotEmpty) {
     for (var data in res.reversed) {
       post = PostData();
       post.id_post = data['id_post'];
@@ -110,9 +138,12 @@ Future<List<PostData>> getPostAsync() async{
   return postList;
 }
 
-Future<String> getPostUsernameAsync(String id_user) async{
+Future<String> getPostUsernameAsync(String id_user) async {
   String userName = "error";
-  var res = await supabase.from('user').select("username").match({'id_user' : id_user});
+  var res = await supabase
+      .from('user')
+      .select("username")
+      .match({'id_user': id_user});
   userName = res[0]['username'];
   return userName;
 }
