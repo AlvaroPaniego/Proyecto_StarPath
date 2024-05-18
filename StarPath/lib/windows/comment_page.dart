@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:starpath/model/comment.dart';
 import 'package:starpath/model/user.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase/supabase.dart';
 import 'package:uuid/uuid.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/widgets/avatar_button.dart';
@@ -27,6 +28,16 @@ class _CommentPageState extends State<CommentPage> {
     super.initState();
     _commentController = TextEditingController();
     futureComments = _loadComments();
+    supabase.channel('post_upvotes_changes').onPostgresChanges(
+        event: PostgresChangeEvent.update,
+        schema: 'public',
+        table: 'post',
+        callback: (payload) {
+          setState(() {
+            //actuaizar los likes/dislikes
+
+          });
+        },).subscribe();
   }
 
   @override
