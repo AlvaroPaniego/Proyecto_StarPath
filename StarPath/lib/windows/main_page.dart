@@ -120,9 +120,9 @@ class _MainPageState extends State<MainPage> {
 Future<List<PostData>> getPostAsync() async {
   List<PostData> postList = [];
   PostData post;
-  var res = await supabase.from('post').select("*").match({'deleted': false});
+  var res = await supabase.from('post').select("*").match({'deleted': false}).order('created_at', ascending: false );
   if (res.isNotEmpty) {
-    for (var data in res.reversed) {
+    for (var data in res) {
       post = PostData();
       post.id_post = data['id_post'];
       post.id_user = await getPostUsernameAsync(data['id_user']);
