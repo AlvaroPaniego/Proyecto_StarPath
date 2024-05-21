@@ -6,7 +6,8 @@ import 'package:starpath/model/user.dart';
 import 'package:supabase/supabase.dart';
 
 class AvatarButton extends StatefulWidget {
-  const AvatarButton({super.key});
+  Future<List<Map<String, dynamic>>> profilePictureFuture;
+  AvatarButton({super.key, required this.profilePictureFuture});
 
   @override
   State<AvatarButton> createState() => _AvatarButtonState();
@@ -15,35 +16,31 @@ class AvatarButton extends StatefulWidget {
 class _AvatarButtonState extends State<AvatarButton> {
   @override
   Widget build(BuildContext context) {
-    User user = context.watch<UserProvider>().user!;
-    var profilePictureFuture = getProfilePicture(user);
+    //User user = context.watch<UserProvider>().user!;
     ProfilePictureManager profilePictureManager = ProfilePictureManager();
 
     return Flexible(
       flex: 1,
       child: GestureDetector(
         onTap: ()  async{
-          await profilePictureManager.uploadContent(user, "", "");
+          //await profilePictureManager.uploadContent(user, "", "");
           setState(()  {
-            profilePictureFuture = getProfilePicture(user);
+            //widget.profilePictureFuture = getProfilePicture(user);
 
           });
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(45.0),
           child: FutureBuilder(
-            future: profilePictureFuture,
+            future: widget.profilePictureFuture,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                if (snapshot.data![0]["profile_picture"].isEmpty) {
-                  // print("snapshot.toString() => ${snapshot.data![0]["profile_picture"]}");
+                if(snapshot.data![0]["profile_picture"] == ""){
                   return Image.asset("assets/images/placeholder-avatar.jpg");
                 }
-                // print("snapshot.toString() => ${snapshot.data![0]["profile_picture"]}");
                 return Image.network(snapshot.data![0]["profile_picture"]);
               } else if (snapshot.hasError) {
-                print("hay algun error: ${snapshot.error}");
-                return CircleAvatar();
+                return Image.asset("assets/images/placeholder-avatar.jpg");
               }
               return Image.asset("assets/images/placeholder-avatar.jpg");
             },
@@ -51,14 +48,5 @@ class _AvatarButtonState extends State<AvatarButton> {
         ),
       ),
     );
-  }
-  Future<List<Map<String, dynamic>>> getProfilePicture(User user) async {
-    var profilePicture;
-    profilePicture = await supabase
-        .from("user")
-        .select("profile_picture")
-        .eq("id_user", user.id);
-    // print(profilePicture);
-    return profilePicture;
   }
 }
