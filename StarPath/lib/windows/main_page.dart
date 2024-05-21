@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/PostData.dart';
+import 'package:starpath/model/user.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/camera_button.dart';
 import 'package:starpath/widgets/post.dart';
 import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
+import 'package:starpath/windows/explore_page.dart';
 import 'package:starpath/windows/options.dart';
 import 'package:supabase/supabase.dart';
 
@@ -43,9 +46,15 @@ class _MainPageState extends State<MainPage> {
         )
         .subscribe();
   }
+  @override
+  void dispose() {
+    supabase.channel('post_upvotes_changes').unsubscribe();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    User user = context.watch<UserProvider>().user!;
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
@@ -54,10 +63,9 @@ class _MainPageState extends State<MainPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            const UpperAppBar(
-                content: [AvatarButton(), SerachBar(), CameraButton()]),
+            UpperAppBar(
+                content: [AvatarButton(profilePictureFuture: getProfilePicture(user)), const SerachBar(), const CameraButton()]),
 
-            //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
             Expanded(
                 flex: 8,
                 child: Padding(
@@ -102,6 +110,16 @@ class _MainPageState extends State<MainPage> {
                         child: const Icon(Icons.mail),
                       ),
                       GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ExplorePage(),
+                              ));
+                        },
+                        child: const Icon(Icons.newspaper ),
+                      ),
+                      GestureDetector(
                         onTap: () {},
                         child: const Icon(Icons.calendar_month),
                       ),
@@ -113,7 +131,17 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ))
           ],
-        ));
+        )
+    );
+  }
+  Future<List<Map<String, dynamic>>> getProfilePicture(User user) async {
+    var profilePicture;
+    profilePicture = await supabase
+        .from("user")
+        .select("profile_picture")
+        .eq("id_user", user.id);
+    // print(profilePicture);
+    return profilePicture;
   }
 }
 
@@ -147,3 +175,4 @@ Future<String> getPostUsernameAsync(String id_user) async {
   userName = res[0]['username'];
   return userName;
 }
+
