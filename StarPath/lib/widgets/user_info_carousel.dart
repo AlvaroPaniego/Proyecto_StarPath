@@ -20,7 +20,9 @@ class UserInfoCarousel extends StatelessWidget {
           child: Row(
             children: [
               AvatarButton(
-                  profilePictureFuture: getProfilePicture(user.id_user)),
+                  profilePictureFuture: getProfilePicture(user.id_user),
+                  user: user,
+              ),
               Expanded(
                   flex: 1,
                   child: Padding(

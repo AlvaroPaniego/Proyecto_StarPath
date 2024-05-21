@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:starpath/misc/constants.dart';
-import 'package:starpath/model/profile_picture_manager.dart';
-import 'package:starpath/model/user.dart';
-import 'package:supabase/supabase.dart';
+import 'package:starpath/model/user_data.dart';
+import 'package:starpath/windows/user_page_temp.dart';
 
 class AvatarButton extends StatefulWidget {
   Future<List<Map<String, dynamic>>> profilePictureFuture;
-  AvatarButton({super.key, required this.profilePictureFuture});
+  UserData user;
+  AvatarButton({super.key, required this.profilePictureFuture, required this.user});
 
   @override
   State<AvatarButton> createState() => _AvatarButtonState();
@@ -16,18 +14,12 @@ class AvatarButton extends StatefulWidget {
 class _AvatarButtonState extends State<AvatarButton> {
   @override
   Widget build(BuildContext context) {
-    //User user = context.watch<UserProvider>().user!;
-    ProfilePictureManager profilePictureManager = ProfilePictureManager();
 
     return Flexible(
       flex: 1,
       child: GestureDetector(
         onTap: ()  async{
-          //await profilePictureManager.uploadContent(user, "", "");
-          setState(()  {
-            //widget.profilePictureFuture = getProfilePicture(user);
-
-          });
+          Navigator.push(context, MaterialPageRoute(builder: (context) => UserPageTemp(user: widget.user)));
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(45.0),

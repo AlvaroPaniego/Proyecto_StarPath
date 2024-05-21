@@ -4,5 +4,7 @@ class UserData{
   String profile_picture = "vacio";
   String followers = "-1";
 
+  UserData.empty();
+
   UserData(this.id_user, this.username, this.profile_picture, this.followers);
 }

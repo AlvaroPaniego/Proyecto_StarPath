@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/PostData.dart';
 import 'package:starpath/model/user.dart';
+import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/camera_button.dart';
 import 'package:starpath/widgets/post.dart';
@@ -21,6 +22,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   Future<List<PostData>> futurePost = getPostAsync();
+  UserData userData = UserData.empty();
   @override
   void initState() {
     super.initState();
@@ -55,6 +57,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
+    getUserDataAsync(user.id).then((value) => userData = value);
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
@@ -64,7 +67,10 @@ class _MainPageState extends State<MainPage> {
               height: MediaQuery.of(context).viewPadding.top,
             ),
             UpperAppBar(
-                content: [AvatarButton(profilePictureFuture: getProfilePicture(user)), const SerachBar(), const CameraButton()]),
+                content: [AvatarButton(
+                    profilePictureFuture: getProfilePicture(user),
+                    user: userData,
+                ), const SerachBar(), const CameraButton()]),
 
             Expanded(
                 flex: 8,
@@ -74,7 +80,6 @@ class _MainPageState extends State<MainPage> {
                       future: futurePost,
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          //print("hay ${snapshot.data!.length} datos");
                           return ListView.builder(
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
@@ -174,5 +179,18 @@ Future<String> getPostUsernameAsync(String id_user) async {
       .match({'id_user': id_user});
   userName = res[0]['username'];
   return userName;
+}
+
+Future<UserData> getUserDataAsync(String id_user) async{
+  UserData user = UserData.empty();
+  var res = await supabase
+      .from('user')
+      .select("id_user, username, profile_picture")
+      .match({'id_user': id_user});
+  user.id_user = res.first['id_user'];
+  user.username = res.first['username'];
+  user.profile_picture = res.first['profile_picture'];
+  user.followers = '0';
+  return user;
 }
 

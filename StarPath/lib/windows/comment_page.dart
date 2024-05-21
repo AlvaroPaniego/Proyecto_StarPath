@@ -153,7 +153,7 @@ class _CommentPageState extends State<CommentPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            AvatarButton(profilePictureFuture: Future.error("Placeholder"),),
+                            //AvatarButton(profilePictureFuture: Future.error("Placeholder"),),
                             Expanded(
                               flex: 5,
                               child: Column(
