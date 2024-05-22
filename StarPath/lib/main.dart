@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/windows/login.dart';
+
 //1234,,._
 SharedPreferences? prefs;
 
@@ -11,7 +12,7 @@ void main() async {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

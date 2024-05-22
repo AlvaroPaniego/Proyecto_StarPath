@@ -22,11 +22,10 @@ class _AvatarButtonState extends State<AvatarButton> {
     return Flexible(
       flex: 1,
       child: GestureDetector(
-        onTap: ()  async{
+        onTap: () async {
           //await profilePictureManager.uploadContent(user, "", "");
-          setState(()  {
+          setState(() {
             //widget.profilePictureFuture = getProfilePicture(user);
-
           });
         },
         child: ClipRRect(
@@ -35,7 +34,7 @@ class _AvatarButtonState extends State<AvatarButton> {
             future: widget.profilePictureFuture,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                if(snapshot.data![0]["profile_picture"] == ""){
+                if (snapshot.data![0]["profile_picture"] == "") {
                   return Image.asset("assets/images/placeholder-avatar.jpg");
                 }
                 return Image.network(snapshot.data![0]["profile_picture"]);
