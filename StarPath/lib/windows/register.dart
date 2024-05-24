@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:starpath/misc/constants.dart';
-import 'package:starpath/windows/login.dart';
+import 'package:starpath/windows/create_profile.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:starpath/model/user.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -67,13 +70,24 @@ class _RegisterState extends State<Register> {
     } else {
       print('Usuario registrado con éxito');
 
-      // Redirigir a la pantalla de inicio de sesión
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const Login(),
-        ),
+      // Iniciar sesión automáticamente después del registro
+      final signInResponse = await supabase.auth.signInWithPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
+
+      if (signInResponse == null) {
+        print('Error al iniciar sesión automáticamente: ${signInResponse}');
+      } else {
+        print('Inicio de sesión automático exitoso');
+        context.read<UserProvider>().setLoggedUser(newUser: response.user!);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const NewProfilePage(),
+          ),
+        );
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-class UserData{
+class UserData {
   String id_user = "vacio";
   String username = "vacio";
   String profile_picture = "vacio";

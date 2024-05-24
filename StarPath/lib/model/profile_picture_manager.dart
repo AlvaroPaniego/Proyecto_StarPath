@@ -5,27 +5,43 @@ import 'package:starpath/Services/file_chooser.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:supabase/supabase.dart';
 
-class ProfilePictureManager implements FileChooser{
+class ProfilePictureManager implements FileChooser {
   @override
-  Future<void> uploadContent(User user, String filePath, String fileName) async {
-    {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.media);
-      //Si no es null el usuario ha escogido un archivo y si es null el usuario ha cancelado la seleccion
-      if(result != null){
+  Future<String?> uploadContent(
+      User user, String filePath, String fileName) async {
+    try {
+      FilePickerResult? result =
+          await FilePicker.platform.pickFiles(type: FileType.media);
+      if (result != null) {
         String file = result.names[0].toString();
         String path = result.paths[0].toString();
-        await supabase.storage.from("pruebas").upload(file, File(path), fileOptions: const FileOptions(upsert: true));
-        var res = supabase.storage.from("pruebas").getPublicUrl(file);
-        // print(res);
-        await supabase.from("user").update({"profile_picture" : res}).eq("id_user", user.id);
-      }else{
+        await supabase.storage.from("pruebas").upload(file, File(path),
+            fileOptions: const FileOptions(upsert: true));
+        var res = await supabase.storage.from("pruebas").getPublicUrl(file);
+
+        String? imageUrl = res;
+        if (imageUrl != null) {
+          await supabase
+              .from("user")
+              .update({"profile_picture": imageUrl}).eq("id_user", user.id);
+          return imageUrl;
+        } else {
+          print("No se pudo obtener la URL de la imagen del perfil");
+          return null;
+        }
+      } else {
         print("No se ha seleccionado nada");
+        return null;
       }
+    } catch (error) {
+      print("Error al subir la foto de perfil: $error");
+      return null;
     }
   }
 
   @override
-  Future<PostgrestList> getContent(User user, String table, String field)async{
+  Future<PostgrestList> getContent(
+      User user, String table, String field) async {
     PostgrestList profilePicture;
     profilePicture = await supabase
         .from("user")
@@ -34,5 +50,4 @@ class ProfilePictureManager implements FileChooser{
     // print(profilePicture);
     return profilePicture;
   }
-
 }

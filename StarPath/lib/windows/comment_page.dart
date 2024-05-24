@@ -1,13 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:starpath/model/comment.dart';
-import 'package:starpath/model/user.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase/supabase.dart';
-import 'package:uuid/uuid.dart';
-import 'package:starpath/misc/constants.dart';
+import 'package:starpath/model/comment.dart';
 import 'package:starpath/widgets/avatar_button.dart';
+import 'package:starpath/widgets/votes_comments.dart';
+import 'package:starpath/misc/constants.dart';
+import 'package:starpath/model/user.dart';
+import 'package:uuid/uuid.dart';
 
 class CommentPage extends StatefulWidget {
   final String postId;
@@ -20,7 +18,6 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   late Future<List<Comment>> futureComments;
-
   late TextEditingController _commentController;
 
   @override
@@ -28,16 +25,6 @@ class _CommentPageState extends State<CommentPage> {
     super.initState();
     _commentController = TextEditingController();
     futureComments = _loadComments();
-    supabase.channel('post_upvotes_changes').onPostgresChanges(
-        event: PostgresChangeEvent.update,
-        schema: 'public',
-        table: 'post',
-        callback: (payload) {
-          setState(() {
-            //actuaizar los likes/dislikes
-
-          });
-        },).subscribe();
   }
 
   @override
@@ -50,60 +37,87 @@ class _CommentPageState extends State<CommentPage> {
     try {
       final response = await supabase
           .from('comment')
-          .select("*")
-          .match({'id_post': widget.postId});
+          .select('*, user(profile_picture)')
+          .eq('id_post', widget.postId)
+          .match({'deleted': false}).order('created_at', ascending: true);
 
       final List<Comment> loadedComments = [];
 
-      for (final row in response) {
-        if (row['id_post'] != null &&
+      for (final row in response! as List<Map<String, dynamic>>) {
+        if (row['id_comment'] != null &&
+            row['id_post'] != null &&
             row['comment'] != null &&
             row['likes'] != null &&
             row['dislikes'] != null &&
             row['deleted'] != null &&
-            row['id_user'] != null) {
-          loadedComments.add(
-            Comment(
-              postId: row['id_post'] as String,
-              comment: row['comment'] as String,
-              likes: row['likes'] as int,
-              dislikes: row['dislikes'] as int,
-              deleted: row['deleted'] as bool,
-              userId: row['id_user'] as String,
-            ),
+            row['id_user'] != null &&
+            row['user'] != null &&
+            row['user']['profile_picture'] != null) {
+          final comment = Comment(
+            commentId: row['id_comment'] as String,
+            postId: row['id_post'] as String,
+            comment: row['comment'] as String,
+            likes: row['likes'] as int,
+            dislikes: row['dislikes'] as int,
+            deleted: row['deleted'] as bool,
+            userId: row['id_user'] as String,
+            profilePictureFuture: _getProfilePicture(row['id_user'] as String),
           );
+
+          loadedComments.add(comment);
         } else {
-          print('hay valores nulos');
+          print('Hay valores nulos');
         }
       }
 
-      print('la longitud de la lista es ${loadedComments.length}');
+      print('La longitud de la lista es ${loadedComments.length}');
       return loadedComments;
     } catch (error) {
-      print('Error añadir commentario: $error');
+      print('Error al cargar los comentarios: $error');
       throw error;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> _getProfilePicture(String userId) async {
+    try {
+      final response = await supabase
+          .from('user')
+          .select('profile_picture')
+          .eq('id_user', userId);
+
+      if (response == null) {
+        print('Error al obtener la foto de perfil');
+        return [];
+      }
+
+      final List<Map<String, dynamic>> profilePictureData =
+          response as List<Map<String, dynamic>>;
+      return profilePictureData;
+    } catch (error) {
+      print('Error al obtener la foto de perfil: $error');
+      return [];
     }
   }
 
   Future<void> _addComment() async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final currentUser = userProvider.user;
+    final userId = userProvider.user?.id;
     if (currentUser != null) {
       final newComment = Comment(
-        postId: widget.postId,
-        comment: _commentController.text.trim(),
-        likes: 0,
-        dislikes: 0,
-        deleted: false,
-        userId: currentUser.id,
-      );
+          commentId: const Uuid().v4(),
+          postId: widget.postId,
+          comment: _commentController.text.trim(),
+          likes: 0,
+          dislikes: 0,
+          deleted: false,
+          userId: currentUser.id,
+          profilePictureFuture: _getProfilePicture(userId ?? ""));
 
       try {
-        final idComment = const Uuid().v4();
-
         await supabase.from('comment').insert([
           {
-            'id_comment': idComment,
+            'id_comment': newComment.commentId,
             'id_user': currentUser.id,
             'id_post': newComment.postId,
             'comment': newComment.comment,
@@ -120,7 +134,7 @@ class _CommentPageState extends State<CommentPage> {
 
         _commentController.clear();
       } catch (error) {
-        print('Error añadir commentario: $error');
+        print('Error al añadir comentario: $error');
       }
     }
   }
@@ -129,7 +143,7 @@ class _CommentPageState extends State<CommentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Commentarios del Post ${widget.postId}'),
+        title: Text('Comentarios del Post ${widget.postId}'),
       ),
       body: Column(
         children: [
@@ -138,7 +152,7 @@ class _CommentPageState extends State<CommentPage> {
               future: futureComments,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
@@ -153,24 +167,28 @@ class _CommentPageState extends State<CommentPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            //AvatarButton(profilePictureFuture: Future.error("Placeholder"),),
+                            AvatarButton(
+                              profilePictureFuture:
+                                  comment.profilePictureFuture,
+                            ),
                             Expanded(
                               flex: 5,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   FutureBuilder<String>(
-                                    future: getCommentUsernameAsync(comment.userId),
+                                    future:
+                                        getCommentUsernameAsync(comment.userId),
                                     builder: (context, snapshot) {
                                       if (snapshot.hasData) {
                                         return Text(
-                                          '${snapshot.data}',
-                                          style: const TextStyle(
+                                          snapshot.data!,
+                                          style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                         );
                                       } else {
-                                        return const Text(
-                                          'Usuario',
+                                        return Text(
+                                          'Cargando Usuario', //texto temporal mientras se carga el nombre de usuario
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                         );
@@ -178,34 +196,22 @@ class _CommentPageState extends State<CommentPage> {
                                     },
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(
-                                    comment.comment,
-                                  ),
+                                  Text(comment.comment),
                                 ],
                               ),
                             ),
                             Expanded(
                               flex: 3,
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      // Implementar código para like
-                                    },
-                                    icon: const Icon(Icons.thumb_up),
-                                  ),
-                                  Text('${comment.likes}'),
-                                  IconButton(
-                                    onPressed: () {
-                                      // Implementar código para dislike
-                                    },
-                                    icon: const Icon(Icons.thumb_down),
-                                  ),
-                                  Text('${comment.dislikes}'),
-                                ],
+                              child: VotesForComments(
+                                comment: comment,
+                                onUpdate: (int likes, int dislikes) {
+                                  setState(() {
+                                    comment.likes = likes;
+                                    comment.dislikes = dislikes;
+                                  });
+                                },
                               ),
-                            )
+                            ),
                           ],
                         ),
                       );
@@ -240,7 +246,8 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   Future<String> getCommentUsernameAsync(String userId) async {
-    String userName = "error";
+    String userName =
+        "Cargando Usuario"; // texto temporal mientras se carga el nombre de usuario
     var res = await supabase
         .from('user')
         .select("username")

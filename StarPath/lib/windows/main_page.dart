@@ -33,7 +33,6 @@ class _MainPageState extends State<MainPage> {
           schema: 'public',
           table: 'post',
           callback: (payload) {
-
             futurePost.then((value) {
               for (var post in value) {
                 if (post.id_post == payload.newRecord['id_post']) {
@@ -48,6 +47,7 @@ class _MainPageState extends State<MainPage> {
         )
         .subscribe();
   }
+
   @override
   void dispose() {
     supabase.channel('post_upvotes_changes').unsubscribe();
@@ -80,6 +80,7 @@ class _MainPageState extends State<MainPage> {
                       future: futurePost,
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
+                          //print("hay ${snapshot.data!.length} datos");
                           return ListView.builder(
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
@@ -153,7 +154,10 @@ class _MainPageState extends State<MainPage> {
 Future<List<PostData>> getPostAsync() async {
   List<PostData> postList = [];
   PostData post;
-  var res = await supabase.from('post').select("*").match({'deleted': false}).order('created_at', ascending: false );
+  var res = await supabase
+      .from('post')
+      .select("*")
+      .match({'deleted': false}).order('created_at', ascending: false);
   if (res.isNotEmpty) {
     for (var data in res) {
       post = PostData();
