@@ -26,8 +26,29 @@ class _NewProfilePageState extends State<NewProfilePage> {
   @override
   void initState() {
     super.initState();
-    // Inicializar el futuro para obtener la foto de perfil del usuario actual
     _profilePictureFuture = _getProfilePicture();
+    _showInfoDialog();
+  }
+
+  void _showInfoDialog() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text("Información"),
+          content: Text(
+              "Aquí puede insertar una biografía, una foto de perfil y ajustar la privacidad del perfil."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("Aceptar"),
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   void _showUploadDialog() {
@@ -64,7 +85,6 @@ class _NewProfilePageState extends State<NewProfilePage> {
         String? imageUrl = await _profilePictureManager.uploadContent(
             user, filePath, fileName);
         if (imageUrl != null) {
-          // Actualizar el futuro para obtener la nueva foto de perfil
           setState(() {
             _profilePictureFuture = _getProfilePicture();
           });
@@ -101,6 +121,23 @@ class _NewProfilePageState extends State<NewProfilePage> {
     } catch (error) {
       print('Error al obtener la foto de perfil: $error');
       return [];
+    }
+  }
+
+  Future<void> _updateUserProfile() async {
+    try {
+      User? user = Provider.of<UserProvider>(context, listen: false).user;
+      if (user != null) {
+        final bio = _textController.text;
+        await supabase
+            .from('user')
+            .update({'bio': bio, 'privacy': privacy}).eq('id_user', user.id);
+        print('Perfil actualizado con éxito');
+      } else {
+        print('No se pudo obtener el usuario actual');
+      }
+    } catch (error) {
+      print('Error al actualizar el perfil del usuario: $error');
     }
   }
 
@@ -175,8 +212,10 @@ class _NewProfilePageState extends State<NewProfilePage> {
                   const EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
               child: TextField(
                 controller: _textController,
-                maxLines: 10,
-                style: const TextStyle(color: BLACK),
+                maxLines: 5,
+                style: const TextStyle(color: BLACK, fontSize: 14.0),
+                decoration: const InputDecoration.collapsed(
+                    hintText: "Escribe tu biografía aquí"),
               ),
             ),
           ),
@@ -193,7 +232,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
                   value: privacy,
                   onChanged: (value) {
                     setState(() {
-                      privacy = !privacy;
+                      privacy = value ?? false;
                     });
                   },
                 )
@@ -206,7 +245,8 @@ class _NewProfilePageState extends State<NewProfilePage> {
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(BUTTON_BACKGROUND),
               ),
-              onPressed: () {
+              onPressed: () async {
+                await _updateUserProfile();
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => Login()),

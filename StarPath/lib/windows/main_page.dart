@@ -31,7 +31,6 @@ class _MainPageState extends State<MainPage> {
           schema: 'public',
           table: 'post',
           callback: (payload) {
-
             futurePost.then((value) {
               for (var post in value) {
                 if (post.id_post == payload.newRecord['id_post']) {
@@ -46,6 +45,7 @@ class _MainPageState extends State<MainPage> {
         )
         .subscribe();
   }
+
   @override
   void dispose() {
     supabase.channel('post_upvotes_changes').unsubscribe();
@@ -63,9 +63,11 @@ class _MainPageState extends State<MainPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            UpperAppBar(
-                content: [AvatarButton(profilePictureFuture: getProfilePicture(user)), const SerachBar(), const CameraButton()]),
-
+            UpperAppBar(content: [
+              AvatarButton(profilePictureFuture: getProfilePicture(user)),
+              const SerachBar(),
+              const CameraButton()
+            ]),
             Expanded(
                 flex: 8,
                 child: Padding(
@@ -117,7 +119,7 @@ class _MainPageState extends State<MainPage> {
                                 builder: (context) => const ExplorePage(),
                               ));
                         },
-                        child: const Icon(Icons.newspaper ),
+                        child: const Icon(Icons.newspaper),
                       ),
                       GestureDetector(
                         onTap: () {},
@@ -131,9 +133,9 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ))
           ],
-        )
-    );
+        ));
   }
+
   Future<List<Map<String, dynamic>>> getProfilePicture(User user) async {
     var profilePicture;
     profilePicture = await supabase
@@ -148,7 +150,10 @@ class _MainPageState extends State<MainPage> {
 Future<List<PostData>> getPostAsync() async {
   List<PostData> postList = [];
   PostData post;
-  var res = await supabase.from('post').select("*").match({'deleted': false}).order('created_at', ascending: false );
+  var res = await supabase
+      .from('post')
+      .select("*")
+      .match({'deleted': false}).order('created_at', ascending: false);
   if (res.isNotEmpty) {
     for (var data in res) {
       post = PostData();
@@ -175,4 +180,3 @@ Future<String> getPostUsernameAsync(String id_user) async {
   userName = res[0]['username'];
   return userName;
 }
-

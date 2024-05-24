@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/register.dart';
+import 'package:starpath/windows/user_profile_page.dart';
 import 'package:flutter/cupertino.dart';
 
 class Login extends StatefulWidget {
@@ -156,13 +157,13 @@ class _LoginState extends State<Login> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const MainPage(),
+                                        builder: (context) => MainPage(),
                                       ),
                                     );
                                   }
                                 } on AuthException catch (e) {
                                   if (e.message ==
-                                      'Invalid login credentials') {
+                                      'Credenciales de login inválidas') {
                                     _showErrorDialog(
                                         'El correo electrónico o la contraseña son incorrectos.');
                                   }

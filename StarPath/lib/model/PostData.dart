@@ -1,6 +1,6 @@
-class PostData{
+class PostData {
   String id_user = '-1';
-  String id_post= '-1';
+  String id_post = '-1';
   String content = 'vacio';
   String description = 'vacio';
   int like = -1;

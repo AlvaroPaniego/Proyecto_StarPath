@@ -48,7 +48,7 @@ class UserInfoCarousel extends StatelessWidget {
                   child: ElevatedButton(
                       style: ButtonStyle(
                         backgroundColor:
-                        MaterialStateColor.resolveWith((states) {
+                            MaterialStateColor.resolveWith((states) {
                           if (states.contains(MaterialState.selected)) {
                             return BUTTON_BACKGROUND_DISABLED;
                           }
@@ -59,16 +59,15 @@ class UserInfoCarousel extends StatelessWidget {
                       child: const Text(
                         "Seguir",
                         style:
-                        TextStyle(color: TEXT, fontWeight: FontWeight.bold),
-                      )
-                  )
-              )
+                            TextStyle(color: TEXT, fontWeight: FontWeight.bold),
+                      )))
             ],
           ),
         ),
       ),
     );
   }
+
   Future<List<Map<String, dynamic>>> getProfilePicture(String id_user) async {
     var profilePicture;
     profilePicture = await supabase
