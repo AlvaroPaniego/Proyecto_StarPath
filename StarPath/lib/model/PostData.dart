@@ -1,3 +1,5 @@
+import 'package:starpath/model/user_data.dart';
+
 class PostData {
   String id_user = '-1';
   String id_post = '-1';
@@ -6,6 +8,7 @@ class PostData {
   int like = -1;
   int dislike = -1;
   String created_at = 'vacio';
+  UserData userData = UserData.empty();
 
   @override
   String toString() {

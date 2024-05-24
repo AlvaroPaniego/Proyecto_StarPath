@@ -3,15 +3,16 @@ import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/model/PostData.dart';
+import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
-import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/post.dart';
-import 'package:starpath/windows/explore_page.dart';
-import 'package:starpath/windows/options.dart';
 import 'package:starpath/windows/edit_profile_page.dart';
 import 'package:supabase/supabase.dart';
 
 class UserProfilePage extends StatefulWidget {
+  final UserData userData;
+
+  const UserProfilePage({super.key, required this.userData});
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
@@ -71,9 +72,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AvatarButton(
-                          profilePictureFuture: _avatarFuture,
-                        ),
+                        AvatarButton.LogedUserPage(profilePictureFuture: _avatarFuture,),
                         SizedBox(width: 16),
                         Expanded(
                           child: Column(

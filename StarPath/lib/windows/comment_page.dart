@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/model/comment.dart';
+import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/votes_comments.dart';
 import 'package:starpath/misc/constants.dart';
@@ -64,6 +65,7 @@ class _CommentPageState extends State<CommentPage> {
             profilePictureFuture: _getProfilePicture(row['id_user'] as String),
           );
 
+          comment.userData = await getUserDataAsync(comment.userId);
           loadedComments.add(comment);
         } else {
           print('Hay valores nulos');
@@ -157,9 +159,10 @@ class _CommentPageState extends State<CommentPage> {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
                   final comments = snapshot.data!;
+
                   return ListView.builder(
                     itemCount: comments.length,
-                    itemBuilder: (context, index) {
+                    itemBuilder: (context, index)  {
                       final comment = comments[index];
                       return Padding(
                         padding: const EdgeInsets.all(15.0),
@@ -170,6 +173,7 @@ class _CommentPageState extends State<CommentPage> {
                             AvatarButton(
                               profilePictureFuture:
                                   comment.profilePictureFuture,
+                                  user: comment.userData,
                             ),
                             Expanded(
                               flex: 5,
@@ -254,5 +258,18 @@ class _CommentPageState extends State<CommentPage> {
         .match({'id_user': userId});
     userName = res[0]['username'];
     return userName;
+  }
+  Future<UserData> getUserDataAsync(String id_user) async{
+    UserData user = UserData.empty();
+    var res = await supabase
+        .from('user')
+        .select("id_user, username, profile_picture")
+        .match({'id_user': id_user});
+    user.id_user = res.first['id_user'];
+    user.username = res.first['username'];
+    user.profile_picture = res.first['profile_picture'];
+    user.followers = '0';
+    print(user.username);
+    return user;
   }
 }
