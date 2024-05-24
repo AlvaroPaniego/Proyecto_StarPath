@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/PostData.dart';
 import 'package:starpath/model/user.dart';
+import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/camera_button.dart';
 import 'package:starpath/widgets/post.dart';
@@ -21,6 +22,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   Future<List<PostData>> futurePost = getPostAsync();
+  UserData userData = UserData.empty();
   @override
   void initState() {
     super.initState();
@@ -55,6 +57,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
+    getUserDataAsync(user.id).then((value) => userData = value);
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
@@ -63,11 +66,12 @@ class _MainPageState extends State<MainPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            UpperAppBar(content: [
-              AvatarButton(profilePictureFuture: getProfilePicture(user)),
-              const SerachBar(),
-              const CameraButton()
-            ]),
+            UpperAppBar(
+                content: [AvatarButton(
+                    profilePictureFuture: getProfilePicture(user),
+                    user: userData,
+                ), const SerachBar(), const CameraButton()]),
+
             Expanded(
                 flex: 8,
                 child: Padding(
@@ -119,7 +123,7 @@ class _MainPageState extends State<MainPage> {
                                 builder: (context) => const ExplorePage(),
                               ));
                         },
-                        child: const Icon(Icons.newspaper),
+                        child: const Icon(Icons.newspaper ),
                       ),
                       GestureDetector(
                         onTap: () {},
@@ -133,9 +137,9 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ))
           ],
-        ));
+        )
+    );
   }
-
   Future<List<Map<String, dynamic>>> getProfilePicture(User user) async {
     var profilePicture;
     profilePicture = await supabase
@@ -180,3 +184,17 @@ Future<String> getPostUsernameAsync(String id_user) async {
   userName = res[0]['username'];
   return userName;
 }
+
+Future<UserData> getUserDataAsync(String id_user) async{
+  UserData user = UserData.empty();
+  var res = await supabase
+      .from('user')
+      .select("id_user, username, profile_picture")
+      .match({'id_user': id_user});
+  user.id_user = res.first['id_user'];
+  user.username = res.first['username'];
+  user.profile_picture = res.first['profile_picture'];
+  user.followers = '0';
+  return user;
+}
+
