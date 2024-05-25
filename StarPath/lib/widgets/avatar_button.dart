@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:starpath/model/user_data.dart';
-import 'package:starpath/windows/user_page_temp.dart';
 import 'package:starpath/windows/user_profile_page.dart';
-import 'package:supabase/supabase.dart';
 
 class AvatarButton extends StatefulWidget {
   Future<List<Map<String, dynamic>>> profilePictureFuture;

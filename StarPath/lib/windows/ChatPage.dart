@@ -32,19 +32,16 @@ class _ChatPageState extends State<ChatPage> {
       event: PostgresChangeEvent.all,
       schema: 'public',
       table: 'message',
-      callback: (payload) {
-        print(payload);
+      callback: (payload) async {
         var idReceiver = payload.newRecord['id_user_receiver'];
         var idSender = payload.newRecord['id_user_sender'];
         print("idSender: $idSender idReceiver: $idReceiver");
-        if(idReceiver == widget.receiverUser.id_user &&
-            idSender == senderUser.id_user){
-          var senderUserAux = getUserDataAsync(idSender);
-          String username = "";
-          senderUserAux.then((value) => username = value.username);
+        if(isMessageInConversation(idSender, idReceiver, senderUser, widget.receiverUser)){
+          print("mensaje recibido");
+          var senderUserAux = await getUserDataAsync(idSender);
           setState(() {
             futureMessages.then((value) {
-              value.add(Message(username, payload.newRecord['message'], idSender));
+              value.add(Message(senderUserAux.username, payload.newRecord['message'], idSender));
             });
           });
         }
@@ -195,4 +192,12 @@ Future<List<Message>> getFutureMessagesAsync(String id_userSender, String id_use
     messageList.add(messageData);
   }
   return messageList;
+}
+bool isMessageInConversation(String id_userSenderMessage, String id_userReceiverMessage, UserData sendingUser, UserData receivingUser){
+  var res = (
+      (sendingUser.id_user == id_userSenderMessage && receivingUser.id_user == id_userReceiverMessage)
+          || (sendingUser.id_user == id_userReceiverMessage && receivingUser.id_user == id_userSenderMessage)
+  );
+  print(res);
+  return res;
 }
