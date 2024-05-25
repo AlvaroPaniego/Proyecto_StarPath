@@ -6,6 +6,7 @@ import 'package:starpath/model/PostData.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/post.dart';
+import 'package:starpath/windows/ChatPage.dart';
 import 'package:starpath/windows/edit_profile_page.dart';
 import 'package:supabase/supabase.dart';
 
@@ -99,6 +100,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 }
               },
             ),
+            SizedBox(height: 16),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(receiverUser: widget.userData),));
+                },
+                style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll( BUTTON_BACKGROUND)),
+                child: const Text("Enviar mensaje", style: TextStyle(color: TEXT),)),
             SizedBox(height: 16),
             FutureBuilder<List<PostData>>(
               future: _postsFuture,

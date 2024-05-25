@@ -114,6 +114,7 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
               const Text('¿Estás seguro de que deseas subir esta publicación?'),
           actions: <Widget>[
             TextButton(
+              //poner booleano para que solo suba una foto a la vez
               onPressed: () async {
                 await uploadContent(
                     user, filePath, fileName, _textController.text.trim());
