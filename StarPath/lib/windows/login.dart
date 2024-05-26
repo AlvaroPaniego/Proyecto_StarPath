@@ -69,6 +69,7 @@ class _LoginState extends State<Login> {
                       Image.asset("assets/images/logo.png"),
                       const SizedBox(height: 60.0),
                       TextFormField(
+                        onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
                         controller: _emailController,
                         autofocus: false,
                         style: const TextStyle(color: TEXT),
@@ -97,6 +98,7 @@ class _LoginState extends State<Login> {
                       ),
                       const SizedBox(height: 60.0),
                       TextFormField(
+                        onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
                         obscureText: true,
                         controller: _passwordController,
                         autofocus: false,
