@@ -7,10 +7,39 @@ import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/follow_button.dart';
 import 'package:supabase/supabase.dart';
 
-class UserInfoCarousel extends StatelessWidget {
-  UserData user;
-  UserInfoCarousel({super.key, required this.user});
+class UserInfoCarousel extends StatefulWidget {
+  final UserData user;
+  const UserInfoCarousel({super.key, required this.user});
 
+  @override
+  State<UserInfoCarousel> createState() => _UserInfoCarouselState();
+}
+
+class _UserInfoCarouselState extends State<UserInfoCarousel> {
+  Future<String> futureFollowers = Future.value("vacio");
+  void initState() {
+    futureFollowers = getFollowers(widget.user.id_user);
+    super.initState();
+    supabase
+        .channel('followers_changes')
+        .onPostgresChanges(
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'followers',
+      callback: (payload) {
+        setState(() {
+          futureFollowers = getFollowers(widget.user.id_user);
+        });
+        print('en el callback');
+      },
+    ).subscribe();
+  }
+
+  @override
+  void dispose() {
+    supabase.channel('followers_changes').unsubscribe();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     User loggedUser = context.watch<UserProvider>().user!;
@@ -25,8 +54,8 @@ class UserInfoCarousel extends StatelessWidget {
           child: Row(
             children: [
               AvatarButton(
-                  profilePictureFuture: getProfilePicture(user.id_user),
-                  user: user,
+                  profilePictureFuture: getProfilePicture(widget.user.id_user),
+                  user: widget.user,
               ),
               Expanded(
                   flex: 1,
@@ -37,20 +66,32 @@ class UserInfoCarousel extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          user.username,
+                          widget.user.username,
                           style: const TextStyle(
                               color: TEXT, fontWeight: FontWeight.bold),
                         ),
-                        Text(
-                          "Seguidores: ${user.followers}",
-                          style: const TextStyle(
-                            color: TEXT,
-                          ),
-                        )
+                        FutureBuilder(future: futureFollowers, builder: (context, snapshot) {
+                          if(snapshot.hasData){
+                            if(snapshot.data != 'vacio'){
+                              return Text(
+                                "Seguidores: ${snapshot.data}",
+                                style: const TextStyle(
+                                  color: TEXT,
+                                ),
+                              );
+                            }
+                          }
+                          return const Text(
+                            "Seguidores:",
+                            style: TextStyle(
+                              color: TEXT,
+                            ),
+                          );
+                        },)
                       ],
                     ),
                   )),
-              FollowButton(userData: user)
+              FollowButton(userData: widget.user, loggedId: loggedUser.id,)
             ],
           ),
         ),
@@ -67,7 +108,12 @@ class UserInfoCarousel extends StatelessWidget {
     // print(profilePicture);
     return profilePicture;
   }
-  Future<void> followUser(String loggedUserId, String userToFollow) async{
 
+  Future<String> getFollowers(String user) async{
+    String followers = '';
+    var res = await supabase.from('followers').count().eq('id_user_secundario', user);
+    followers = res.toString();
+    print(followers);
+    return followers;
   }
 }
