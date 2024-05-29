@@ -23,8 +23,8 @@ class MainApp extends StatelessWidget {
           create: (context) => UserProvider(),
         )
       ],
-      child: const MaterialApp(
-          debugShowCheckedModeBanner: false, home: WikiPage()),
+      child:
+          const MaterialApp(debugShowCheckedModeBanner: false, home: Login()),
     );
   }
 }
