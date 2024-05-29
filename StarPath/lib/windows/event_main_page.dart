@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
-import 'package:starpath/widgets/avatar_button.dart';
+import 'package:starpath/widgets/event.dart';
 import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:supabase/supabase.dart';
@@ -19,10 +20,11 @@ class EventMainPage extends StatefulWidget {
 }
 
 class _EventMainPageState extends State<EventMainPage> {
-  Future<List<EventData>> futureEvents = Future.value([]);
+  Future<List<EventData>> futureEvents = Future.value([EventData.empty()]);
   UserData userData = UserData.empty();
   @override
   Widget build(BuildContext context) {
+    futureEvents = getEvents();
     User user = context.watch<UserProvider>().user!;
     getUserDataAsync(user.id).then((value) => userData = value);
     return Scaffold(
@@ -33,11 +35,8 @@ class _EventMainPageState extends State<EventMainPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            UpperAppBar(
-                content: [AvatarButton(
-                  profilePictureFuture: getProfilePicture(user),
-                  user: userData,
-                ), const SerachBar()]),
+            const UpperAppBar(
+                content: [BackButton(), SerachBar()]),
 
             Expanded(
                 flex: 8,
@@ -51,8 +50,7 @@ class _EventMainPageState extends State<EventMainPage> {
                           return ListView.builder(
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
-                              //snapshot.data![index]
-                              return const Placeholder();
+                              return Event(eventData: snapshot.data![index]);
                             },
                           );
                         }
@@ -83,13 +81,20 @@ class _EventMainPageState extends State<EventMainPage> {
     user.followers = '0';
     return user;
   }
-  Future<List<Map<String, dynamic>>> getProfilePicture(User user) async {
-    var profilePicture;
-    profilePicture = await supabase
-        .from("user")
-        .select("profile_picture")
-        .eq("id_user", user.id);
-    // print(profilePicture);
-    return profilePicture;
+  Future<List<EventData>> getEvents() async{
+    List<EventData> eventList = [];
+    EventData eventData;
+    var res = await supabase.from('events').select();
+    DateFormat format = DateFormat.yMd();
+    for (var event in res) {
+      eventData = EventData.empty();
+      eventData.idEvent = event['id'].toString();
+      eventData.username = event['name_user'];
+      eventData.description = event['description'];
+      eventData.title = event['title'];
+      eventData.eventDate = format.format(DateTime.parse(event['time']));
+      eventList.add(eventData);
+    }
+    return eventList;
   }
 }

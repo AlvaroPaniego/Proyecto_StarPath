@@ -1,12 +1,14 @@
 import 'dart:math';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
+import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/news.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/widgets/user_info_carousel.dart';
-
+import 'package:supabase/supabase.dart';
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
 
@@ -15,9 +17,11 @@ class ExplorePage extends StatefulWidget {
 }
 
 class _ExplorePageState extends State<ExplorePage> {
-  Future<List<UserData>> futureUser = getRandomUsers();
+  Future<List<UserData>> futureUser = Future.value([]);
   @override
   Widget build(BuildContext context) {
+    User user = context.watch<UserProvider>().user!;
+    futureUser = getRandomUsers(user.id);
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
@@ -76,13 +80,18 @@ class _ExplorePageState extends State<ExplorePage> {
   }
 
 }
-Future<List<UserData>> getRandomUsers() async{
+Future<List<UserData>> getRandomUsers(String idUser) async{
   List<UserData> userList = [];
   Random r = Random();
   int maxUsers = 6;
-  var res = await supabase
-      .from("user")
-      .select("*");
+  // var query = 'select distinct public.user.username from followers, public.user'
+  //     ' where  public.user.id_user not in (select followers.id_user_secundario from'
+  //     ' followers where followers.id_user_principal = \'$idUser\')';
+  var res = await supabase.rpc('getunfollowedusers', params: {'idloggeduser' : idUser});
+  // var res = await supabase
+  //     .from("user")
+  //     .select("*");
+  print(res.length);
   for (int i = 0; i < maxUsers; i++) {
     int randomUser = r.nextInt(res.length);
     res.removeAt(randomUser);
