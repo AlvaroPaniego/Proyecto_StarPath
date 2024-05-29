@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/windows/login.dart';
+import 'package:starpath/windows/wiki_page.dart';
 
 //1234,,._
 SharedPreferences? prefs;
@@ -22,8 +23,8 @@ class MainApp extends StatelessWidget {
           create: (context) => UserProvider(),
         )
       ],
-      child:
-          const MaterialApp(debugShowCheckedModeBanner: false, home: Login()),
+      child: const MaterialApp(
+          debugShowCheckedModeBanner: false, home: WikiPage()),
     );
   }
 }

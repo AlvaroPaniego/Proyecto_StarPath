@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/register.dart';
-import 'package:starpath/windows/user_profile_page.dart';
 import 'package:flutter/cupertino.dart';
 
 class Login extends StatefulWidget {
@@ -55,7 +54,7 @@ class _LoginState extends State<Login> {
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
                   40.0,
-                  30.0,
+                  80.0,
                   40.0,
                   isKeyboardVisible ? 20.0 : 30.0,
                 ),
@@ -65,9 +64,8 @@ class _LoginState extends State<Login> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      const Text("LOGIN", style: TextStyle(color: TEXT)),
                       Image.asset("assets/images/logo.png"),
-                      const SizedBox(height: 60.0),
+                      const SizedBox(height: 80.0),
                       TextFormField(
                         controller: _emailController,
                         autofocus: false,
@@ -143,12 +141,39 @@ class _LoginState extends State<Login> {
                                   authOptions: const AuthClientOptions(
                                       authFlowType: AuthFlowType.implicit),
                                 );
+
+                                final email = _emailController.text.trim();
+                                final password =
+                                    _passwordController.text.trim();
+
                                 try {
+                                  // Verificar si el correo existe en la base de datos
+                                  final emailCheckResponse =
+                                      await supabaseClient
+                                          .from('user')
+                                          .select()
+                                          .eq('email', email);
+
+                                  if (emailCheckResponse == null) {
+                                    _showErrorDialog(
+                                        'Error al verificar el correo electrónico.');
+                                    return;
+                                  }
+
+                                  final userList = emailCheckResponse as List;
+                                  if (userList.isEmpty) {
+                                    _showErrorDialog(
+                                        'El correo electrónico es incorrecto.');
+                                    return;
+                                  }
+
+                                  // Intentar iniciar sesión con el correo y la contraseña
                                   final response = await supabaseClient.auth
                                       .signInWithPassword(
-                                    email: _emailController.text.trim(),
-                                    password: _passwordController.text.trim(),
+                                    email: email,
+                                    password: password,
                                   );
+
                                   if (response.session != null &&
                                       response.user != null) {
                                     context
@@ -157,15 +182,21 @@ class _LoginState extends State<Login> {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => MainPage(),
-                                      ),
+                                          builder: (context) => MainPage()),
                                     );
+                                  } else {
+                                    // Si el correo existe pero la contraseña es incorrecta
+                                    _showErrorDialog(
+                                        'La contraseña es incorrecta.');
                                   }
                                 } on AuthException catch (e) {
                                   if (e.message ==
                                       'Credenciales de login inválidas') {
                                     _showErrorDialog(
                                         'El correo electrónico o la contraseña son incorrectos.');
+                                  } else {
+                                    _showErrorDialog(
+                                        'La contraseña es incorrecta.');
                                   }
                                 }
                               }
@@ -191,8 +222,7 @@ class _LoginState extends State<Login> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const Register(),
-                                ),
+                                    builder: (context) => const Register()),
                               );
                             },
                             child: Container(
