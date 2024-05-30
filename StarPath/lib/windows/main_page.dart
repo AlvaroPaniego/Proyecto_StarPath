@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
@@ -23,7 +25,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   Future<List<PostData>> futurePost = getPostAsync();
-  UserData userData = UserData.empty();
+  Future<UserData> userData = Future.value(UserData.empty());
   @override
   void initState() {
     super.initState();
@@ -58,7 +60,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
-    getUserDataAsync(user.id).then((value) => userData = value);
+    userData = getUserDataAsync(user.id);
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
@@ -68,10 +70,7 @@ class _MainPageState extends State<MainPage> {
               height: MediaQuery.of(context).viewPadding.top,
             ),
             UpperAppBar(
-                content: [AvatarButton(
-                    profilePictureFuture: getProfilePicture(user),
-                    user: userData,
-                ), const SerachBar(), const CameraButton()]),
+                content: [buildAvatarButton(user), const SerachBar(), const CameraButton()]),
 
             Expanded(
                 flex: 8,
@@ -143,6 +142,18 @@ class _MainPageState extends State<MainPage> {
         )
     );
   }
+
+  FutureBuilder<UserData> buildAvatarButton(User user) {
+    return FutureBuilder(future: userData, builder: (context, snapshot) {
+                if(snapshot.hasData && snapshot.data!.username != 'vacio'){
+                  return AvatarButton(
+                    profilePictureFuture: getProfilePicture(user),
+                    user: snapshot.data!,
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              },);
+  }
   Future<List<Map<String, dynamic>>> getProfilePicture(User user) async {
     var profilePicture;
     profilePicture = await supabase
@@ -200,4 +211,6 @@ Future<UserData> getUserDataAsync(String id_user) async{
   user.followers = '0';
   return user;
 }
+
+
 

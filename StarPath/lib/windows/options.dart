@@ -55,7 +55,7 @@ class _OptionsMainPageState extends State<OptionsMainPage> {
           style: TextStyle(color: Colors.black),
         ),
         style: ElevatedButton.styleFrom(
-          primary: BUTTON_BACKGROUND,
+          //primary: BUTTON_BACKGROUND,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
           ),
