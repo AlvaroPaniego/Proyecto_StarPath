@@ -13,7 +13,8 @@ import 'package:supabase/supabase.dart';
 class UserProfilePage extends StatefulWidget {
   final UserData userData;
 
-  const UserProfilePage({super.key, required this.userData});
+  const UserProfilePage({Key? key, required this.userData}) : super(key: key);
+
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
@@ -26,10 +27,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   void initState() {
     super.initState();
-    final user = context.read<UserProvider>().user!;
-    _profileFuture = getProfile(user);
-    _postsFuture = getPostAsync(user);
-    _avatarFuture = getProfilePicture(user);
+    _profileFuture = getProfile(widget.userData.id_user);
+    _postsFuture = getPostAsync(widget.userData.id_user);
+    _avatarFuture = getProfilePicture(widget.userData.id_user);
   }
 
   void _showEditProfile() {
@@ -73,7 +73,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AvatarButton.LogedUserPage(profilePictureFuture: _avatarFuture,),
+                        AvatarButton.LogedUserPage(
+                          profilePictureFuture: _avatarFuture,
+                        ),
                         SizedBox(width: 16),
                         Expanded(
                           child: Column(
@@ -103,10 +105,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
             SizedBox(height: 16),
             ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(receiverUser: widget.userData),));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ChatPage(receiverUser: widget.userData),
+                      ));
                 },
-                style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll( BUTTON_BACKGROUND)),
-                child: const Text("Enviar mensaje", style: TextStyle(color: TEXT),)),
+                style: const ButtonStyle(
+                    backgroundColor:
+                        MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                child: const Text(
+                  "Enviar mensaje",
+                  style: TextStyle(color: TEXT),
+                )),
             SizedBox(height: 16),
             FutureBuilder<List<PostData>>(
               future: _postsFuture,
@@ -135,30 +147,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Future<Map<String, dynamic>> getProfile(User user) async {
+  Future<Map<String, dynamic>> getProfile(String userId) async {
     var profile = await supabase
         .from("user")
         .select("id_user, username, bio, profile_picture")
-        .eq("id_user", user.id)
+        .eq("id_user", userId)
         .single();
     return profile;
   }
 
-  Future<List<Map<String, dynamic>>> getProfilePicture(User user) async {
+  Future<List<Map<String, dynamic>>> getProfilePicture(String userId) async {
     var profilePicture = await supabase
         .from("user")
         .select("profile_picture")
-        .eq("id_user", user.id);
+        .eq("id_user", userId);
     return profilePicture;
   }
 
-  Future<List<PostData>> getPostAsync(User user) async {
+  Future<List<PostData>> getPostAsync(String userId) async {
     List<PostData> postList = [];
     PostData post;
     var res = await supabase
         .from('post')
         .select("*")
-        .match({'id_user': user.id}).order('created_at', ascending: false);
+        .match({'id_user': userId}).order('created_at', ascending: false);
     if (res.isNotEmpty) {
       for (var data in res) {
         post = PostData();

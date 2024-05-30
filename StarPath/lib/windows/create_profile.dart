@@ -20,6 +20,7 @@ class NewProfilePage extends StatefulWidget {
 class _NewProfilePageState extends State<NewProfilePage> {
   final TextEditingController _textController = TextEditingController();
   bool privacy = false;
+  String? profilePictureUrl;
   final ProfilePictureManager _profilePictureManager = ProfilePictureManager();
   late Future<List<Map<String, dynamic>>> _profilePictureFuture;
 
@@ -28,6 +29,9 @@ class _NewProfilePageState extends State<NewProfilePage> {
     super.initState();
     _profilePictureFuture = _getProfilePicture();
     _showInfoDialog();
+    _textController.addListener(() {
+      setState(() {});
+    });
   }
 
   void _showInfoDialog() {
@@ -86,6 +90,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
             user, filePath, fileName);
         if (imageUrl != null) {
           setState(() {
+            profilePictureUrl = imageUrl;
             _profilePictureFuture = _getProfilePicture();
           });
         } else {
@@ -113,6 +118,9 @@ class _NewProfilePageState extends State<NewProfilePage> {
         }
         List<Map<String, dynamic>> profilePictureData =
             response as List<Map<String, dynamic>>;
+        if (profilePictureData.isNotEmpty) {
+          profilePictureUrl = profilePictureData[0]['profile_picture'];
+        }
         return profilePictureData;
       } else {
         print('No se pudo obtener el usuario actual');
@@ -129,9 +137,11 @@ class _NewProfilePageState extends State<NewProfilePage> {
       User? user = Provider.of<UserProvider>(context, listen: false).user;
       if (user != null) {
         final bio = _textController.text;
-        await supabase
-            .from('user')
-            .update({'bio': bio, 'privacy': privacy}).eq('id_user', user.id);
+        await supabase.from('user').update({
+          'bio': bio,
+          'privacy': privacy,
+          'profile_picture': profilePictureUrl,
+        }).eq('id_user', user.id);
         print('Perfil actualizado con éxito');
       } else {
         print('No se pudo obtener el usuario actual');
@@ -151,7 +161,17 @@ class _NewProfilePageState extends State<NewProfilePage> {
           SizedBox(
             height: MediaQuery.of(context).viewPadding.top,
           ),
-          const UpperAppBar(content: [Text("Creación de usuario")]),
+          UpperAppBar(
+            content: [
+              Center(
+                child: Text(
+                  "Creación de usuario",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
           Expanded(
             flex: 3,
             child: GestureDetector(
@@ -159,6 +179,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Stack(
+                  alignment: Alignment.center,
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.all(Radius.circular(180)),
@@ -190,54 +211,71 @@ class _NewProfilePageState extends State<NewProfilePage> {
                         },
                       ),
                     ),
-                    const Positioned(
-                      bottom: 10.0,
-                      right: 10.0,
-                      child: Icon(Icons.change_circle_outlined),
-                    )
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                      padding: EdgeInsets.all(8.0),
+                      child: IconButton(
+                        iconSize: 48.0,
+                        icon: Icon(Icons.add_a_photo, color: Colors.white),
+                        onPressed: _showUploadDialog,
+                        tooltip: 'Cambiar foto de perfil',
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
           ),
           Expanded(
-            flex: 4,
-            child: Container(
-              decoration: BoxDecoration(
-                color: BUTTON_BAR_BACKGROUND,
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              margin: const EdgeInsets.all(12.0),
-              padding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 12.0),
-              child: TextField(
-                controller: _textController,
-                maxLines: 5,
-                style: const TextStyle(color: BLACK, fontSize: 14.0),
-                decoration: const InputDecoration.collapsed(
-                    hintText: "Escribe tu biografía aquí"),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            flex: 2,
+            child: Stack(
               children: [
-                const Text(
-                  "Perfil público",
-                  style: TextStyle(color: TEXT),
+                Container(
+                  decoration: BoxDecoration(
+                    color: BUTTON_BAR_BACKGROUND,
+                    borderRadius: BorderRadius.circular(25.0),
+                  ),
+                  margin: const EdgeInsets.all(12.0),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10.0, horizontal: 12.0),
+                  child: TextField(
+                    controller: _textController,
+                    maxLines: 5,
+                    maxLength: 150,
+                    style: const TextStyle(color: BLACK, fontSize: 14.0),
+                    decoration: const InputDecoration(
+                      hintText: "Escribe tu biografía aquí",
+                      border: InputBorder.none,
+                      counterText: '',
+                    ),
+                  ),
                 ),
-                Checkbox(
-                  value: privacy,
-                  onChanged: (value) {
-                    setState(() {
-                      privacy = value ?? false;
-                    });
-                  },
-                )
+                Positioned(
+                  bottom: 15,
+                  right: 20,
+                  child: Text(
+                    '${_textController.text.length}/150',
+                    style: const TextStyle(color: BLACK),
+                  ),
+                ),
               ],
             ),
+          ),
+          SwitchListTile(
+            title: const Text(
+              "Perfil público",
+              style: TextStyle(color: TEXT),
+            ),
+            value: privacy,
+            onChanged: (value) {
+              setState(() {
+                privacy = value;
+              });
+            },
+            activeColor: Colors.blue,
           ),
           Expanded(
             flex: 1,
