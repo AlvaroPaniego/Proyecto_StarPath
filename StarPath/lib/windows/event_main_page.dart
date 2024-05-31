@@ -84,7 +84,7 @@ class _EventMainPageState extends State<EventMainPage> {
   Future<List<EventData>> getEvents() async{
     List<EventData> eventList = [];
     EventData eventData;
-    var res = await supabase.from('events').select();
+    var res = await supabase.from('events').select().gte('time', DateTime.now());
     DateFormat format = DateFormat.yMd();
     for (var event in res) {
       eventData = EventData.empty();

@@ -1,7 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:starpath/model/events.dart';
+import 'package:starpath/model/user.dart';
+import 'package:starpath/widgets/follow_button.dart';
+import 'package:supabase/supabase.dart';
 
 class Event extends StatefulWidget {
   final EventData eventData;
@@ -15,6 +18,7 @@ class _EventState extends State<Event> {
   bool hasValidImage = false;
   @override
   Widget build(BuildContext context) {
+    User user = context.watch<UserProvider>().user!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Column(
@@ -62,12 +66,7 @@ class _EventState extends State<Event> {
                                 //widget.eventData.description
                                 child: Text(widget.eventData.description)
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: IconButton(onPressed: () {
-
-                              }, icon: const Icon(Icons.follow_the_signs)),
-                            )
+                            FollowButton(loggedId: user.id, eventData: widget.eventData,)
                           ],
                         )
                       ],
