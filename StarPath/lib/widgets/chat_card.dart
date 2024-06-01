@@ -78,7 +78,7 @@ class _ChatCardState extends State<ChatCard> {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(snapshot.data![1], style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text(widget.chatData.receiverUser.username, style: const TextStyle(fontWeight: FontWeight.bold)),
                         Text('${snapshot.data![1]}: ${snapshot.data![0]}', style: const TextStyle(fontWeight: FontWeight.w300),)
                       ],
                     );
