@@ -73,6 +73,7 @@ class _EventMainPageState extends State<EventMainPage> {
                       },
                     ))),
             Expanded(
+              //Poner opcion para ver los eventdos de hoy
                 flex: 1,
                 child: Container(
                   decoration: const BoxDecoration(
