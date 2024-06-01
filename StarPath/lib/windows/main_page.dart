@@ -14,6 +14,7 @@ import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/windows/event_main_page.dart';
 import 'package:starpath/windows/explore_page.dart';
 import 'package:starpath/windows/options.dart';
+import 'package:starpath/windows/wiki_page.dart';
 import 'package:supabase/supabase.dart';
 
 class MainPage extends StatefulWidget {
@@ -112,7 +113,9 @@ class _MainPageState extends State<MainPage> {
                         child: const Icon(Icons.settings),
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const WikiPage(),));
+                        },
                         child: const Icon(Icons.mail),
                       ),
                       GestureDetector(
@@ -137,7 +140,8 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ],
                   ),
-                ))
+                )
+            )
           ],
         )
     );

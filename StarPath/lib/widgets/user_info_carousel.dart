@@ -17,6 +17,7 @@ class UserInfoCarousel extends StatefulWidget {
 
 class _UserInfoCarouselState extends State<UserInfoCarousel> {
   Future<String> futureFollowers = Future.value("vacio");
+  @override
   void initState() {
     futureFollowers = getFollowers(widget.user.id_user);
     super.initState();

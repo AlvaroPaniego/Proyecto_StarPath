@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/widgets/follow_button.dart';
@@ -15,9 +16,34 @@ class Event extends StatefulWidget {
 }
 
 class _EventState extends State<Event> {
-  bool hasValidImage = false;
+  Future<String> futureAsistant = Future.value("vacio");
+  @override
+  void initState() {
+    futureAsistant = getEventsAsistants(widget.eventData.idEvent);
+    super.initState();
+    supabase
+        .channel('asistant_changes')
+        .onPostgresChanges(
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'event_followers',
+      callback: (payload) {
+        setState(() {
+          futureAsistant = getEventsAsistants(widget.eventData.idEvent);
+        });
+        print('en el callback');
+      },
+    ).subscribe();
+  }
+
+  @override
+  void dispose() {
+    supabase.channel('asistant_changes').unsubscribe();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
+    bool hasValidImage = widget.eventData.eventImage != 'vacio';
     User user = context.watch<UserProvider>().user!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -38,7 +64,7 @@ class _EventState extends State<Event> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.0),
                     child: hasValidImage
-                        ? Image.network(widget.eventData.username) // todavia no hay campo de imagen en la bd
+                        ? Image.network(widget.eventData.eventImage)
                         : Image.asset("assets/images/placeholder-image.jpg"),
                   ),
                 ),
@@ -68,7 +94,17 @@ class _EventState extends State<Event> {
                             ),
                             FollowButton(loggedId: user.id, eventData: widget.eventData,)
                           ],
-                        )
+                        ),
+                        FutureBuilder(future: futureAsistant, builder: (context, snapshot) {
+                          if(snapshot.hasData && snapshot.data != 'vacio'){
+                              return Text(
+                                "Asistentes: ${snapshot.data}"
+                              );
+                          }
+                          return const Text(
+                            "Asistentes:"
+                          );
+                        },)
                       ],
                     ),
                   ),
@@ -79,5 +115,11 @@ class _EventState extends State<Event> {
         ],
       ),
     );
+  }
+  Future<String> getEventsAsistants(String idEvent) async{
+    String asistants ='0';
+    var res = await supabase.from('event_followers').count().eq('id_event', idEvent);
+    asistants = res.toString();
+    return asistants;
   }
 }
