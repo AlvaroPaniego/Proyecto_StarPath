@@ -64,6 +64,7 @@ class _ChatListPageState extends State<ChatListPage> {
        for (var receiver in res) {
          var lastMessageData = await getLastMessage(user.id, receiver);
          chatData = ChatData();
+         chatData.senderUser = user.id;
          chatData.receiverUser = await getUserDataAsync(receiver);
          chatData.lastMessage = lastMessageData[0];
          chatData.lastMessageSender = lastMessageData[1];

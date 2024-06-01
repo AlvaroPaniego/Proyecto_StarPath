@@ -31,7 +31,6 @@ class _UserInfoCarouselState extends State<UserInfoCarousel> {
         setState(() {
           futureFollowers = getFollowers(widget.user.id_user);
         });
-        print('en el callback');
       },
     ).subscribe();
   }
