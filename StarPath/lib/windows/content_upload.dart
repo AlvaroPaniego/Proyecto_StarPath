@@ -35,8 +35,8 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
           SizedBox(
             height: MediaQuery.of(context).viewPadding.top,
           ),
-          const UpperAppBar(content: [
-            BackArrow(),
+          UpperAppBar(content: [
+            BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),),),
           ]),
           Expanded(
             flex: 4,

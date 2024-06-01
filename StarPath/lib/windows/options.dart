@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
-import 'package:starpath/windows/login.dart'; // Importa la página de inicio de sesión
+import 'package:starpath/windows/login.dart';
+import 'package:starpath/windows/main_page.dart'; // Importa la página de inicio de sesión
 
 class OptionsMainPage extends StatefulWidget {
   const OptionsMainPage({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _OptionsMainPageState extends State<OptionsMainPage> {
           SizedBox(
             height: MediaQuery.of(context).viewPadding.top,
           ),
-          UpperAppBar(content: [BackArrow()]),
+          UpperAppBar(content: [BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),),)]),
           Expanded(
             flex: 8,
             child: Padding(

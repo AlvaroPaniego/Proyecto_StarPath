@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -7,9 +6,12 @@ import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
+import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/event.dart';
 import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
+import 'package:starpath/windows/create_event.dart';
+import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 
 class EventMainPage extends StatefulWidget {
@@ -35,8 +37,21 @@ class _EventMainPageState extends State<EventMainPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            const UpperAppBar(
-                content: [BackButton(), SerachBar()]),
+            UpperAppBar(
+                content: [
+                  BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
+                  const SerachBar(),
+                  Expanded(
+                      flex: 1,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const CreateEventPage(),));
+                        },
+                        child: const Icon(Icons.add),
+                      )
+                  )
+                ]
+            ),
 
             Expanded(
                 flex: 8,
@@ -58,6 +73,7 @@ class _EventMainPageState extends State<EventMainPage> {
                       },
                     ))),
             Expanded(
+              //Poner opcion para ver los eventdos de hoy
                 flex: 1,
                 child: Container(
                   decoration: const BoxDecoration(
@@ -84,7 +100,7 @@ class _EventMainPageState extends State<EventMainPage> {
   Future<List<EventData>> getEvents() async{
     List<EventData> eventList = [];
     EventData eventData;
-    var res = await supabase.from('events').select();
+    var res = await supabase.from('events').select().gte('time', DateTime.now());
     DateFormat format = DateFormat.yMd();
     for (var event in res) {
       eventData = EventData.empty();
@@ -93,6 +109,8 @@ class _EventMainPageState extends State<EventMainPage> {
       eventData.description = event['description'];
       eventData.title = event['title'];
       eventData.eventDate = format.format(DateTime.parse(event['time']));
+      eventData.eventImage = event['event_image'] ?? 'vacio';
+      eventData.asistants = '0';
       eventList.add(eventData);
     }
     return eventList;
