@@ -35,9 +35,7 @@ class _ChatPageState extends State<ChatPage> {
       callback: (payload) async {
         var idReceiver = payload.newRecord['id_user_receiver'];
         var idSender = payload.newRecord['id_user_sender'];
-        print("idSender: $idSender idReceiver: $idReceiver");
         if(isMessageInConversation(idSender, idReceiver, senderUser, widget.receiverUser)){
-          print("mensaje recibido");
           var senderUserAux = await getUserDataAsync(idSender);
           setState(() {
             futureMessages.then((value) {
