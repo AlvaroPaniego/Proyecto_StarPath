@@ -69,9 +69,11 @@ class _MainPageState extends State<MainPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            UpperAppBar(
-                content: [buildAvatarButton(user), const SerachBar(), const CameraButton()]),
-
+            UpperAppBar(content: [
+              buildAvatarButton(user),
+              const SerachBar(),
+              const CameraButton()
+            ]),
             Expanded(
                 flex: 8,
                 child: Padding(
@@ -123,11 +125,15 @@ class _MainPageState extends State<MainPage> {
                                 builder: (context) => const ExplorePage(),
                               ));
                         },
-                        child: const Icon(Icons.newspaper ),
+                        child: const Icon(Icons.newspaper),
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const EventMainPage(),));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const EventMainPage(),
+                              ));
                         },
                         child: const Icon(Icons.calendar_month),
                       ),
@@ -139,21 +145,24 @@ class _MainPageState extends State<MainPage> {
                   ),
                 ))
           ],
-        )
-    );
+        ));
   }
 
   FutureBuilder<UserData> buildAvatarButton(User user) {
-    return FutureBuilder(future: userData, builder: (context, snapshot) {
-                if(snapshot.hasData && snapshot.data!.username != 'vacio'){
-                  return AvatarButton(
-                    profilePictureFuture: getProfilePicture(user),
-                    user: snapshot.data!,
-                  );
-                }
-                return const Center(child: CircularProgressIndicator());
-              },);
+    return FutureBuilder(
+      future: userData,
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data!.username != 'vacio') {
+          return AvatarButton(
+            profilePictureFuture: getProfilePicture(user),
+            user: snapshot.data!,
+          );
+        }
+        return const Center(child: CircularProgressIndicator());
+      },
+    );
   }
+
   Future<List<Map<String, dynamic>>> getProfilePicture(User user) async {
     var profilePicture;
     profilePicture = await supabase
@@ -199,7 +208,7 @@ Future<String> getPostUsernameAsync(String id_user) async {
   return userName;
 }
 
-Future<UserData> getUserDataAsync(String id_user) async{
+Future<UserData> getUserDataAsync(String id_user) async {
   UserData user = UserData.empty();
   var res = await supabase
       .from('user')
@@ -211,6 +220,3 @@ Future<UserData> getUserDataAsync(String id_user) async{
   user.followers = '0';
   return user;
 }
-
-
-

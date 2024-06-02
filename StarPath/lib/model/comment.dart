@@ -8,7 +8,7 @@ class Comment {
   int dislikes;
   bool deleted;
   String userId;
-  Future<List<Map<String, dynamic>>> profilePictureFuture; // Nueva propiedad
+  Future<List<Map<String, dynamic>>> profilePictureFuture;
   UserData userData = UserData.empty();
 
   Comment({
@@ -19,6 +19,6 @@ class Comment {
     required this.dislikes,
     required this.deleted,
     required this.userId,
-    required this.profilePictureFuture, // Nueva propiedad
+    required this.profilePictureFuture,
   });
 }

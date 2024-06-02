@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
@@ -35,7 +34,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
   }
 
   void _showInfoDialog() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
@@ -58,18 +57,18 @@ class _NewProfilePageState extends State<NewProfilePage> {
   void _showUploadDialog() {
     showDialog(
       context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
+      builder: (BuildContext context) => AlertDialog(
         title: Text("Subir foto de perfil"),
         content: Text("¿Desea subir una foto de perfil?"),
         actions: [
-          CupertinoDialogAction(
+          TextButton(
             onPressed: () {
               Navigator.of(context).pop();
               _uploadProfilePicture();
             },
             child: Text("Sí"),
           ),
-          CupertinoDialogAction(
+          TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -86,16 +85,10 @@ class _NewProfilePageState extends State<NewProfilePage> {
       if (user != null) {
         String filePath = "";
         String fileName = "";
-        String? imageUrl = await _profilePictureManager.uploadContent(
-            user, filePath, fileName);
-        if (imageUrl != null) {
-          setState(() {
-            profilePictureUrl = imageUrl;
-            _profilePictureFuture = _getProfilePicture();
-          });
-        } else {
-          print("No se pudo obtener la URL de la imagen del perfil");
-        }
+        await _profilePictureManager.uploadContent(user, filePath, fileName);
+        setState(() {
+          _profilePictureFuture = _getProfilePicture();
+        });
       } else {
         print("No se pudo obtener el usuario actual");
       }
@@ -108,12 +101,10 @@ class _NewProfilePageState extends State<NewProfilePage> {
     try {
       User? user = Provider.of<UserProvider>(context, listen: false).user;
       if (user != null) {
-        final response = await supabase
-            .from('user')
-            .select('profile_picture')
-            .eq('id_user', user.id);
+        final response = await _profilePictureManager.getContent(
+            user, 'user', 'profile_picture');
         if (response == null) {
-          print('Error al obtener la foto de perfil: ${response}');
+          print('Error al obtener la foto de perfil');
           return [];
         }
         List<Map<String, dynamic>> profilePictureData =
