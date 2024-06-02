@@ -5,11 +5,13 @@ import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/widgets/follow_button.dart';
+import 'package:starpath/windows/edit_event.dart';
 import 'package:supabase/supabase.dart';
 
 class Event extends StatefulWidget {
   final EventData eventData;
-  const Event({super.key, required this.eventData});
+  final bool canEdit;
+  const Event({super.key, required this.eventData, required this.canEdit});
 
   @override
   State<Event> createState() => _EventState();
@@ -24,16 +26,17 @@ class _EventState extends State<Event> {
     supabase
         .channel('asistant_changes')
         .onPostgresChanges(
-      event: PostgresChangeEvent.all,
-      schema: 'public',
-      table: 'event_followers',
-      callback: (payload) {
-        setState(() {
-          futureAsistant = getEventsAsistants(widget.eventData.idEvent);
-        });
-        print('en el callback');
-      },
-    ).subscribe();
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'event_followers',
+          callback: (payload) {
+            setState(() {
+              futureAsistant = getEventsAsistants(widget.eventData.idEvent);
+            });
+            print('en el callback');
+          },
+        )
+        .subscribe();
   }
 
   @override
@@ -41,6 +44,7 @@ class _EventState extends State<Event> {
     supabase.channel('asistant_changes').unsubscribe();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     bool hasValidImage = widget.eventData.eventImage != 'vacio';
@@ -59,7 +63,6 @@ class _EventState extends State<Event> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
-
                   flex: 2,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.0),
@@ -71,15 +74,23 @@ class _EventState extends State<Event> {
                 Flexible(
                   flex: 1,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 24.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(widget.eventData.title, style: const TextStyle(fontWeight: FontWeight.bold),),
+                        Text(
+                          widget.eventData.title,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(widget.eventData.username, style: const TextStyle(fontWeight: FontWeight.w300),),
+                            Text(
+                              widget.eventData.username,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w300),
+                            ),
                             Text(widget.eventData.eventDate.toString())
                           ],
                         ),
@@ -90,21 +101,34 @@ class _EventState extends State<Event> {
                             Expanded(
                                 flex: 2,
                                 //widget.eventData.description
-                                child: Text(widget.eventData.description)
-                            ),
-                            FollowButton(loggedId: user.id, eventData: widget.eventData,)
+                                child: Text(widget.eventData.description)),
+                            widget.canEdit
+                                ? Expanded(
+                                    child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    BUTTON_BACKGROUND)),
+                                        onPressed:() => Navigator.push(context, MaterialPageRoute(builder: (context) => EditEventPage(eventData: widget.eventData))),
+                                        child: const Text(
+                                          'Editar',
+                                          style: TextStyle(color: TEXT),
+                                        )))
+                                : FollowButton(
+                                    loggedId: user.id,
+                                    eventData: widget.eventData,
+                                  )
                           ],
                         ),
-                        FutureBuilder(future: futureAsistant, builder: (context, snapshot) {
-                          if(snapshot.hasData && snapshot.data != 'vacio'){
-                              return Text(
-                                "Asistentes: ${snapshot.data}"
-                              );
-                          }
-                          return const Text(
-                            "Asistentes:"
-                          );
-                        },)
+                        FutureBuilder(
+                          future: futureAsistant,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData && snapshot.data != 'vacio') {
+                              return Text("Asistentes: ${snapshot.data}");
+                            }
+                            return const Text("Asistentes:");
+                          },
+                        )
                       ],
                     ),
                   ),
@@ -116,9 +140,11 @@ class _EventState extends State<Event> {
       ),
     );
   }
-  Future<String> getEventsAsistants(String idEvent) async{
-    String asistants ='0';
-    var res = await supabase.from('event_followers').count().eq('id_event', idEvent);
+
+  Future<String> getEventsAsistants(String idEvent) async {
+    String asistants = '0';
+    var res =
+        await supabase.from('event_followers').count().eq('id_event', idEvent);
     asistants = res.toString();
     return asistants;
   }
