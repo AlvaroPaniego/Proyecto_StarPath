@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:starpath/misc/constants.dart';
-import 'package:starpath/windows/login.dart'; // Asegúrate de importar tu ventana de login
+import 'package:starpath/windows/login.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/model/user.dart';
 
@@ -69,96 +68,128 @@ class _RegisterState extends State<Register> {
   }
 
   Future<void> _registerUser() async {
-    if (_passwordController.text != _repeatPasswordController.text) {
+    try {
+      if (_passwordController.text != _repeatPasswordController.text) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoAlertDialog(
+              title: Text('Error'),
+              content: Text('Las contraseñas no coinciden.'),
+              actions: [
+                CupertinoDialogAction(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Aceptar'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
+      final username = _usernameController.text.trim();
+      final email = _emailController.text.trim();
+
+      final existenceMessage = await _checkUserEmailExistence(username, email);
+      if (existenceMessage != null) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoAlertDialog(
+              title: Text('Error'),
+              content: Text(existenceMessage),
+              actions: [
+                CupertinoDialogAction(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Aceptar'),
+                ),
+              ],
+            );
+          },
+        );
+        return;
+      }
+
+      final response = await supabase.auth.signUp(
+        email: email,
+        password: _passwordController.text.trim(),
+        data: {
+          'username': username,
+          'email': email,
+          'first_time': 1,
+        },
+      );
+
+      if (response == null) {
+        print('Error al registrar usuario');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoAlertDialog(
+              title: Text('Registro Exitoso'),
+              content: Text(
+                'Se ha enviado un enlace de verificación a su correo electrónico. Por favor, revise su bandeja de entrada y confirme su cuenta antes de iniciar sesión.',
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Login(),
+                      ),
+                    );
+                  },
+                  child: Text('Aceptar'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CupertinoAlertDialog(
+              title: Text('Registro Exitoso'),
+              content: Text(
+                'Se ha enviado un enlace de verificación a su correo electrónico. Por favor, revise su bandeja de entrada y confirme su cuenta antes de iniciar sesión.',
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Login(),
+                      ),
+                    );
+                  },
+                  child: Text('Aceptar'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (error) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
             title: Text('Error'),
-            content: Text('Las contraseñas no coinciden.'),
+            content: Text('La dirección de correo electrónico no existe.'),
             actions: [
               CupertinoDialogAction(
                 onPressed: () {
                   Navigator.pop(context);
-                },
-                child: Text('Aceptar'),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    final username = _usernameController.text.trim();
-    final email = _emailController.text.trim();
-
-    final existenceMessage = await _checkUserEmailExistence(username, email);
-    if (existenceMessage != null) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text('Error'),
-            content: Text(existenceMessage),
-            actions: [
-              CupertinoDialogAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('Aceptar'),
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-
-    final response = await supabase.auth.signUp(
-      email: email,
-      password: _passwordController.text.trim(),
-      data: {'username': username, 'email': email},
-    );
-
-    if (response == null) {
-      print('Error al registrar usuario');
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text('Error'),
-            content: Text('Error al registrar usuario'),
-            actions: [
-              CupertinoDialogAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('Aceptar'),
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: Text('Registro Exitoso'),
-            content: Text(
-                'Se ha enviado un enlace de verificación a su correo electrónico. Por favor, revise su bandeja de entrada.'),
-            actions: [
-              CupertinoDialogAction(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          const Login(), // Redirigir a la ventana de login
-                    ),
-                  );
                 },
                 child: Text('Aceptar'),
               ),

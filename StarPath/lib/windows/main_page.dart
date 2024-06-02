@@ -11,11 +11,9 @@ import 'package:starpath/widgets/camera_button.dart';
 import 'package:starpath/widgets/post.dart';
 import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
-import 'package:starpath/windows/chat_list.dart';
 import 'package:starpath/windows/event_main_page.dart';
 import 'package:starpath/windows/explore_page.dart';
 import 'package:starpath/windows/options.dart';
-import 'package:starpath/windows/wiki_page.dart';
 import 'package:supabase/supabase.dart';
 
 class MainPage extends StatefulWidget {
@@ -28,9 +26,11 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   Future<List<PostData>> futurePost = getPostAsync();
   Future<UserData> userData = Future.value(UserData.empty());
+  late String userId;
   @override
   void initState() {
     super.initState();
+    userId = context.read<UserProvider>().user!.id;
     supabase
         .channel('post_upvotes_changes')
         .onPostgresChanges(
@@ -116,10 +116,8 @@ class _MainPageState extends State<MainPage> {
                         child: const Icon(Icons.settings),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const WikiPage(),));
-                        },
-                        child: const Icon(Icons.account_balance_outlined),
+                        onTap: () {},
+                        child: const Icon(Icons.mail),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -142,15 +140,12 @@ class _MainPageState extends State<MainPage> {
                         child: const Icon(Icons.calendar_month),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatListPage()));
-                        },
+                        onTap: () {},
                         child: const Icon(Icons.chat),
                       ),
                     ],
                   ),
-                )
-            )
+                ))
           ],
         ));
   }
@@ -219,11 +214,20 @@ Future<UserData> getUserDataAsync(String id_user) async {
   UserData user = UserData.empty();
   var res = await supabase
       .from('user')
-      .select("id_user, username, profile_picture")
+      .select("id_user, username, profile_picture, last_login")
       .match({'id_user': id_user});
   user.id_user = res.first['id_user'];
   user.username = res.first['username'];
   user.profile_picture = res.first['profile_picture'];
   user.followers = '0';
+
+  var creationDate = DateTime.parse(res.first['last_login']);
+  var currentDate = DateTime.now();
+
+  if (creationDate.month == currentDate.month &&
+      creationDate.day == currentDate.day) {
+    // Realizar animación
+  }
+
   return user;
 }
