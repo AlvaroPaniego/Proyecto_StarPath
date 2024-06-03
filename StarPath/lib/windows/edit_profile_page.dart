@@ -1,13 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
+import 'package:starpath/model/user_data.dart';
 import 'package:starpath/model/profile_picture_manager.dart';
+import 'package:starpath/windows/user_profile_page.dart';
 
 class EditProfilePage extends StatefulWidget {
+  final UserData userData; // Agregamos este campo
+
+  EditProfilePage({required this.userData}); // Actualizamos el constructor
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -83,7 +88,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       userProvider.updateProfilePictureUrl(_profilePictureUrl!);
     }
 
-    Navigator.pop(context);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserProfilePage(userData: widget.userData),
+      ),
+    );
   }
 
   Future<void> _changeProfilePicture() async {

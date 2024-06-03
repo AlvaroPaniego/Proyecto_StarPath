@@ -192,7 +192,6 @@ class _LoginState extends State<Login> {
                                     return;
                                   }
 
-                                  // Intentar iniciar sesión con el correo y la contraseña
                                   final response = await supabaseClient.auth
                                       .signInWithPassword(
                                     email: email,
@@ -204,7 +203,7 @@ class _LoginState extends State<Login> {
                                     final user = response.user!;
                                     final userId = user.id;
 
-                                    // Realizar una consulta a Supabase para obtener el valor de firstTime
+                                    // obtener el valor de firstTime
                                     final firstTimeResponse = await supabase
                                         .from('user')
                                         .select('first_time')
@@ -215,7 +214,7 @@ class _LoginState extends State<Login> {
                                                 as int? ??
                                             0;
 
-                                    // Actualizar el valor de first_time a 2 si es necesario
+                                    // Actualizar el valor de first_time a 2
                                     if (firstTime == 1) {
                                       await supabase
                                           .from('user')
@@ -227,9 +226,7 @@ class _LoginState extends State<Login> {
                                         .read<UserProvider>()
                                         .setLoggedUser(newUser: user);
 
-                                    // Verificar el valor de first_time
                                     if (firstTime == 1) {
-                                      // Redirigir a la ventana de creación de perfil
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
@@ -237,17 +234,12 @@ class _LoginState extends State<Login> {
                                                 NewProfilePage()),
                                       );
                                     } else {
-                                      // Redirigir a la página principal
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => MainPage()),
                                       );
                                     }
-
-                                    // Actualizar el valor de first_time a 2
-                                    await supabase.from('user').update(
-                                        {'first_time': 2}).eq('email', email);
                                   } else {
                                     // Si el correo existe pero la contraseña es incorrecta
                                     _showErrorDialog(
@@ -276,7 +268,7 @@ class _LoginState extends State<Login> {
                                         'El correo electrónico o la contraseña son incorrectos.');
                                   } else {
                                     _showErrorDialog(
-                                        'La contraseña es incorrecta.');
+                                        'El usuario no ha confirmado el registro.');
                                   }
                                 }
                               }
