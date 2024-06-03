@@ -35,7 +35,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
   void _showEditProfile() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => EditProfilePage()),
+      MaterialPageRoute(
+          builder: (context) => EditProfilePage(
+              userData: widget.userData)), // Pasar el argumento userData
     );
   }
 

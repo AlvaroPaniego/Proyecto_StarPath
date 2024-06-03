@@ -12,21 +12,21 @@ class SerachBar extends StatelessWidget {
     return Expanded(
       flex: 5,
       child: GestureDetector(
-        onTap: () => Navigator.push(context, PageRouteBuilder(
-            pageBuilder:(context, animation, secondaryAnimation) => const SearchPage(),
-            reverseTransitionDuration: Duration.zero,
-            transitionDuration: Duration.zero
-        )
-        ),
+        onTap: () => Navigator.push(
+            context,
+            PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const SearchPage(),
+                reverseTransitionDuration: Duration.zero,
+                transitionDuration: Duration.zero)),
         child: Container(
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-                color: Colors.grey,
-            )
-          ),
-          child: const Text('Buscar', style: TextStyle(color: TEXT)),
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                color: FOCUS_ORANGE,
+              )),
+          child: const Text('Buscar'),
         ),
       ),
     );

@@ -55,7 +55,7 @@ class _EventState extends State<Event> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: EVENT_BACKGROUND,
               borderRadius: BorderRadius.circular(25.0),
             ),
             child: Column(
@@ -63,6 +63,7 @@ class _EventState extends State<Event> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
+
                   flex: 2,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.0),

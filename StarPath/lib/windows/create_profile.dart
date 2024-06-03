@@ -6,6 +6,7 @@ import 'package:starpath/misc/constants.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/model/profile_picture_manager.dart';
 import 'package:starpath/windows/login.dart';
+import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 import 'package:starpath/model/user.dart';
 
@@ -278,7 +279,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
                 await _updateUserProfile();
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(builder: (context) => MainPage()),
                 );
               },
               child: const Text("Finalizar", style: TextStyle(color: TEXT)),

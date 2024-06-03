@@ -5,7 +5,8 @@ import 'package:starpath/windows/user_profile_page.dart';
 class AvatarButton extends StatefulWidget {
   Future<List<Map<String, dynamic>>> profilePictureFuture;
   UserData user = UserData.empty();
-  AvatarButton({super.key, required this.profilePictureFuture, required this.user});
+  AvatarButton(
+      {super.key, required this.profilePictureFuture, required this.user});
   AvatarButton.LogedUserPage({super.key, required this.profilePictureFuture});
 
   @override
@@ -15,14 +16,18 @@ class AvatarButton extends StatefulWidget {
 class _AvatarButtonState extends State<AvatarButton> {
   @override
   Widget build(BuildContext context) {
-
     return Flexible(
       flex: 1,
       child: GestureDetector(
-        onTap: ()  async{
-          if(widget.user.id_user != 'vacio'){
+        onTap: () async {
+          if (widget.user.id_user != 'vacio') {
             //Para poder navegar a una ventana de ususario especifico
-            Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfilePage(userData: widget.user,)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => UserProfilePage(
+                          userData: widget.user,
+                        )));
           }
         },
         child: ClipRRect(
@@ -31,7 +36,7 @@ class _AvatarButtonState extends State<AvatarButton> {
             future: widget.profilePictureFuture,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                if(snapshot.data![0]["profile_picture"] == ""){
+                if (snapshot.data![0]["profile_picture"] == "") {
                   return Image.asset("assets/images/placeholder-avatar.jpg");
                 }
                 return Image.network(snapshot.data![0]["profile_picture"]);
