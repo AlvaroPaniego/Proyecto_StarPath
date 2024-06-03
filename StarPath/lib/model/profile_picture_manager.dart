@@ -24,11 +24,12 @@ class ProfilePictureManager implements FileChooser {
         CroppedFile? croppedFile = await ImageCropper().cropImage(
           sourcePath: path,
           aspectRatioPresets: [
-            CropAspectRatioPreset.original,
-            CropAspectRatioPreset.square,
             CropAspectRatioPreset.ratio3x2,
             CropAspectRatioPreset.ratio4x3,
             CropAspectRatioPreset.ratio16x9,
+            CropAspectRatioPreset.ratio5x4,
+            CropAspectRatioPreset.ratio7x5,
+            CropAspectRatioPreset.ratio5x3
           ],
           uiSettings: [
             AndroidUiSettings(
@@ -36,7 +37,7 @@ class ProfilePictureManager implements FileChooser {
               toolbarColor: Colors.deepOrange,
               toolbarWidgetColor: Colors.white,
               initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false,
+              lockAspectRatio: true,
             ),
             IOSUiSettings(title: 'Recortar imagen'),
           ],

@@ -9,6 +9,7 @@ import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:starpath/windows/create_profile.dart';
+import 'package:starpath/windows/forgot_password.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -23,6 +24,7 @@ class _LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool remember = false;
   bool _profileCompleted = false;
+  bool _passwordVisible = true;
 
   @override
   void initState() {
@@ -120,7 +122,7 @@ class _LoginState extends State<Login> {
                       TextFormField(
                         onTapOutside: (event) =>
                             FocusManager.instance.primaryFocus?.unfocus(),
-                        obscureText: true,
+                        obscureText: _passwordVisible,
                         controller: _passwordController,
                         autofocus: false,
                         style: const TextStyle(color: TEXT),
@@ -139,6 +141,16 @@ class _LoginState extends State<Login> {
                             borderSide: const BorderSide(
                                 color: FOCUS_ORANGE, width: 1.0),
                           ),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _passwordVisible = !_passwordVisible;
+                              });
+                            },
+                            icon: _passwordVisible
+                                ? Icon(Icons.visibility)
+                                : Icon(Icons.visibility_off),
+                          ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -152,6 +164,24 @@ class _LoginState extends State<Login> {
                           }
                           return null;
                         },
+                      ),
+                      const SizedBox(height: 10.0),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: () async {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ForgotPassword(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Recuperar contraseña',
+                            style: TextStyle(color: BUTTON_BACKGROUND),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 20.0),
                       Row(

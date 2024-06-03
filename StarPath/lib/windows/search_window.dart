@@ -28,7 +28,8 @@ class _SearchPageState extends State<SearchPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            UpperAppBar(content: [const BackButton(), searchBar(searchController)]),
+            UpperAppBar(
+                content: [const BackButton(), searchBar(searchController)]),
             Expanded(
                 flex: 10,
                 child: Padding(
@@ -36,39 +37,51 @@ class _SearchPageState extends State<SearchPage> {
                     child: FutureBuilder(
                       future: futureUserList,
                       builder: (context, snapshot) {
-                        if(snapshot.hasData){
-                          if(snapshot.data!.isEmpty && !hasSearched){
-                            return const Center(child: Text("Escribe para buscar un usuario",style: TextStyle(color: TEXT),),);
-                          }else if (snapshot.data!.isEmpty && hasSearched){
-                            return const Center(child: Text("No se ha encontrado ese usuario",style: TextStyle(color: TEXT),),);
-                          }else{
-                            return ListView.builder(
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) => UserInfoCarousel(user: snapshot.data![index])
+                        if (snapshot.hasData) {
+                          if (snapshot.data!.isEmpty && !hasSearched) {
+                            return const Center(
+                              child: Text(
+                                "Escribe para buscar un usuario",
+                                style: TextStyle(color: TEXT),
+                              ),
                             );
+                          } else if (snapshot.data!.isEmpty && hasSearched) {
+                            return const Center(
+                              child: Text(
+                                "No se ha encontrado ese usuario",
+                                style: TextStyle(color: TEXT),
+                              ),
+                            );
+                          } else {
+                            return ListView.builder(
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) =>
+                                    UserInfoCarousel(
+                                        user: snapshot.data![index]));
                           }
                         }
                         return const Center(child: CircularProgressIndicator());
                       },
-                    )
-                )
-            ),
+                    ))),
           ],
-        )
-    );
+        ));
   }
-  Widget searchBar(TextEditingController searchController){
+
+  Widget searchBar(TextEditingController searchController) {
     return Flexible(
       child: Row(
         children: [
           Expanded(
             flex: 3,
             child: TextField(
-              style: const TextStyle(color: TEXT),
-              decoration: const InputDecoration(hintText: "Buscar", border: OutlineInputBorder()
-              ),
+              decoration: const InputDecoration(
+                  hintText: "Buscar",
+                  border: OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(color: FOCUS_ORANGE, width: 1.0))),
               controller: searchController,
-              onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
+              onTapOutside: (event) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
             ),
           ),
           Expanded(
@@ -77,14 +90,13 @@ class _SearchPageState extends State<SearchPage> {
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
                 setState(() {
-                  if(searchController.text.isNotEmpty){
+                  if (searchController.text.isNotEmpty) {
                     hasSearched = true;
                     futureUserList = searchUsers(searchController.text.trim());
-                  }else{
+                  } else {
                     hasSearched = false;
                     futureUserList = Future.value([]);
                   }
-
                 });
               },
               child: const Icon(Icons.search),
@@ -94,10 +106,14 @@ class _SearchPageState extends State<SearchPage> {
       ),
     );
   }
-  Future<List<UserData>> searchUsers(String user) async{
+
+  Future<List<UserData>> searchUsers(String user) async {
     List<UserData> userList = [];
     UserData userData = UserData.empty();
-    var res = await supabase.from('user').select('id_user, username, profile_picture').ilike('username', '$user%');
+    var res = await supabase
+        .from('user')
+        .select('id_user, username, profile_picture')
+        .ilike('username', '$user%');
     for (var user in res) {
       userData = UserData.empty();
       userData.id_user = user['id_user'];

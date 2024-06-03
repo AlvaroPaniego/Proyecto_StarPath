@@ -21,6 +21,9 @@ class _RegisterState extends State<Register> {
       TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  bool _passwordVisible = true;
+  bool _repeatPasswordVisible = true;
+
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'La contraseña está vacía';
@@ -285,7 +288,7 @@ class _RegisterState extends State<Register> {
                       controller: _passwordController,
                       autofocus: false,
                       style: const TextStyle(color: TEXT),
-                      obscureText: true,
+                      obscureText: _passwordVisible,
                       decoration: InputDecoration(
                         hintText: "Introduzca contraseña",
                         hintStyle: const TextStyle(color: HINT),
@@ -301,6 +304,18 @@ class _RegisterState extends State<Register> {
                           borderSide:
                               const BorderSide(color: FOCUS_ORANGE, width: 1.0),
                         ),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _passwordVisible = !_passwordVisible;
+                            });
+                          },
+                          icon: Icon(
+                            _passwordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                        ),
                       ),
                       validator: _validatePassword,
                     ),
@@ -309,7 +324,7 @@ class _RegisterState extends State<Register> {
                       controller: _repeatPasswordController,
                       autofocus: false,
                       style: const TextStyle(color: TEXT),
-                      obscureText: true,
+                      obscureText: _repeatPasswordVisible,
                       decoration: InputDecoration(
                         hintText: "Introduzca de nuevo la contraseña",
                         hintStyle: const TextStyle(color: HINT),
@@ -324,6 +339,18 @@ class _RegisterState extends State<Register> {
                           borderRadius: BorderRadius.circular(8.0),
                           borderSide:
                               const BorderSide(color: FOCUS_ORANGE, width: 1.0),
+                        ),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _repeatPasswordVisible = !_repeatPasswordVisible;
+                            });
+                          },
+                          icon: Icon(
+                            _repeatPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
                         ),
                       ),
                       validator: (value) {

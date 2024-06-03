@@ -100,7 +100,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
+    /*if (pickedFile != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: pickedFile.path,
         aspectRatioPresets: [
@@ -121,19 +121,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ],
       );
 
-      if (croppedFile != null) {
-        final userProvider = context.read<UserProvider>();
-        final user = userProvider.user!;
+    } */
 
-        final newUrl = await _profilePictureManager.uploadContent(
-            user, croppedFile.path, "");
+    if (pickedFile != null) {
+      final userProvider = context.read<UserProvider>();
+      final user = userProvider.user!;
 
-        if (newUrl != null) {
-          setState(() {
-            _profilePictureUrl = newUrl;
-          });
-          userProvider.updateProfilePictureUrl(newUrl);
-        }
+      final newUrl =
+          await _profilePictureManager.uploadContent(user, pickedFile.path, "");
+
+      if (newUrl != null) {
+        setState(() {
+          _profilePictureUrl = newUrl;
+        });
+        userProvider.updateProfilePictureUrl(newUrl);
       }
     }
   }
