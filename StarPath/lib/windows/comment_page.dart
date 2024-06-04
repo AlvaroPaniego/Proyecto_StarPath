@@ -1,15 +1,20 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/model/comment.dart';
+import 'package:starpath/model/translate_data.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/votes_comments.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
 import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
 
 class CommentPage extends StatefulWidget {
   final String postId;
+
 
   const CommentPage({Key? key, required this.postId}) : super(key: key);
 
@@ -20,6 +25,8 @@ class CommentPage extends StatefulWidget {
 class _CommentPageState extends State<CommentPage> {
   late Future<List<Comment>> futureComments;
   late TextEditingController _commentController;
+  bool isAlreadyTranslated = false;
+  late String translatedComment;
 
   @override
   void initState() {
@@ -200,7 +207,14 @@ class _CommentPageState extends State<CommentPage> {
                                     },
                                   ),
                                   const SizedBox(height: 4),
-                                  Text(comment.comment),
+                                  Text(isAlreadyTranslated
+                                      ? translatedComment
+                                      : comment.comment
+                                  ),
+                                  TextButton(
+                                      onPressed:  () async => await translateComment(comment.comment, isAlreadyTranslated),
+                                      child: const Text('Traducir')
+                                  )
                                 ],
                               ),
                             ),
@@ -248,7 +262,34 @@ class _CommentPageState extends State<CommentPage> {
       ),
     );
   }
-
+  Future<void>translateComment(String comment, bool isEnglish) async{
+    var data = jsonEncode({
+      'q': comment,
+      'source': isEnglish ? 'EN' : 'ES',
+      'target': isEnglish ? 'ES' : 'EN',
+    });
+    print(data);
+    final res = await http.post(
+        Uri.parse('https://deep-translate1.p.rapidapi.com/language/translate/v2'),
+      headers: {
+        'x-rapidapi-key': TRANSLATOR_API_KEY,
+        'Content-Type': 'application/json',
+        'X-RapidAPI-Host': 'deep-translate1.p.rapidapi.com',
+      },
+      body: data
+    );
+    if(res.statusCode == 200){
+      final responseData = utf8.decode(res.bodyBytes);
+      final jsonData = jsonDecode(responseData);
+      var resComment = jsonData['data']['translations']['translatedText'];
+      setState(() {
+        print('seteando');
+        isAlreadyTranslated = !isEnglish;
+        translatedComment = resComment;
+        print(translatedComment);
+      });
+    }
+  }
   Future<String> getCommentUsernameAsync(String userId) async {
     String userName =
         "Cargando Usuario"; // texto temporal mientras se carga el nombre de usuario

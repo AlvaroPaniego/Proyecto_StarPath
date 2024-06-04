@@ -97,8 +97,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _changeProfilePicture() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    // final pickedFile =
+    //     await ImagePicker().pickImage(source: ImageSource.gallery);
 
     /*if (pickedFile != null) {
       final croppedFile = await ImageCropper().cropImage(
@@ -123,12 +123,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     } */
 
-    if (pickedFile != null) {
+    // if (pickedFile != null) {
       final userProvider = context.read<UserProvider>();
       final user = userProvider.user!;
 
       final newUrl =
-          await _profilePictureManager.uploadContent(user, pickedFile.path, "");
+          await _profilePictureManager.uploadContent(user, '', "");
 
       if (newUrl != null) {
         setState(() {
@@ -136,7 +136,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         });
         userProvider.updateProfilePictureUrl(newUrl);
       }
-    }
+    // }
   }
 
   @override
