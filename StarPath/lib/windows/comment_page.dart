@@ -6,6 +6,7 @@ import 'package:starpath/model/comment.dart';
 import 'package:starpath/model/translate_data.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
+import 'package:starpath/widgets/comment_card.dart';
 import 'package:starpath/widgets/votes_comments.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
@@ -170,69 +171,7 @@ class _CommentPageState extends State<CommentPage> {
                   return ListView.builder(
                     itemCount: comments.length,
                     itemBuilder: (context, index)  {
-                      final comment = comments[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            AvatarButton(
-                              profilePictureFuture:
-                                  comment.profilePictureFuture,
-                                  user: comment.userData,
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  FutureBuilder<String>(
-                                    future:
-                                        getCommentUsernameAsync(comment.userId),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasData) {
-                                        return Text(
-                                          snapshot.data!,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        );
-                                      } else {
-                                        return Text(
-                                          'Cargando Usuario', //texto temporal mientras se carga el nombre de usuario
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(isAlreadyTranslated
-                                      ? translatedComment
-                                      : comment.comment
-                                  ),
-                                  TextButton(
-                                      onPressed:  () async => await translateComment(comment.comment, isAlreadyTranslated),
-                                      child: const Text('Traducir')
-                                  )
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: VotesForComments(
-                                comment: comment,
-                                onUpdate: (int likes, int dislikes) {
-                                  setState(() {
-                                    comment.likes = likes;
-                                    comment.dislikes = dislikes;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
+                      return CommentCard(comment: comments[index],);
                     },
                   );
                 }
