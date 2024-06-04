@@ -234,6 +234,8 @@ class _NewProfilePageState extends State<NewProfilePage> {
                   padding: const EdgeInsets.symmetric(
                       vertical: 10.0, horizontal: 12.0),
                   child: TextField(
+                    onTapOutside: (event) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
                     controller: _textController,
                     maxLines: 5,
                     maxLength: 150,

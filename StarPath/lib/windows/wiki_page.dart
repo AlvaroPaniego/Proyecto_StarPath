@@ -60,6 +60,8 @@ class _AstronomyWikiPageState extends State<WikiPage> {
         child: Column(
           children: [
             TextField(
+              onTapOutside: (event) =>
+                  FocusManager.instance.primaryFocus?.unfocus(),
               onChanged: (value) {
                 setState(() {
                   searchText = value;

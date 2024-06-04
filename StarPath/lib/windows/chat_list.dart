@@ -34,7 +34,7 @@ class _ChatListPageState extends State<ChatListPage> {
             UpperAppBar(content: [BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),))]),
             //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
             Expanded(
-                flex: 7,
+                flex: 9,
                 child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: FutureBuilder(

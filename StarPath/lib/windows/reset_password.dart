@@ -30,6 +30,8 @@ class _ResetPasswordState extends State<ResetPassword> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextFormField(
+                onTapOutside: (event) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 controller: resetTokenC,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
@@ -45,6 +47,8 @@ class _ResetPasswordState extends State<ResetPassword> {
               ),
               const SizedBox(width: 16, height: 16),
               TextFormField(
+                onTapOutside: (event) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 controller: emailC,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
@@ -58,6 +62,8 @@ class _ResetPasswordState extends State<ResetPassword> {
               ),
               const SizedBox(width: 16, height: 16),
               TextFormField(
+                onTapOutside: (event) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 controller: passwordC,
                 obscureText: _passwordVisible,
                 decoration: InputDecoration(

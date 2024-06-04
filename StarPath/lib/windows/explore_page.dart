@@ -42,7 +42,6 @@ class _ExplorePageState extends State<ExplorePage> {
                         return CarouselSlider(
                             items: userInfo(snapshot.data!),
                             options: CarouselOptions(
-                                autoPlay: true,
                                 animateToClosest: true,
                                 disableCenter: true,
                             )

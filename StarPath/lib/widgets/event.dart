@@ -5,11 +5,13 @@ import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/widgets/follow_button.dart';
+import 'package:starpath/windows/edit_event.dart';
 import 'package:supabase/supabase.dart';
 
 class Event extends StatefulWidget {
   final EventData eventData;
-  const Event({super.key, required this.eventData});
+  final bool canEdit;
+  const Event({super.key, required this.eventData, required this.canEdit});
 
   @override
   State<Event> createState() => _EventState();
@@ -61,6 +63,7 @@ class _EventState extends State<Event> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
+
                   flex: 2,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.0),
@@ -100,10 +103,22 @@ class _EventState extends State<Event> {
                                 flex: 2,
                                 //widget.eventData.description
                                 child: Text(widget.eventData.description)),
-                            FollowButton(
-                              loggedId: user.id,
-                              eventData: widget.eventData,
-                            )
+                            widget.canEdit
+                                ? Expanded(
+                                    child: ElevatedButton(
+                                        style: ButtonStyle(
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                                    BUTTON_BACKGROUND)),
+                                        onPressed:() => Navigator.push(context, MaterialPageRoute(builder: (context) => EditEventPage(eventData: widget.eventData))),
+                                        child: const Text(
+                                          'Editar',
+                                          style: TextStyle(color: TEXT),
+                                        )))
+                                : FollowButton(
+                                    loggedId: user.id,
+                                    eventData: widget.eventData,
+                                  )
                           ],
                         ),
                         FutureBuilder(

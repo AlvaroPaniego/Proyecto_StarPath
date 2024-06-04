@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +9,9 @@ import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/model/profile_picture_manager.dart';
+import 'package:starpath/widgets/back_arrow.dart';
+import 'package:starpath/widgets/upper_app_bar.dart';
+import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/user_profile_page.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -69,7 +74,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (!usernameAvailable) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('El nombre de usuario ya está en uso.'),
           backgroundColor: Colors.red,
         ),
@@ -97,8 +102,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _changeProfilePicture() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    // final pickedFile =
+    //     await ImagePicker().pickImage(source: ImageSource.gallery);
 
     /*if (pickedFile != null) {
       final croppedFile = await ImageCropper().cropImage(
@@ -123,12 +128,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     } */
 
-    if (pickedFile != null) {
+    // if (pickedFile != null) {
       final userProvider = context.read<UserProvider>();
       final user = userProvider.user!;
 
       final newUrl =
-          await _profilePictureManager.uploadContent(user, pickedFile.path, "");
+          await _profilePictureManager.uploadContent(user, '', "");
 
       if (newUrl != null) {
         setState(() {
@@ -136,92 +141,119 @@ class _EditProfilePageState extends State<EditProfilePage> {
         });
         userProvider.updateProfilePictureUrl(newUrl);
       }
-    }
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Editar Perfil'),
-      ),
-      body: FutureBuilder(
-        future: _profilePictureFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          return SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: _changeProfilePicture,
-                    child: Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: _profilePictureUrl != null
-                              ? NetworkImage(_profilePictureUrl!)
-                              : AssetImage(
-                                      'assets/images/placeholder-avatar.jpg')
-                                  as ImageProvider,
-                          fit: BoxFit.cover,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.4),
-                            spreadRadius: 2,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
+      backgroundColor: BACKGROUND,
+      body: Column(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).viewPadding.top,
+          ),
+          UpperAppBar(content: [
+            BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
+            const Text('Editar usuario', style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold
+            ),),
+            SizedBox(width: 50,)
+          ]),
+          Expanded(
+            flex: 9,
+            child: FutureBuilder(
+              future: _profilePictureFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: _changeProfilePicture,
+                          child: Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: _profilePictureUrl != null
+                                    ? NetworkImage(_profilePictureUrl!)
+                                    : const AssetImage(
+                                            'assets/images/placeholder-avatar.jpg')
+                                        as ImageProvider,
+                                fit: BoxFit.cover,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.4),
+                                  spreadRadius: 2,
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                                size: 40,
+                              ),
+                            ),
                           ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                          size: 40,
                         ),
-                      ),
+                        TextField(
+                          onTapOutside: (event) =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
+                          controller: _usernameController,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: const InputDecoration(
+                            labelStyle: TextStyle(color: FOCUS_ORANGE),
+                            labelText: 'Nombre de Usuario',
+                          ),
+                        ),
+                        TextField(
+                          controller: _bioController,
+                          style: const TextStyle(color: Colors.white),
+                          onTapOutside: (event) =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
+                          decoration: InputDecoration(
+                            labelText: 'Biografía',
+                            alignLabelWithHint: true,
+                            labelStyle: const TextStyle(color: FOCUS_ORANGE),
+                            counterText: '${_bioController.text.length}/150',
+                            counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                          ),
+                          maxLines: null,
+                          maxLength: 150,
+                        ),
+                        SwitchListTile(
+                          title: const Text('Perfil Público', style: TextStyle(color: Colors.white)),
+                          value: _isPublic,
+                          onChanged: (value) {
+                            setState(() {
+                              _isPublic = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: _saveProfile,
+                          child: const Text('Actualizar'),
+                        ),
+                      ],
                     ),
                   ),
-                  TextField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(labelText: 'Nombre de Usuario'),
-                  ),
-                  TextField(
-                    controller: _bioController,
-                    decoration: InputDecoration(
-                      labelText: 'Biografía',
-                      alignLabelWithHint: true,
-                      counterText: '${_bioController.text.length}/150',
-                    ),
-                    maxLines: null,
-                    maxLength: 150,
-                  ),
-                  SwitchListTile(
-                    title: Text('Perfil Público'),
-                    value: _isPublic,
-                    onChanged: (value) {
-                      setState(() {
-                        _isPublic = value;
-                      });
-                    },
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _saveProfile,
-                    child: Text('Actualizar'),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

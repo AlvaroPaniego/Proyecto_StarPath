@@ -6,7 +6,6 @@ import 'package:starpath/model/user.dart';
 import 'package:starpath/windows/login.dart';
 import 'package:starpath/misc/constants.dart';
 
-//1234,,._
 SharedPreferences? prefs;
 
 void main() async {

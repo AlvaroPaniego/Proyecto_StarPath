@@ -74,6 +74,8 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                onTapOutside: (event) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _textController,
                 decoration:
                     const InputDecoration(hintText: "Introduce la descripción"),

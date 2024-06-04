@@ -114,6 +114,8 @@ class _ChatPageState extends State<ChatPage> {
                       Expanded(
                         flex: 5,
                         child: TextField(
+                          onTapOutside: (event) =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
                           autocorrect: true,
                           controller: _messageController,
                           decoration: InputDecoration(
