@@ -36,8 +36,6 @@ class _EditEventPageState extends State<EditEventPage> {
     _descriptionController.text = widget.eventData.description;
     var date = widget.eventData.eventDate.split('/');
     eventDate = DateTime(int.parse(date[2]), int.parse(date[0]), int.parse(date[1]));
-    print(widget.eventData.eventDate);
-    print(eventDate);
   }
   @override
   Widget build(BuildContext context) {
@@ -84,6 +82,8 @@ class _EditEventPageState extends State<EditEventPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  onTapOutside: (event) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _titleController,
                   decoration:
                   const InputDecoration(hintText: "Introduce el título"),
@@ -95,6 +95,8 @@ class _EditEventPageState extends State<EditEventPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  onTapOutside: (event) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _descriptionController,
                   decoration:
                   const InputDecoration(hintText: "Introduce la descripción"),
@@ -107,6 +109,8 @@ class _EditEventPageState extends State<EditEventPage> {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  onTapOutside: (event) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _dateController,
                   decoration:
                   const InputDecoration(

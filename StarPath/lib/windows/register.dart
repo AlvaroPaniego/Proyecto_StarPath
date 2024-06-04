@@ -229,6 +229,8 @@ class _RegisterState extends State<Register> {
                     ),
                     const SizedBox(height: 30),
                     TextFormField(
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
                       controller: _usernameController,
                       autofocus: false,
                       style: const TextStyle(color: TEXT),
@@ -257,6 +259,8 @@ class _RegisterState extends State<Register> {
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
                       controller: _emailController,
                       autofocus: false,
                       style: const TextStyle(color: TEXT),
@@ -285,6 +289,8 @@ class _RegisterState extends State<Register> {
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
                       controller: _passwordController,
                       autofocus: false,
                       style: const TextStyle(color: TEXT),
@@ -321,6 +327,8 @@ class _RegisterState extends State<Register> {
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
                       controller: _repeatPasswordController,
                       autofocus: false,
                       style: const TextStyle(color: TEXT),

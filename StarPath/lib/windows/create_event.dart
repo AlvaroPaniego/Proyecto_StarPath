@@ -79,6 +79,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                onTapOutside: (event) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _titleController,
                 decoration:
                 const InputDecoration(hintText: "Introduce el título"),
@@ -90,6 +92,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                onTapOutside: (event) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _descriptionController,
                 decoration:
                 const InputDecoration(hintText: "Introduce la descripción"),
@@ -102,6 +106,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                onTapOutside: (event) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _dateController,
                 decoration:
                 const InputDecoration(

@@ -23,13 +23,10 @@ class ProfilePictureManager implements FileChooser {
 
         CroppedFile? croppedFile = await ImageCropper().cropImage(
           sourcePath: path,
+          maxWidth: 100,
+          maxHeight: 100,
           aspectRatioPresets: [
-            CropAspectRatioPreset.ratio3x2,
             CropAspectRatioPreset.ratio4x3,
-            CropAspectRatioPreset.ratio16x9,
-            CropAspectRatioPreset.ratio5x4,
-            CropAspectRatioPreset.ratio7x5,
-            CropAspectRatioPreset.ratio5x3
           ],
           uiSettings: [
             AndroidUiSettings(
@@ -44,8 +41,9 @@ class ProfilePictureManager implements FileChooser {
         );
 
         if (croppedFile != null) {
-          File croppedFileAsFile = File(croppedFile.path!);
-          String storagePath = 'profile_pictures/${user.id}/$fileName';
+          print('imagen: ${croppedFile.path}');
+          File croppedFileAsFile = File(croppedFile.path);
+          String storagePath = 'profile_pictures/${user.id}/${croppedFile.path}';
 
           await supabase.storage.from('pruebas').upload(
               storagePath, croppedFileAsFile,

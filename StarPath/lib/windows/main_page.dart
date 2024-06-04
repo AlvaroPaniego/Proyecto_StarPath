@@ -11,6 +11,7 @@ import 'package:starpath/widgets/camera_button.dart';
 import 'package:starpath/widgets/post.dart';
 import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
+import 'package:starpath/windows/chat_list.dart';
 import 'package:starpath/windows/event_main_page.dart';
 import 'package:starpath/windows/explore_page.dart';
 import 'package:starpath/windows/options.dart';
@@ -140,7 +141,9 @@ class _MainPageState extends State<MainPage> {
                         child: const Icon(Icons.calendar_month),
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatListPage(),));
+                        },
                         child: const Icon(Icons.chat),
                       ),
                     ],

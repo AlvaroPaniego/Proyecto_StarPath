@@ -184,6 +184,8 @@ class _CommentPageState extends State<CommentPage> {
               children: [
                 Expanded(
                   child: TextField(
+                    onTapOutside: (event) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
                     controller: _commentController,
                     decoration: const InputDecoration(
                       hintText: 'Escribe un comentario...',
