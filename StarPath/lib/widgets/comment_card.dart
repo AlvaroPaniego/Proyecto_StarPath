@@ -34,38 +34,44 @@ class _CommentCardState extends State<CommentCard> {
           ),
           Expanded(
             flex: 5,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                FutureBuilder<String>(
-                  future:
-                  getCommentUsernameAsync(widget.comment.userId),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Text(
-                        snapshot.data!,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold),
-                      );
-                    } else {
-                      return Text(
-                        'Cargando Usuario', //texto temporal mientras se carga el nombre de usuario
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold),
-                      );
-                    }
-                  },
-                ),
-                const SizedBox(height: 4),
-                Text(isAlreadyTranslated
-                    ? translatedComment
-                    : widget.comment.comment
-                ),
-                TextButton(
-                    onPressed:  () async => await translateComment(widget.comment.comment, isAlreadyTranslated),
-                    child: const Text('Traducir')
-                )
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  FutureBuilder<String>(
+                    future:
+                    getCommentUsernameAsync(widget.comment.userId),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                          snapshot.data!,
+                          style: const TextStyle(
+                            color: TEXT,
+                              fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return const Text(
+                          'Cargando Usuario', //texto temporal mientras se carga el nombre de usuario
+                          style: TextStyle(
+                              color: TEXT,
+                              fontWeight: FontWeight.bold),
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 4),
+                  Text(isAlreadyTranslated
+                      ? translatedComment
+                      : widget.comment.comment,
+                    style: const TextStyle(color: TEXT,),
+                  ),
+                  TextButton(
+                      onPressed:  () async => await translateComment(widget.comment.comment, isAlreadyTranslated),
+                      child: const Text('Traducir', style: TextStyle(color: FOCUS_ORANGE,))
+                  )
+                ],
+              ),
             ),
           ),
           Expanded(

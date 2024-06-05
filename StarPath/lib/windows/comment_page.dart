@@ -6,10 +6,13 @@ import 'package:starpath/model/comment.dart';
 import 'package:starpath/model/translate_data.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
+import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/comment_card.dart';
+import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/widgets/votes_comments.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
+import 'package:starpath/windows/main_page.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
@@ -152,19 +155,31 @@ class _CommentPageState extends State<CommentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Comentarios del Post ${widget.postId}'),
-      ),
+      backgroundColor: BACKGROUND,
+      // appBar: AppBar(
+      //   title: const Text('Comentarios de la publicacion'),
+      // ),
+
       body: Column(
         children: [
+          SizedBox(
+            height: MediaQuery.of(context).viewPadding.top,
+          ),
+          UpperAppBar(content: [
+            BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
+            const Text('Comentarios de la publicacion', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+            const SizedBox(width: 40,)
+          ]),
           Expanded(
+            flex: 8,
             child: FutureBuilder<List<Comment>>(
               future: futureComments,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return Center(child: Text('Error: ${snapshot.error}',
+                      style: const TextStyle(color: TEXT,)));
                 } else {
                   final comments = snapshot.data!;
 
@@ -187,14 +202,16 @@ class _CommentPageState extends State<CommentPage> {
                     onTapOutside: (event) =>
                         FocusManager.instance.primaryFocus?.unfocus(),
                     controller: _commentController,
+                    style: const TextStyle(color: TEXT,),
                     decoration: const InputDecoration(
                       hintText: 'Escribe un comentario...',
+                      hintStyle: TextStyle(color: TEXT,)
                     ),
                   ),
                 ),
                 IconButton(
                   onPressed: _addComment,
-                  icon: const Icon(Icons.send),
+                  icon: const Icon(Icons.send, color: Colors.black,),
                 ),
               ],
             ),

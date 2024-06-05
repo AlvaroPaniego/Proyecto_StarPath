@@ -20,6 +20,7 @@ class _VotesForCommentsState extends State<VotesForComments> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         GestureDetector(
           onTap: () async {

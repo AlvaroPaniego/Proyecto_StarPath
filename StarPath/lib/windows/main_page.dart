@@ -93,7 +93,6 @@ class _MainPageState extends State<MainPage> {
                   ],
                 ),
               ),
-              //const SerachBar(),
               Expanded(
                 flex: 1,
                 child: GestureDetector(
