@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/model/user.dart';
@@ -43,13 +44,13 @@ class _LoginState extends State<Login> {
     }
   }
 
-  Future<void> _saveProfileCompletion() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('profileCompleted', true);
-    setState(() {
-      _profileCompleted = true;
-    });
-  }
+  // Future<void> _saveProfileCompletion() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.setBool('profileCompleted', true);
+  //   setState(() {
+  //     _profileCompleted = true;
+  //   });
+  // }
 
   void _loadRememberStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -58,10 +59,10 @@ class _LoginState extends State<Login> {
     });
   }
 
-  void _saveRememberStatus(bool value) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('remember', value);
-  }
+  // void _saveRememberStatus(bool value) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.setBool('remember', value);
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +89,9 @@ class _LoginState extends State<Login> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Image.asset("assets/images/logo.png"),
-                      const SizedBox(height: 80.0),
+                      const SizedBox(height: 40.0),
+                      const Text('Iniciar sesión', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: TEXT),),
+                      const SizedBox(height: 40.0),
                       TextFormField(
                         onTapOutside: (event) =>
                             FocusManager.instance.primaryFocus?.unfocus(),
@@ -177,15 +180,17 @@ class _LoginState extends State<Login> {
                               ),
                             );
                           },
-                          child: const Text(
-                            'Recuperar contraseña',
-                            style: TextStyle(color: BUTTON_BACKGROUND),
+                          child: const Center(
+                            child: Text(
+                              'Recuperar contraseña',
+                              style: TextStyle(color: BUTTON_BACKGROUND),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 20.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           TextButton(
                             onPressed: () async {
@@ -308,7 +313,7 @@ class _LoginState extends State<Login> {
                               width: MediaQuery.of(context).size.width * 0.30,
                               decoration: BoxDecoration(
                                 color: BUTTON_BACKGROUND,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(30),
                               ),
                               child: const Center(
                                 child: Text(
@@ -332,7 +337,7 @@ class _LoginState extends State<Login> {
                               width: MediaQuery.of(context).size.width * 0.30,
                               decoration: BoxDecoration(
                                 color: BUTTON_BACKGROUND,
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(30),
                               ),
                               child: const Center(
                                 child: Text(
