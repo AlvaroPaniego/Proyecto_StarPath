@@ -85,7 +85,9 @@ class _MainPageState extends State<MainPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Image.asset('assets/images/logo.png'),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5.0),
+                        child: Image.asset('assets/images/logo.png')),
                     const Text('STARPATH', style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 25

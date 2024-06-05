@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/back_arrow.dart';
-import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/widgets/user_info_carousel.dart';
 import 'package:starpath/windows/main_page.dart';
