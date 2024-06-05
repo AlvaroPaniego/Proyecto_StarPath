@@ -3,8 +3,6 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/login.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
-import 'package:starpath/model/user.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -211,6 +209,7 @@ class _RegisterState extends State<Register> {
         builder: (context, isKeyboardVisible) {
           return SingleChildScrollView(
             child: Container(
+              height: MediaQuery.of(context).size.height,
               padding: EdgeInsets.fromLTRB(
                 40.0,
                 30.0,
@@ -221,6 +220,7 @@ class _RegisterState extends State<Register> {
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     const SizedBox(height: 30),
                     const Text(
@@ -320,6 +320,7 @@ class _RegisterState extends State<Register> {
                             _passwordVisible
                                 ? Icons.visibility
                                 : Icons.visibility_off,
+                            color: TEXT,
                           ),
                         ),
                       ),
@@ -358,6 +359,7 @@ class _RegisterState extends State<Register> {
                             _repeatPasswordVisible
                                 ? Icons.visibility
                                 : Icons.visibility_off,
+                            color: TEXT,
                           ),
                         ),
                       ),
@@ -371,9 +373,17 @@ class _RegisterState extends State<Register> {
                       },
                     ),
                     const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _registerUser,
-                      child: const Text('Registrarse'),
+                    Column(
+                      children: [
+                        TextButton(
+                            onPressed: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const Login(),), (route) => false),
+                            child: const Text('Ya tengo una cuenta', style: TextStyle(color: FOCUS_ORANGE),)),
+                        ElevatedButton(
+                          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(BUTTON_BACKGROUND)),
+                          onPressed: _registerUser,
+                          child: const Text('Registrarse', style: TextStyle(color: BLACK),),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 30),
                   ],

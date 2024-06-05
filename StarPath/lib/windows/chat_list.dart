@@ -31,8 +31,11 @@ class _ChatListPageState extends State<ChatListPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            UpperAppBar(content: [BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),))]),
-            //Habra que cambiar el ListView por un ListView.builder para que las publicaciones se añadan dinamicamente
+            UpperAppBar(content: [
+              BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
+              const Text('Conversaciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              const SizedBox(width: 40,)
+            ]),
             Expanded(
                 flex: 9,
                 child: Padding(

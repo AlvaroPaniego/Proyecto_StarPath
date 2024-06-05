@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user_data.dart';
-import 'package:starpath/widgets/search_bar.dart';
+import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/widgets/user_info_carousel.dart';
+import 'package:starpath/windows/main_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -29,7 +30,10 @@ class _SearchPageState extends State<SearchPage> {
               height: MediaQuery.of(context).viewPadding.top,
             ),
             UpperAppBar(
-                content: [const BackButton(), searchBar(searchController)]),
+                content: [
+                  BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
+                  searchBar(searchController)
+                ]),
             Expanded(
                 flex: 10,
                 child: Padding(
@@ -69,6 +73,7 @@ class _SearchPageState extends State<SearchPage> {
 
   Widget searchBar(TextEditingController searchController) {
     return Flexible(
+      flex: 5,
       child: Row(
         children: [
           Expanded(

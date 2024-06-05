@@ -17,10 +17,12 @@ class _PostState extends State<Post> {
 
   @override
   Widget build(BuildContext context) {
+    Future<String> futureCommentCount = Future.value("");
     String user = widget.postData.id_user,
         description = widget.postData.description;
 
     bool hasValidImage = widget.postData.content.isNotEmpty;
+    futureCommentCount = getCommentCount(widget.postData.id_post);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
       child: Column(
@@ -36,7 +38,7 @@ class _PostState extends State<Post> {
                 Flexible(
                   flex: 2,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25.0),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(25.0)),
                     child: hasValidImage
                         ? Image.network(widget.postData.content)
                         : Image.asset("assets/images/placeholder-image.jpg"),
@@ -74,11 +76,22 @@ class _PostState extends State<Post> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    CommentPage(postId: postId),
+                                    CommentPage(post: widget.postData, hasReturnToMain: true,),
                               ),
                             );
                           },
-                          child: const Icon(Icons.comment),
+                          child: FutureBuilder(future: futureCommentCount, builder: (context, snapshot) {
+                            if(snapshot.hasData && snapshot.data!.isNotEmpty){
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  const Icon(Icons.comment),
+                                  Text(snapshot.data!)
+                                ],
+                              );
+                            }
+                            return const Icon(Icons.comment);
+                          },)
                         ),
                       ),
                     ],
@@ -90,5 +103,11 @@ class _PostState extends State<Post> {
         ],
       ),
     );
+  }
+  Future<String> getCommentCount(String idPost) async{
+    String commentCount = '0';
+    var res = await supabase.from('comment').count().eq('id_post', idPost);
+    commentCount = res.toString();
+    return commentCount;
   }
 }

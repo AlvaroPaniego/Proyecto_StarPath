@@ -5,9 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
+import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/news.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/widgets/user_info_carousel.dart';
+import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 class ExplorePage extends StatefulWidget {
   const ExplorePage({super.key});
@@ -30,7 +32,11 @@ class _ExplorePageState extends State<ExplorePage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            const UpperAppBar(content: [BackButton()]),
+            UpperAppBar(content: [
+              BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
+              const Text('Explorar', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              const SizedBox(width: 50,)
+            ]),
             Expanded(
               flex: 2,
                 child: SizedBox(

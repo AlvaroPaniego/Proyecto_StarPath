@@ -19,6 +19,7 @@ class _VotesState extends State<Votes> {
     return Expanded(
       flex: 1,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
               onTap: () async{
@@ -37,7 +38,7 @@ class _VotesState extends State<Votes> {
                 });
                 await updateLikesAsync();
               },
-              child: const Icon(Icons.arrow_upward_rounded)),
+              child: const Icon(Icons.thumb_up)),
           Text("${widget.likes}"),
           GestureDetector(
               onTap: () async{
@@ -56,7 +57,7 @@ class _VotesState extends State<Votes> {
                 });
                 await updateLikesAsync();
               },
-              child: const Icon(Icons.arrow_downward_rounded)),
+              child: const Icon(Icons.thumb_down)),
           Text("${widget.dislikes}")
         ],
       ),

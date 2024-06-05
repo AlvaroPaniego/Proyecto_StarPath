@@ -20,6 +20,7 @@ class _VotesForCommentsState extends State<VotesForComments> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         GestureDetector(
           onTap: () async {
@@ -41,9 +42,9 @@ class _VotesForCommentsState extends State<VotesForComments> {
             });
             await updateLikesAsync();
           },
-          child: const Icon(Icons.thumb_up),
+          child: const Icon(Icons.thumb_up, color: TEXT),
         ),
-        Text("${widget.comment.likes}"),
+        Text("${widget.comment.likes}", style: const TextStyle(color: TEXT),),
         GestureDetector(
           onTap: () async {
             setState(() {
@@ -64,9 +65,9 @@ class _VotesForCommentsState extends State<VotesForComments> {
             });
             await updateLikesAsync();
           },
-          child: const Icon(Icons.thumb_down),
+          child: const Icon(Icons.thumb_down, color: TEXT,),
         ),
-        Text("${widget.comment.dislikes}"),
+        Text("${widget.comment.dislikes}", style: const TextStyle(color: TEXT)),
       ],
     );
   }

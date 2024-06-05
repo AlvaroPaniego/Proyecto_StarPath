@@ -29,7 +29,6 @@ class _EventMainPageState extends State<EventMainPage> {
   Future<List<EventData>> futureEvents = Future.value([EventData.empty()]);
   UserData userData = UserData.empty();
   int _selectedIndex = 0;
-  TextEditingController _searchController = TextEditingController();
   static const List<Widget> _widgetOptions = <Widget>[
     EventMainList(),
     TodayEventList(),
