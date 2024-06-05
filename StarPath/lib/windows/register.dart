@@ -320,6 +320,7 @@ class _RegisterState extends State<Register> {
                             _passwordVisible
                                 ? Icons.visibility
                                 : Icons.visibility_off,
+                            color: TEXT,
                           ),
                         ),
                       ),
@@ -358,6 +359,7 @@ class _RegisterState extends State<Register> {
                             _repeatPasswordVisible
                                 ? Icons.visibility
                                 : Icons.visibility_off,
+                            color: TEXT,
                           ),
                         ),
                       ),
@@ -375,10 +377,11 @@ class _RegisterState extends State<Register> {
                       children: [
                         TextButton(
                             onPressed: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const Login(),), (route) => false),
-                            child: const Text('Ya tengo una cuenta', style: TextStyle(color: TEXT),)),
+                            child: const Text('Ya tengo una cuenta', style: TextStyle(color: FOCUS_ORANGE),)),
                         ElevatedButton(
+                          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(BUTTON_BACKGROUND)),
                           onPressed: _registerUser,
-                          child: const Text('Registrarse'),
+                          child: const Text('Registrarse', style: TextStyle(color: BLACK),),
                         ),
                       ],
                     ),

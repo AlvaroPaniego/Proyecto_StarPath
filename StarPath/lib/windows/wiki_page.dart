@@ -1,4 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:starpath/widgets/back_arrow.dart';
+import 'package:starpath/widgets/upper_app_bar.dart';
+import 'package:starpath/windows/main_page.dart';
 
 class WikiPage extends StatefulWidget {
   const WikiPage({Key? key}) : super(key: key);
@@ -53,13 +58,19 @@ class _AstronomyWikiPageState extends State<WikiPage> {
         .toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Astronomy Wiki'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            TextField(
+      body: Column(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).viewPadding.top,
+          ),
+          UpperAppBar(content: [
+            BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
+            const Text('Consultas astronómicas', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+            const SizedBox(width: 40,)
+          ]),
+          Expanded(
+            flex: 1,
+            child: TextField(
               onTapOutside: (event) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
               onChanged: (value) {
@@ -67,25 +78,31 @@ class _AstronomyWikiPageState extends State<WikiPage> {
                   searchText = value;
                 });
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 hintText:
                     'Busca información de un planeta del Sistema Solar...',
                 prefixIcon: Icon(Icons.search),
               ),
             ),
-            searchText.isEmpty
-                ? Center(
+          ),
+          searchText.isEmpty
+              ? const Expanded(
+                flex: 8,
+                child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(16.0),
                       child: Text(
                         'Introduce las primeras letras de un planeta...',
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ),
-                  )
-                : ListView.builder(
+                  ),
+              )
+              : Expanded(
+                flex: 2,
+                child: ListView.builder(
                     shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: filteredPlanets.length,
                     itemBuilder: (context, index) {
                       return ListTile(
@@ -99,30 +116,30 @@ class _AstronomyWikiPageState extends State<WikiPage> {
                       );
                     },
                   ),
-            if (selectedPlanet.isNotEmpty) ...[
-              Divider(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Text(
-                      selectedPlanet,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    Image.asset(
-                      'assets/images/$selectedPlanet.png',
-                      height: 150,
-                      width: 150,
-                    ),
-                    SizedBox(height: 10),
-                    Text(texto),
-                  ],
-                ),
               ),
-            ],
+          if (selectedPlanet.isNotEmpty) ...[
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    selectedPlanet,
+                    style:
+                        const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  Image.asset(
+                    'assets/images/$selectedPlanet.png',
+                    height: 150,
+                    width: 150,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(texto),
+                ],
+              ),
+            ),
           ],
-        ),
+        ],
       ),
     );
   }

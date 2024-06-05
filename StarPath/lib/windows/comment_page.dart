@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:starpath/model/PostData.dart';
 import 'package:starpath/model/comment.dart';
 import 'package:starpath/model/translate_data.dart';
 import 'package:starpath/model/user_data.dart';
@@ -17,10 +18,11 @@ import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
 class CommentPage extends StatefulWidget {
-  final String postId;
+  final PostData post;
+  final bool hasReturnToMain;
 
 
-  const CommentPage({Key? key, required this.postId}) : super(key: key);
+  const CommentPage({super.key, required this.post, required this.hasReturnToMain});
 
   @override
   _CommentPageState createState() => _CommentPageState();
@@ -50,7 +52,7 @@ class _CommentPageState extends State<CommentPage> {
       final response = await supabase
           .from('comment')
           .select('*, user(profile_picture)')
-          .eq('id_post', widget.postId)
+          .eq('id_post', widget.post.id_post)
           .match({'deleted': false}).order('created_at', ascending: true);
 
       final List<Comment> loadedComments = [];
@@ -119,7 +121,7 @@ class _CommentPageState extends State<CommentPage> {
     if (currentUser != null) {
       final newComment = Comment(
           commentId: const Uuid().v4(),
-          postId: widget.postId,
+          postId: widget.post.id_post,
           comment: _commentController.text.trim(),
           likes: 0,
           dislikes: 0,
@@ -154,24 +156,33 @@ class _CommentPageState extends State<CommentPage> {
 
   @override
   Widget build(BuildContext context) {
+    bool hasValidImage = widget.post.content.isNotEmpty;
     return Scaffold(
       backgroundColor: BACKGROUND,
-      // appBar: AppBar(
-      //   title: const Text('Comentarios de la publicacion'),
-      // ),
-
       body: Column(
         children: [
           SizedBox(
             height: MediaQuery.of(context).viewPadding.top,
           ),
           UpperAppBar(content: [
-            BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
+            widget.hasReturnToMain
+                ? BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),))
+                : const BackButton()
+            ,
             const Text('Comentarios de la publicacion', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
             const SizedBox(width: 40,)
           ]),
           Expanded(
-            flex: 8,
+              flex: 3,
+              child: ClipRRect(
+                child: hasValidImage
+                    ? Image.network(widget.post.content)
+                    : Image.asset('assets/images/placeholder-image.jpg')
+              )
+          ),
+          const Divider(color: FOCUS_ORANGE, thickness: 2.5,),
+          Expanded(
+            flex: 5,
             child: FutureBuilder<List<Comment>>(
               future: futureComments,
               builder: (context, snapshot) {
@@ -211,7 +222,7 @@ class _CommentPageState extends State<CommentPage> {
                 ),
                 IconButton(
                   onPressed: _addComment,
-                  icon: const Icon(Icons.send, color: Colors.black,),
+                  icon: const Icon(Icons.send, color: TEXT),
                 ),
               ],
             ),

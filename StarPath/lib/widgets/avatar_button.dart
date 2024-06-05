@@ -39,7 +39,16 @@ class _AvatarButtonState extends State<AvatarButton> {
                 if (snapshot.data![0]["profile_picture"] == "") {
                   return Image.asset("assets/images/placeholder-avatar.jpg");
                 }
-                return Image.network(snapshot.data![0]["profile_picture"]);
+                return
+                //   Container(
+                //   decoration: BoxDecoration(
+                //       image: DecorationImage(
+                //           fit: BoxFit.cover,
+                //           image: NetworkImage(snapshot.data![0]["profile_picture"])
+                //       )
+                //   ),
+                // );
+                  Image.network(snapshot.data![0]["profile_picture"], fit: BoxFit.cover,);
               } else if (snapshot.hasError) {
                 return Image.asset("assets/images/placeholder-avatar.jpg");
               }

@@ -151,8 +151,8 @@ class _LoginState extends State<Login> {
                               });
                             },
                             icon: _passwordVisible
-                                ? Icon(Icons.visibility)
-                                : Icon(Icons.visibility_off),
+                                ? const Icon(Icons.visibility, color: TEXT)
+                                : const Icon(Icons.visibility_off, color: TEXT),
                           ),
                         ),
                         validator: (value) {
@@ -183,7 +183,7 @@ class _LoginState extends State<Login> {
                           child: const Center(
                             child: Text(
                               'Recuperar contraseña',
-                              style: TextStyle(color: BUTTON_BACKGROUND),
+                              style: TextStyle(color: FOCUS_ORANGE),
                             ),
                           ),
                         ),

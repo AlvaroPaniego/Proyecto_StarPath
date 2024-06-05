@@ -76,7 +76,7 @@ class _PostState extends State<Post> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    CommentPage(postId: postId),
+                                    CommentPage(post: widget.postData, hasReturnToMain: true,),
                               ),
                             );
                           },

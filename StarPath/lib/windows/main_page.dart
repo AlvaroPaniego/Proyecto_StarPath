@@ -21,6 +21,7 @@ import 'package:starpath/windows/login.dart';
 import 'package:starpath/windows/options.dart';
 import 'package:starpath/windows/search_window.dart';
 import 'package:starpath/windows/user_profile_page.dart';
+import 'package:starpath/windows/wiki_page.dart';
 import 'package:supabase/supabase.dart';
 
 class MainPage extends StatefulWidget {
@@ -135,19 +136,11 @@ class _MainPageState extends State<MainPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       const CameraButton(),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     Navigator.push(
-                      //         context,
-                      //         MaterialPageRoute(
-                      //           builder: (context) => const OptionsMainPage(),
-                      //         ));
-                      //   },
-                      //   child: const Icon(Icons.settings),
-                      // ),
                       GestureDetector(
-                        onTap: () {},
-                        child: const Icon(Icons.mail),
+                        onTap: () {
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const WikiPage(),), (route) => false);
+                        },
+                        child: const Icon(Icons.account_balance),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -196,7 +189,15 @@ class _MainPageState extends State<MainPage> {
                 if (snapshot.data!.profile_picture == "") {
                   return Image.asset("assets/images/placeholder-avatar.jpg");
                 }
-                return Image.network(snapshot.data!.profile_picture );
+                return Container(
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(snapshot.data!.profile_picture)
+                      )
+                  ),
+                );
+                  //Image.network(snapshot.data!.profile_picture );
               } else if (snapshot.hasError) {
                 return Image.asset("assets/images/placeholder-avatar.jpg");
               }

@@ -16,7 +16,7 @@ class FollowButton extends StatefulWidget {
 }
 
 class _FollowButtonState extends State<FollowButton> {
-  late Future<bool> hasFollowed;
+  Future<bool> hasFollowed = Future.error(2);
   late bool isForUser;
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class _FollowButtonState extends State<FollowButton> {
     }
     isForUser = widget.userData != null;
     var text = isForUser ? 'Seguir' : 'Asistir';
-    return Expanded(
+    return Flexible(
         flex: 1,
         child: FutureBuilder(
           future: hasFollowed,
