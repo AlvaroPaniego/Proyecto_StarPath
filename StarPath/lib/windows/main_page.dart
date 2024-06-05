@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/PostData.dart';
@@ -12,9 +14,13 @@ import 'package:starpath/widgets/post.dart';
 import 'package:starpath/widgets/search_bar.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/windows/chat_list.dart';
+import 'package:starpath/windows/edit_profile_page.dart';
 import 'package:starpath/windows/event_main_page.dart';
 import 'package:starpath/windows/explore_page.dart';
+import 'package:starpath/windows/login.dart';
 import 'package:starpath/windows/options.dart';
+import 'package:starpath/windows/search_window.dart';
+import 'package:starpath/windows/user_profile_page.dart';
 import 'package:supabase/supabase.dart';
 
 class MainPage extends StatefulWidget {
@@ -73,9 +79,30 @@ class _MainPageState extends State<MainPage> {
               height: MediaQuery.of(context).viewPadding.top,
             ),
             UpperAppBar(content: [
-              buildAvatarButton(user),
-              const SerachBar(),
-              const CameraButton()
+              buildAvatarButton(),
+              Expanded(
+                flex: 3,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Image.asset('assets/images/logo.png'),
+                    const Text('STARPATH', style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25
+                    ),)
+                  ],
+                ),
+              ),
+              //const SerachBar(),
+              Expanded(
+                flex: 1,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SearchPage(),), (route) => false);
+                  },
+                  child: const Icon(Icons.search),
+                ),
+              )
             ]),
             Expanded(
                 flex: 8,
@@ -106,16 +133,17 @@ class _MainPageState extends State<MainPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const OptionsMainPage(),
-                              ));
-                        },
-                        child: const Icon(Icons.settings),
-                      ),
+                      const CameraButton(),
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     Navigator.push(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //           builder: (context) => const OptionsMainPage(),
+                      //         ));
+                      //   },
+                      //   child: const Icon(Icons.settings),
+                      // ),
                       GestureDetector(
                         onTap: () {},
                         child: const Icon(Icons.mail),
@@ -153,18 +181,57 @@ class _MainPageState extends State<MainPage> {
         ));
   }
 
-  FutureBuilder<UserData> buildAvatarButton(User user) {
-    return FutureBuilder(
-      future: userData,
-      builder: (context, snapshot) {
-        if (snapshot.hasData && snapshot.data!.username != 'vacio') {
-          return AvatarButton(
-            profilePictureFuture: getProfilePicture(user),
-            user: snapshot.data!,
-          );
-        }
-        return const Center(child: CircularProgressIndicator());
-      },
+  Widget buildAvatarButton() {
+    return Expanded(
+      flex: 1,
+      child: PopupMenuButton(
+        position: PopupMenuPosition.under,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(45.0),
+          child: FutureBuilder(
+            future: userData,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data!.profile_picture == "") {
+                  return Image.asset("assets/images/placeholder-avatar.jpg");
+                }
+                return Image.network(snapshot.data!.profile_picture );
+              } else if (snapshot.hasError) {
+                return Image.asset("assets/images/placeholder-avatar.jpg");
+              }
+              return Image.asset("assets/images/placeholder-avatar.jpg");
+            },
+          ),
+        ),
+        itemBuilder: (context) => <PopupMenuEntry>[
+          PopupMenuItem(child: FutureBuilder(future: userData, builder: (context, snapshot) {
+            if(snapshot.hasData){
+              return GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage(userData: snapshot.data!),)),
+                child: const Text('Editar perfil'),
+              );
+            }
+            return const Text('Editar perfil');
+          },)),
+          PopupMenuItem(child: FutureBuilder(future: userData, builder: (context, snapshot) {
+            if(snapshot.hasData){
+              return GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfilePage(userData: snapshot.data!),)),
+                child: const Text('Ver perfil'),
+              );
+            }
+            return const Text('Ver perfil');
+          },)),
+          PopupMenuItem(child: GestureDetector(
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Login()),
+                      (Route<dynamic> route) => false,
+                );
+              },
+              child: const Text("Cerrar sesion"))),
+        ] ,),
     );
   }
 

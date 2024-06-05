@@ -21,6 +21,7 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   UserData senderUser = UserData.empty();
   late Future<List<Message>> futureMessages;
 
@@ -37,11 +38,18 @@ class _ChatPageState extends State<ChatPage> {
         var idSender = payload.newRecord['id_user_sender'];
         if(isMessageInConversation(idSender, idReceiver, senderUser, widget.receiverUser)){
           var senderUserAux = await getUserDataAsync(idSender);
+          var auxMessageList = await futureMessages;
           setState(() {
-            futureMessages.then((value) {
-              value.add(Message(senderUserAux.username, payload.newRecord['message'], idSender));
-            });
+            auxMessageList.add(Message(senderUserAux.username, payload.newRecord['message'], idSender));
+            // futureMessages.then((value) {
+            //   value.add(Message(senderUserAux.username, payload.newRecord['message'], idSender));
+            // });
           });
+          // print(_scrollController.position.maxScrollExtent);
+            _scrollController.animateTo(0.0,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.bounceIn,
+            );
         }
       },).subscribe();
   }
@@ -58,7 +66,7 @@ class _ChatPageState extends State<ChatPage> {
     futureMessages = getFutureMessagesAsync(user.id, widget.receiverUser.id_user);
     bool hasValidImage = widget.receiverUser.profile_picture.isNotEmpty;
     return Scaffold(
-        resizeToAvoidBottomInset: false,
+        // resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
         body: Column(
           children: [
@@ -69,9 +77,12 @@ class _ChatPageState extends State<ChatPage> {
                 content: [
                   const BackButton(),
                   Text(widget.receiverUser.username),
-                  hasValidImage
-                      ? Image.network(widget.receiverUser.profile_picture)
-                      : Image.asset("assets/images/placeholder-image.jpg")
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(45.0),
+                    child: hasValidImage
+                        ? Image.network(widget.receiverUser.profile_picture)
+                        : Image.asset("assets/images/placeholder-image.jpg"),
+                  )
                 ]),
             Expanded(
                 flex: 8,
@@ -84,11 +95,14 @@ class _ChatPageState extends State<ChatPage> {
                           child: Text("Escribe para empezar la conversacion :)", style: TextStyle(color: TEXT),),
                         );
                       }
+                      var finalMessages = snapshot.data!.reversed;
                       return ListView.builder(
-                        itemCount: snapshot.data!.length,
+                        reverse: true,
+                        controller: _scrollController,
+                        itemCount: finalMessages.length,
                         itemBuilder: (context, index) {
-                          return MessageBubble(messageData: snapshot.data![index],
-                              isSender: snapshot.data![index].sender_id != user.id);
+                          return MessageBubble(messageData: finalMessages.elementAt(index),
+                              isSender: finalMessages.elementAt(index).sender_id != user.id);
                         });
                     }else if(snapshot.hasError){
                       return const Center(

@@ -55,6 +55,7 @@ class _ChatCardState extends State<ChatCard> {
           Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(receiverUser: widget.chatData.receiverUser ),));
         },
         child: Container(
+          height: 75,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(25.0),
@@ -76,6 +77,7 @@ class _ChatCardState extends State<ChatCard> {
                 child: FutureBuilder(future: futureFollowers, builder: (context, snapshot) {
                   if(snapshot.hasData && snapshot.data!.isNotEmpty){
                     return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(widget.chatData.receiverUser.username, style: const TextStyle(fontWeight: FontWeight.bold)),
