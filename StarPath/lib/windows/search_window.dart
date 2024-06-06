@@ -117,7 +117,7 @@ class _SearchPageState extends State<SearchPage> {
     UserData userData = UserData.empty();
     var res = await supabase
         .from('user')
-        .select('id_user, username, profile_picture')
+        .select('id_user, username, profile_picture, privacy')
         .ilike('username', '$user%');
     for (var user in res) {
       userData = UserData.empty();
@@ -125,6 +125,7 @@ class _SearchPageState extends State<SearchPage> {
       userData.username = user['username'];
       userData.profile_picture = user['profile_picture'];
       userData.followers = '0';
+      userData.privacy = res.first['privacy'];
       userList.add(userData);
     }
     return userList;

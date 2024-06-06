@@ -273,12 +273,13 @@ class _CommentPageState extends State<CommentPage> {
     UserData user = UserData.empty();
     var res = await supabase
         .from('user')
-        .select("id_user, username, profile_picture")
+        .select("id_user, username, profile_picture, privacy")
         .match({'id_user': id_user});
     user.id_user = res.first['id_user'];
     user.username = res.first['username'];
     user.profile_picture = res.first['profile_picture'];
     user.followers = '0';
+    user.privacy = res.first['privacy'];
     print(user.username);
     return user;
   }
