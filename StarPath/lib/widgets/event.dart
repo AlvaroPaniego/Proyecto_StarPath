@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
@@ -19,6 +18,7 @@ class Event extends StatefulWidget {
 
 class _EventState extends State<Event> {
   Future<String> futureAsistant = Future.value("vacio");
+
   @override
   void initState() {
     futureAsistant = getEventsAsistants(widget.eventData.idEvent);
@@ -63,7 +63,6 @@ class _EventState extends State<Event> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
-
                   flex: 2,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25.0),
@@ -110,7 +109,13 @@ class _EventState extends State<Event> {
                                             backgroundColor:
                                                 MaterialStateProperty.all(
                                                     BUTTON_BACKGROUND)),
-                                        onPressed:() => Navigator.push(context, MaterialPageRoute(builder: (context) => EditEventPage(eventData: widget.eventData))),
+                                        onPressed: () => Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EditEventPage(
+                                                        eventData:
+                                                            widget.eventData))),
                                         child: const Text(
                                           'Editar',
                                           style: TextStyle(color: TEXT),

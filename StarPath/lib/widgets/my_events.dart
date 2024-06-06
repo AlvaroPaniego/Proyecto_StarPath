@@ -35,14 +35,20 @@ class _EventMainPageState extends State<MyEventList> {
           future: futureEvents,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              if(snapshot.data!.isEmpty){
-                return const Center(child: Text('No has creado ningún evento.', style: TextStyle(color: TEXT),));
+              if (snapshot.data!.isEmpty) {
+                return const Center(
+                    child: Text(
+                  'No has creado ningún evento.',
+                  style: TextStyle(color: TEXT),
+                ));
               }
-              //print("hay ${snapshot.data!.length} datos");
               return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  return Event(eventData: snapshot.data![index], canEdit: true,);
+                  return Event(
+                    eventData: snapshot.data![index],
+                    canEdit: true,
+                  );
                 },
               );
             }
@@ -50,7 +56,8 @@ class _EventMainPageState extends State<MyEventList> {
           },
         ));
   }
-  Future<UserData> getUserDataAsync(String id_user) async{
+
+  Future<UserData> getUserDataAsync(String id_user) async {
     UserData user = UserData.empty();
     var res = await supabase
         .from('user')
@@ -62,20 +69,31 @@ class _EventMainPageState extends State<MyEventList> {
     user.followers = '0';
     return user;
   }
-  Future<List<EventData>> getEvents(User user) async{
+
+  Future<List<EventData>> getEvents(User user) async {
     List<EventData> eventList = [];
     EventData eventData;
-    var res = await supabase.rpc('getuserevents', params: {'idloggeduser' : user.id});
     DateFormat format = DateFormat.yMd();
+
+    var res =
+        await supabase.rpc('getuserevents', params: {'idloggeduser': user.id});
     for (var event in res) {
-      eventData = EventData.empty();
-      eventData.idEvent = event['id'].toString();
-      eventData.username = event['name_user'];
-      eventData.description = event['description'];
-      eventData.title = event['title'];
-      eventData.eventDate = format.format(DateTime.parse(event['time']));
-      eventData.eventImage = event['event_image'] ?? 'vacio';
-      eventData.asistants = '0';
+      var resFollowers = await supabase
+          .from('event_followers')
+          .count()
+          .eq('id_event', event['id']);
+      var asistants = resFollowers.toString();
+      eventData = EventData(
+        idEvent: event['id'].toString(),
+        title: event['title'],
+        eventDate: format.format(DateTime.parse(event['time'])),
+        description: event['description'],
+        username: event['name_user'],
+        asistants: asistants,
+        eventImage: event['event_image'] ?? 'vacio',
+        latitude: event['latitude'],
+        longitude: event['longitude'],
+      );
       eventList.add(eventData);
     }
     return eventList;

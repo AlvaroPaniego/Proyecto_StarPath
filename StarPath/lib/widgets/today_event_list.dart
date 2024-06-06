@@ -1,56 +1,110 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
-import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/event.dart';
-import 'package:starpath/widgets/search_bar.dart';
-import 'package:starpath/widgets/upper_app_bar.dart';
-import 'package:starpath/windows/create_event.dart';
-import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 
 class TodayEventList extends StatefulWidget {
   const TodayEventList({super.key});
 
   @override
-  State<TodayEventList> createState() => _EventMainPageState();
+  State<TodayEventList> createState() => _TodayEventListState();
 }
 
-class _EventMainPageState extends State<TodayEventList> {
+class _TodayEventListState extends State<TodayEventList> {
   Future<List<EventData>> futureEvents = Future.value([EventData.empty()]);
   UserData userData = UserData.empty();
+  late Future<Position> _currentPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPosition = _determinePosition();
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error(
+          'Los servicios de localización están deshabilitados.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Los permisos de localización fueron denegados.');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Los permisos de localización fueron denegados permanentemente.');
+    }
+    print('Obteniendo posición del usuario: $_currentPosition');
+
+    return await Geolocator.getCurrentPosition();
+  }
+
   @override
   Widget build(BuildContext context) {
     futureEvents = getEvents();
     User user = context.watch<UserProvider>().user!;
     getUserDataAsync(user.id).then((value) => userData = value);
+
     return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FutureBuilder(
-          future: futureEvents,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              if(snapshot.data!.isEmpty){
-                return const Center(child: Text('No hay eventos planeados para hoy.', style: TextStyle(color: TEXT),));
-              }
-              //print("hay ${snapshot.data!.length} datos");
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  return Event(eventData: snapshot.data![index], canEdit: false,);
-                },
+      padding: const EdgeInsets.all(8.0),
+      child: FutureBuilder(
+        future: Future.wait([futureEvents, _currentPosition]),
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else {
+            final events = snapshot.data![0] as List<EventData>;
+            final userPosition = snapshot.data![1] as Position?;
+            if (userPosition == null) {
+              return const Center(
+                child: Text(
+                  'No se pudo obtener la posición del usuario.',
+                  style: TextStyle(color: TEXT),
+                ),
               );
             }
-            return const Center(child: CircularProgressIndicator());
-          },
-        ));
+            final nearbyEvents = EventData.filterEventsByProximity(
+                events, userPosition, 10000); // 10km
+
+            if (nearbyEvents.isEmpty) {
+              return const Center(
+                  child: Text(
+                'No hay eventos planeados para hoy cercanos.',
+                style: TextStyle(color: TEXT),
+              ));
+            }
+
+            return ListView.builder(
+              itemCount: nearbyEvents.length,
+              itemBuilder: (context, index) {
+                return Event(eventData: nearbyEvents[index], canEdit: false);
+              },
+            );
+          }
+        },
+      ),
+    );
   }
-  Future<UserData> getUserDataAsync(String id_user) async{
+
+  Future<UserData> getUserDataAsync(String id_user) async {
     UserData user = UserData.empty();
     var res = await supabase
         .from('user')
@@ -62,7 +116,8 @@ class _EventMainPageState extends State<TodayEventList> {
     user.followers = '0';
     return user;
   }
-  Future<List<EventData>> getEvents() async{
+
+  Future<List<EventData>> getEvents() async {
     List<EventData> eventList = [];
     EventData eventData;
     var date = DateTime.now();
@@ -70,14 +125,17 @@ class _EventMainPageState extends State<TodayEventList> {
     var res = await supabase.from('events').select().eq('time', dateToday);
     DateFormat format = DateFormat.yMd();
     for (var event in res) {
-      eventData = EventData.empty();
-      eventData.idEvent = event['id'].toString();
-      eventData.username = event['name_user'];
-      eventData.description = event['description'];
-      eventData.title = event['title'];
-      eventData.eventDate = format.format(DateTime.parse(event['time']));
-      eventData.eventImage = event['event_image'] ?? 'vacio';
-      eventData.asistants = '0';
+      eventData = EventData(
+        idEvent: event['id'].toString(),
+        username: event['name_user'],
+        description: event['description'],
+        title: event['title'],
+        eventDate: format.format(DateTime.parse(event['time'])),
+        eventImage: event['event_image'] ?? 'vacio',
+        asistants: '0',
+        latitude: event['latitude'],
+        longitude: event['longitude'],
+      );
       eventList.add(eventData);
     }
     return eventList;
