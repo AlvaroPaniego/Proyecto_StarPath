@@ -11,16 +11,16 @@ import 'package:starpath/widgets/event.dart';
 import 'package:supabase/supabase.dart';
 
 class TodayEventList extends StatefulWidget {
-  const TodayEventList({super.key});
+  const TodayEventList({Key? key}) : super(key: key);
 
   @override
   State<TodayEventList> createState() => _TodayEventListState();
 }
 
 class _TodayEventListState extends State<TodayEventList> {
-  Future<List<EventData>> futureEvents = Future.value([EventData.empty()]);
+  late Future<List<EventData>> futureEvents;
   UserData userData = UserData.empty();
-  late Future<Position> _currentPosition;
+  late Future<Position?> _currentPosition;
 
   @override
   void initState() {
@@ -28,38 +28,35 @@ class _TodayEventListState extends State<TodayEventList> {
     _currentPosition = _determinePosition();
   }
 
-  Future<Position> _determinePosition() async {
+  Future<Position?> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      return Future.error(
-          'Los servicios de localización están deshabilitados.');
+      throw Exception('Los servicios de localización están deshabilitados.');
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        return Future.error('Los permisos de localización fueron denegados.');
+        throw Exception('Los permisos de localización fueron denegados.');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      return Future.error(
+      throw Exception(
           'Los permisos de localización fueron denegados permanentemente.');
     }
-    print('Obteniendo posición del usuario: $_currentPosition');
 
     return await Geolocator.getCurrentPosition();
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<UserProvider>().user!;
     futureEvents = getEvents();
-    User user = context.watch<UserProvider>().user!;
-    getUserDataAsync(user.id).then((value) => userData = value);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -104,28 +101,14 @@ class _TodayEventListState extends State<TodayEventList> {
     );
   }
 
-  Future<UserData> getUserDataAsync(String id_user) async {
-    UserData user = UserData.empty();
-    var res = await supabase
-        .from('user')
-        .select("id_user, username, profile_picture")
-        .match({'id_user': id_user});
-    user.id_user = res.first['id_user'];
-    user.username = res.first['username'];
-    user.profile_picture = res.first['profile_picture'];
-    user.followers = '0';
-    return user;
-  }
-
   Future<List<EventData>> getEvents() async {
-    List<EventData> eventList = [];
-    EventData eventData;
-    var date = DateTime.now();
-    var dateToday = DateTime(date.year, date.month, date.day);
-    var res = await supabase.from('events').select().eq('time', dateToday);
-    DateFormat format = DateFormat.yMd();
+    final List<EventData> eventList = [];
+    final date = DateTime.now();
+    final dateToday = DateTime(date.year, date.month, date.day);
+    final res = await supabase.from('events').select().eq('time', dateToday);
+    final format = DateFormat.yMd();
     for (var event in res) {
-      eventData = EventData(
+      final eventData = EventData(
         idEvent: event['id'].toString(),
         username: event['name_user'],
         description: event['description'],

@@ -11,7 +11,7 @@ import 'package:starpath/widgets/event.dart';
 import 'package:supabase/supabase.dart';
 
 class EventMainList extends StatefulWidget {
-  const EventMainList({super.key});
+  const EventMainList({Key? key}) : super(key: key);
 
   @override
   State<EventMainList> createState() => _EventMainPageState();
@@ -51,9 +51,11 @@ class _EventMainPageState extends State<EventMainList> {
           'Los permisos de localización fueron denegados permanentemente.');
     }
 
-    print('Obteniendo posición del usuario: $_currentPosition');
+    // Obtener la posición del usuario
+    var position = await Geolocator.getCurrentPosition();
+    print('1 Obteniendo posición del usuario: $position');
 
-    return await Geolocator.getCurrentPosition();
+    return position;
   }
 
   @override
