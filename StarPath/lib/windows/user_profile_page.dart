@@ -13,6 +13,7 @@ import 'package:starpath/windows/ChatPage.dart';
 import 'package:starpath/windows/comment_page.dart';
 import 'package:starpath/windows/follower_list.dart';
 import 'package:starpath/windows/main_page.dart';
+import 'package:starpath/windows/user_event.dart';
 import 'package:supabase/supabase.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -100,19 +101,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               AvatarButton.LogedUserPage(
                                 profilePictureFuture: _avatarFuture,
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: FutureBuilder(future: _followersFuture, builder: (context, snapshot) {
-                                  if(snapshot.hasData && snapshot.data!.isNotEmpty){
-                                    return TextButton(
-                                        onPressed: () {
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) => FollowersListPage(userData: widget.userData),));
-                                        },
-                                        child: Text('Seguidores: ${snapshot.data!}', style: const TextStyle(color: TEXT),));
-                                  }
-                                  return const Text('Seguidores:  ', style: TextStyle(color: TEXT),);
-                                },)
-                              )
+
                             ],
                           ),
                           const SizedBox(width: 16),
@@ -143,6 +132,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 },
               ),
             ),
+          ),
+          Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  FutureBuilder(future: _followersFuture, builder: (context, snapshot) {
+                    if(snapshot.hasData && snapshot.data!.isNotEmpty){
+                      return TextButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => FollowersListPage(userData: widget.userData),));
+                          },
+                          child: Text('Seguidores: ${snapshot.data!}', style: const TextStyle(color: TEXT),));
+                    }
+                    return const Text('Seguidores:  ', style: TextStyle(color: TEXT),);
+                  },),
+                  TextButton(onPressed: () {
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => UserEventList(userData: widget.userData),), (route) => false);
+                  }, child: const Text('Ver eventos', style: TextStyle(color: TEXT)))
+                ],
+              )
           ),
           user.id != widget.userData.id_user ? Expanded(
             flex: 1,
