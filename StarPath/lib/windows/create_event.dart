@@ -44,7 +44,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
             ),
           ]),
           Expanded(
-            flex: 4,
+            flex: 6,
             child: isImageSelected
                 ? Image.file(File(filePath))
                 : const Center(
@@ -54,7 +54,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ),
             ),
           ),
-          Expanded(
+          Flexible(
             flex: 1,
             child: ElevatedButton(
                 onPressed: () async {
@@ -82,9 +82,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 onTapOutside: (event) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _titleController,
-                decoration:
-                const InputDecoration(hintText: "Introduce el título"),
-                style: const TextStyle(color: TEXT),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelStyle: TextStyle(color: FOCUS_ORANGE),
+                  labelText: 'Introduce el nombre del evento',
+                ),
               ),
             ),
           ),Expanded(
@@ -95,9 +97,11 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 onTapOutside: (event) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _descriptionController,
-                decoration:
-                const InputDecoration(hintText: "Introduce la descripción"),
-                style: const TextStyle(color: TEXT),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelStyle: TextStyle(color: FOCUS_ORANGE),
+                  labelText: 'Introduce una descripcion',
+                ),
               ),
             ),
           ),
@@ -112,7 +116,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 decoration:
                 const InputDecoration(
                   labelText: "Introduce la fecha",
-                  prefixIcon: Icon((Icons.calendar_month))
+                  labelStyle: TextStyle(color: TEXT),
+                  prefixIcon: Icon((Icons.calendar_month), color: TEXT,)
                 ),
                 readOnly: true,
                 onTap: () {
@@ -122,7 +127,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ),
             ),
           ),
-          Expanded(
+          Flexible(
             flex: 1,
             child: ElevatedButton(
               onPressed: () {
