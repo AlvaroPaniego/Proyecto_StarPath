@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
@@ -18,7 +19,7 @@ import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 
 class EventMainPage extends StatefulWidget {
-  const EventMainPage({Key? key});
+  const EventMainPage({super.key});
 
   @override
   State<EventMainPage> createState() => _EventMainPageState();
@@ -33,7 +34,6 @@ class _EventMainPageState extends State<EventMainPage> {
     TodayEventList(),
     MyEventList()
   ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -42,72 +42,63 @@ class _EventMainPageState extends State<EventMainPage> {
 
   @override
   Widget build(BuildContext context) {
-    final futureEvents = getEvents();
-    final user = context.watch<UserProvider>().user!;
+    futureEvents = getEvents();
+    User user = context.watch<UserProvider>().user!;
     getUserDataAsync(user.id).then((value) => userData = value);
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: BACKGROUND,
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Buscar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.today),
-            label: 'Hoy',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Mis eventos',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).viewPadding.top,
-          ),
-          UpperAppBar(content: [
-            BackArrow(
-              route: MaterialPageRoute(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: BACKGROUND,
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.search),
+              label: 'Buscar',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.today),
+              label: 'Hoy',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Mis eventos',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.amber[800],
+          onTap: _onItemTapped,
+        ),
+        body: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).viewPadding.top,
+            ),
+            UpperAppBar(content: [
+              BackArrow(
+                  route: MaterialPageRoute(
                 builder: (context) => const MainPage(),
-              ),
-            ),
-            const Expanded(
-              flex: 3,
-              child: Text(
-                'EVENTOS',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CreateEventPage(),
-                    ),
-                  );
-                },
-                child: const Icon(Icons.add),
-              ),
-            )
-          ]),
-          Expanded(flex: 9, child: _widgetOptions.elementAt(_selectedIndex))
-        ],
-      ),
-    );
+              )),
+              const Expanded(
+                  flex: 3,
+                  child: Text('EVENTOS',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 20.0))),
+              Expanded(
+                  flex: 1,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CreateEventPage(),
+                          ));
+                    },
+                    child: const Icon(Icons.add),
+                  ))
+            ]),
+            Expanded(flex: 9, child: _widgetOptions.elementAt(_selectedIndex))
+          ],
+        ));
   }
 
   Future<UserData> getUserDataAsync(String id_user) async {
@@ -124,25 +115,22 @@ class _EventMainPageState extends State<EventMainPage> {
   }
 
   Future<List<EventData>> getEvents() async {
-    final eventList = <EventData>[];
-    final res =
+    List<EventData> eventList = [];
+    EventData eventData;
+    var res =
         await supabase.from('events').select().gte('time', DateTime.now());
-    final format = DateFormat.yMd();
-    for (var event in res ?? []) {
-      eventList.add(EventData(
-        idEvent: event['id'].toString(),
-        username: event['name_user'],
-        description: event['description'],
-        title: event['title'],
-        eventDate: format.format(DateTime.parse(event['time'])),
-        eventImage: event['event_image'] ?? 'vacio',
-        asistants:
-            '0', // Asignar un valor por defecto para el parámetro asistants
-        latitude: 0.0,
-        longitude: 0.0,
-      ));
+    DateFormat format = DateFormat.yMd();
+    for (var event in res) {
+      eventData = EventData.empty();
+      eventData.idEvent = event['id'].toString();
+      eventData.username = event['name_user'];
+      eventData.description = event['description'];
+      eventData.title = event['title'];
+      eventData.eventDate = format.format(DateTime.parse(event['time']));
+      eventData.eventImage = event['event_image'] ?? 'vacio';
+      eventData.asistants = '0';
+      eventList.add(eventData);
     }
-
     return eventList;
   }
 }

@@ -152,12 +152,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   void _onCreateEventButtonPressed(User user) {
-    // Llamar a la función para obtener la posición del usuario y luego mostrar el diálogo de confirmación
     _getUserPositionAndShowConfirmationDialog(user);
   }
 
   Future<void> _getUserPositionAndShowConfirmationDialog(User user) async {
-    // Obtener la posición del usuario
     try {
       userPosition = await Geolocator.getCurrentPosition();
       _showConfirmationDialogIfNeeded(user);
@@ -252,28 +250,28 @@ class _CreateEventPageState extends State<CreateEventPage> {
       'longitude': userPosition!.longitude,
     });
 
-    if (locationInsertionResponse.error != null) {
+    if (locationInsertionResponse != null &&
+        locationInsertionResponse.error != null) {
       throw Exception(
           'Error al insertar la ubicación del evento: ${locationInsertionResponse.error!.message}');
     }
 
-    // Insertar el evento y el usuario en la tabla event_followers
+// Insertar el evento y el usuario en la tabla event_followers
     final followersInsertionResponse =
         await supabase.from("event_followers").insert({
       'id_event': eventId,
       'id_user': user.id,
     });
 
-    if (followersInsertionResponse.error != null) {
+    if (followersInsertionResponse != null &&
+        followersInsertionResponse.error != null) {
       throw Exception(
           'Error al insertar el seguidor del evento: ${followersInsertionResponse.error!.message}');
     }
 
-    // Si todo es exitoso, navegar de vuelta a la página de Mis Eventos
+    // Si todo guay navegar a la página de Mis Eventos
     Navigator.pop(context);
   }
-
-  // Método para mostrar diálogos de error. Aquí está el método _showErrorDialog2:
 
   Future<void> _showErrorDialog2(String errorMessage) async {
     return showDialog<void>(

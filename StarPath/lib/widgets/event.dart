@@ -30,7 +30,6 @@ class _EventState extends State<Event> {
   void initState() {
     futureAsistant = getEventsAsistants(widget.eventData.idEvent);
     super.initState();
-    // Suscribirse a los cambios de asistentes
     supabase
         .channel('asistant_changes')
         .onPostgresChanges(
@@ -49,7 +48,6 @@ class _EventState extends State<Event> {
 
   @override
   void dispose() {
-    // Cancelar la suscripción a los cambios de asistentes
     supabase.channel('asistant_changes').unsubscribe();
     super.dispose();
   }

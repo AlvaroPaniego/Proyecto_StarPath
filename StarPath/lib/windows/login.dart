@@ -90,7 +90,13 @@ class _LoginState extends State<Login> {
                     children: [
                       Image.asset("assets/images/logo.png"),
                       const SizedBox(height: 40.0),
-                      const Text('Iniciar sesión', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: TEXT),),
+                      const Text(
+                        'Iniciar sesión',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                            color: TEXT),
+                      ),
                       const SizedBox(height: 40.0),
                       TextFormField(
                         onTapOutside: (event) =>
@@ -303,7 +309,7 @@ class _LoginState extends State<Login> {
                                         'El correo electrónico o la contraseña son incorrectos.');
                                   } else {
                                     _showErrorDialog(
-                                        'El usuario no ha confirmado el registro.');
+                                        'La contraseña es incorrecta.');
                                   }
                                 }
                               }
