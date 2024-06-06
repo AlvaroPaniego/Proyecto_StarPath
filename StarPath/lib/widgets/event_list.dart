@@ -98,7 +98,11 @@ class _EventMainPageState extends State<EventMainList> {
             return ListView.builder(
               itemCount: nearbyEvents.length,
               itemBuilder: (context, index) {
-                return Event(eventData: nearbyEvents[index], canEdit: false);
+                return Event(
+                  eventData: nearbyEvents[index],
+                  canEdit: false,
+                  userPosition: userPosition,
+                );
               },
             );
           }
@@ -131,7 +135,7 @@ class _EventMainPageState extends State<EventMainList> {
         .gte('time', dateToday)
         .order('time', ascending: true);
     DateFormat format = DateFormat.yMd();
-    for (var event in res) {
+    for (var event in res ?? []) {
       eventData = EventData(
         idEvent: event['id'].toString(),
         username: event['name_user'],
@@ -140,9 +144,11 @@ class _EventMainPageState extends State<EventMainList> {
         eventDate: format.format(DateTime.parse(event['time'])),
         eventImage: event['event_image'] ?? 'vacio',
         asistants: '0',
-        latitude: event['latitude'],
-        longitude: event['longitude'],
+        latitude: 0.0,
+        longitude: 0.0,
       );
+
+      // Añadir el evento a la lista de eventos
       eventList.add(eventData);
     }
     return eventList;

@@ -6,11 +6,18 @@ import 'package:starpath/model/user.dart';
 import 'package:starpath/widgets/follow_button.dart';
 import 'package:starpath/windows/edit_event.dart';
 import 'package:supabase/supabase.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Event extends StatefulWidget {
   final EventData eventData;
   final bool canEdit;
-  const Event({super.key, required this.eventData, required this.canEdit});
+  final Position? userPosition;
+  const Event({
+    Key? key,
+    required this.eventData,
+    required this.canEdit,
+    this.userPosition,
+  });
 
   @override
   State<Event> createState() => _EventState();
@@ -23,6 +30,7 @@ class _EventState extends State<Event> {
   void initState() {
     futureAsistant = getEventsAsistants(widget.eventData.idEvent);
     super.initState();
+    // Suscribirse a los cambios de asistentes
     supabase
         .channel('asistant_changes')
         .onPostgresChanges(
@@ -41,6 +49,7 @@ class _EventState extends State<Event> {
 
   @override
   void dispose() {
+    // Cancelar la suscripción a los cambios de asistentes
     supabase.channel('asistant_changes').unsubscribe();
     super.dispose();
   }

@@ -11,9 +11,10 @@ import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/windows/event_main_page.dart';
 import 'package:supabase/supabase.dart';
+import 'package:geolocator/geolocator.dart';
 
 class CreateEventPage extends StatefulWidget {
-  const CreateEventPage({super.key});
+  const CreateEventPage({Key? key}) : super(key: key);
 
   @override
   State<CreateEventPage> createState() => _CreateEventPageState();
@@ -27,6 +28,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
   String filePath = "";
   bool isImageSelected = false;
   DateTime? eventDate;
+  Position? userPosition; // Agregar la posición del usuario
+
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
@@ -40,7 +43,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
           ),
           UpperAppBar(content: [
             BackArrow(
-              route: MaterialPageRoute(builder: (context) => const EventMainPage(),),
+              route: MaterialPageRoute(
+                builder: (context) => const EventMainPage(),
+              ),
             ),
           ]),
           Expanded(
@@ -48,18 +53,18 @@ class _CreateEventPageState extends State<CreateEventPage> {
             child: isImageSelected
                 ? Image.file(File(filePath))
                 : const Center(
-              child: Text(
-                "Ninguna imagen seleccionada para subir",
-                style: TextStyle(color: TEXT),
-              ),
-            ),
+                    child: Text(
+                      "Ninguna imagen seleccionada para subir",
+                      style: TextStyle(color: TEXT),
+                    ),
+                  ),
           ),
           Expanded(
             flex: 1,
             child: ElevatedButton(
                 onPressed: () async {
                   FilePickerResult? result =
-                  await FilePicker.platform.pickFiles(type: FileType.media);
+                      await FilePicker.platform.pickFiles(type: FileType.media);
                   if (result != null) {
                     setState(() {
                       filePath = result.files.single.path!; //nunca será nulo
@@ -70,7 +75,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 },
                 style: const ButtonStyle(
                     backgroundColor:
-                    MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                        MaterialStatePropertyAll(BUTTON_BACKGROUND)),
                 child: const Text("Seleccionar foto",
                     style: TextStyle(color: TEXT))),
           ),
@@ -83,11 +88,12 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _titleController,
                 decoration:
-                const InputDecoration(hintText: "Introduce el título"),
+                    const InputDecoration(hintText: "Introduce el título"),
                 style: const TextStyle(color: TEXT),
               ),
             ),
-          ),Expanded(
+          ),
+          Expanded(
             flex: 1,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -96,7 +102,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _descriptionController,
                 decoration:
-                const InputDecoration(hintText: "Introduce la descripción"),
+                    const InputDecoration(hintText: "Introduce la descripción"),
                 style: const TextStyle(color: TEXT),
               ),
             ),
@@ -109,11 +115,9 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 onTapOutside: (event) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _dateController,
-                decoration:
-                const InputDecoration(
-                  labelText: "Introduce la fecha",
-                  prefixIcon: Icon((Icons.calendar_month))
-                ),
+                decoration: const InputDecoration(
+                    labelText: "Introduce la fecha",
+                    prefixIcon: Icon((Icons.calendar_month))),
                 readOnly: true,
                 onTap: () {
                   selectDate();
@@ -128,11 +132,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
               onPressed: () {
                 if (!isImageSelected) {
                   _showErrorDialog();
-                } else if(eventDate == null){
+                } else if (eventDate == null) {
                   _showErrorDialogDate();
-                }
-                else {
-                  _showConfirmationDialog(user);
+                } else {
+                  _onCreateEventButtonPressed(user);
                 }
               },
               style: const ButtonStyle(
@@ -147,23 +150,59 @@ class _CreateEventPageState extends State<CreateEventPage> {
       ),
     );
   }
+
+  void _onCreateEventButtonPressed(User user) {
+    // Llamar a la función para obtener la posición del usuario y luego mostrar el diálogo de confirmación
+    _getUserPositionAndShowConfirmationDialog(user);
+  }
+
+  Future<void> _getUserPositionAndShowConfirmationDialog(User user) async {
+    // Obtener la posición del usuario
+    try {
+      userPosition = await Geolocator.getCurrentPosition();
+      _showConfirmationDialogIfNeeded(user);
+    } catch (e) {
+      _showErrorDialog2('Error al obtener la posición del usuario: $e');
+    }
+  }
+
+  void _showConfirmationDialogIfNeeded(User user) {
+    if (userPosition != null) {
+      _showConfirmationDialog(user);
+    } else {
+      _showErrorDialog2('No se proporcionó la posición del usuario');
+    }
+  }
+
   Future<void> _showConfirmationDialog(User user) async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirmación'),
-          content:
-          const Text('¿Estás seguro de que deseas crear este evento?'),
+          content: const Text('¿Estás seguro de que deseas crear este evento?'),
           actions: <Widget>[
             TextButton(
-              //poner booleano para que solo suba una foto a la vez
               onPressed: () async {
-                await uploadContent(
-                    user, filePath, fileName, _titleController.text.trim(), _descriptionController.text.trim(), eventDate);
-                Navigator.of(context).pop();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const EventMainPage()));
+                try {
+                  await uploadContent(
+                    user,
+                    filePath,
+                    fileName,
+                    _titleController.text.trim(),
+                    _descriptionController.text.trim(),
+                    eventDate,
+                  );
+                  Navigator.of(context).pop();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EventMainPage(),
+                    ),
+                  );
+                } catch (e) {
+                  _showErrorDialog2('Error al crear el evento: $e');
+                }
               },
               child: const Text('Aceptar'),
             ),
@@ -179,19 +218,81 @@ class _CreateEventPageState extends State<CreateEventPage> {
     );
   }
 
-  Future<void> uploadContent(User user, String path, String fileName, String title, String description, DateTime? time) async {
+  Future<void> uploadContent(User user, String path, String fileName,
+      String title, String description, DateTime? time) async {
+    // Subir la imagen
     await supabase.storage.from("publicacion").upload(fileName, File(path),
         fileOptions: const FileOptions(upsert: true));
     var res = supabase.storage.from("publicacion").getPublicUrl(fileName);
-    print(time);
     var userData = await getUserDataAsync(user.id);
-    await supabase.from("events").insert({
+
+    // Insertar los datos del evento en la tabla events
+    final eventDataResponse = await supabase.from("events").insert({
       'name_user': userData.username,
       'title': title,
       'description': description,
       'event_image': res,
       'time': time.toString()
+    }).select();
+
+    if (eventDataResponse == null) {
+      throw Exception('Error al insertar el evento');
+    }
+
+    print('La inserción del evento fue exitosa y no hay errores');
+    int eventId = eventDataResponse[0]['id'];
+    // Obtener el ID del evento creado
+    print('El id del evento creado es $eventId');
+
+    // Insertar la ubicación del evento en la tabla event_location
+    final locationInsertionResponse =
+        await supabase.from("event_location").insert({
+      'id': eventId,
+      'latitude': userPosition!.latitude,
+      'longitude': userPosition!.longitude,
     });
+
+    if (locationInsertionResponse.error != null) {
+      throw Exception(
+          'Error al insertar la ubicación del evento: ${locationInsertionResponse.error!.message}');
+    }
+
+    // Insertar el evento y el usuario en la tabla event_followers
+    final followersInsertionResponse =
+        await supabase.from("event_followers").insert({
+      'id_event': eventId,
+      'id_user': user.id,
+    });
+
+    if (followersInsertionResponse.error != null) {
+      throw Exception(
+          'Error al insertar el seguidor del evento: ${followersInsertionResponse.error!.message}');
+    }
+
+    // Si todo es exitoso, navegar de vuelta a la página de Mis Eventos
+    Navigator.pop(context);
+  }
+
+  // Método para mostrar diálogos de error. Aquí está el método _showErrorDialog2:
+
+  Future<void> _showErrorDialog2(String errorMessage) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(errorMessage),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _showErrorDialog() async {
@@ -213,13 +314,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
       },
     );
   }
+
   Future<void> _showErrorDialogDate() async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Error'),
-          content: const Text('No se ha seleccionado ninguna fecha para el evento.'),
+          content:
+              const Text('No se ha seleccionado ninguna fecha para el evento.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -232,21 +335,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
       },
     );
   }
-  Future<void> selectDate() async{
-    DateFormat format = DateFormat.yMd();
-    var selectedDate = await showDatePicker(
-        context: context,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100)
-    );
-    if(selectedDate != null){
-      setState(() {
-        _dateController.text = format.format(DateTime.parse(selectedDate.toString()));
-        eventDate = selectedDate;
-      });
-    }
-  }
-  Future<UserData> getUserDataAsync(String id_user) async{
+
+  Future<UserData> getUserDataAsync(String id_user) async {
     UserData user = UserData.empty();
     var res = await supabase
         .from('user')
@@ -257,5 +347,18 @@ class _CreateEventPageState extends State<CreateEventPage> {
     user.profile_picture = res.first['profile_picture'];
     user.followers = '0';
     return user;
+  }
+
+  Future<void> selectDate() async {
+    DateFormat format = DateFormat.yMd();
+    var selectedDate = await showDatePicker(
+        context: context, firstDate: DateTime.now(), lastDate: DateTime(2100));
+    if (selectedDate != null) {
+      setState(() {
+        _dateController.text =
+            format.format(DateTime.parse(selectedDate.toString()));
+        eventDate = selectedDate;
+      });
+    }
   }
 }
