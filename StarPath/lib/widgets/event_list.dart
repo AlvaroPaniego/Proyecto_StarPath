@@ -8,10 +8,6 @@ import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/event.dart';
-import 'package:starpath/widgets/search_bar.dart';
-import 'package:starpath/widgets/upper_app_bar.dart';
-import 'package:starpath/windows/create_event.dart';
-import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 
 class EventMainList extends StatefulWidget {
