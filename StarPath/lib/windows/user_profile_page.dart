@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
@@ -10,18 +8,18 @@ import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/follow_button.dart';
-import 'package:starpath/widgets/post.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/windows/ChatPage.dart';
 import 'package:starpath/windows/comment_page.dart';
-import 'package:starpath/windows/edit_profile_page.dart';
+import 'package:starpath/windows/follower_list.dart';
 import 'package:starpath/windows/main_page.dart';
+import 'package:starpath/windows/user_event.dart';
 import 'package:supabase/supabase.dart';
 
 class UserProfilePage extends StatefulWidget {
   final UserData userData;
 
-  const UserProfilePage({Key? key, required this.userData}) : super(key: key);
+  const UserProfilePage({super.key, required this.userData});
 
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
@@ -32,6 +30,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   late Future<List<PostData>> _postsFuture;
   late Future<List<Map<String, dynamic>>> _avatarFuture;
   late Future<String> _followersFuture = Future.value("");
+  Future<bool> isPrivate = Future.value(false);
 
   @override
   void initState() {
@@ -40,20 +39,28 @@ class _UserProfilePageState extends State<UserProfilePage> {
     _postsFuture = getPostAsync(widget.userData.id_user);
     _avatarFuture = getProfilePicture(widget.userData.id_user);
     _followersFuture = getFollowers(widget.userData.id_user);
+    supabase
+        .channel('followers_changes')
+        .onPostgresChanges(
+      event: PostgresChangeEvent.all,
+      schema: 'public',
+      table: 'followers',
+      callback: (payload) {
+        setState(() {
+          _followersFuture = getFollowers(widget.userData.id_user);
+        });
+      },
+    ).subscribe();
   }
-
-  void _showEditProfile() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => EditProfilePage(
-              userData: widget.userData)), // Pasar el argumento userData
-    );
+  @override
+  void dispose() {
+    supabase.channel('followers_changes').unsubscribe();
+    super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
+    isPrivate = hasAlreadyFollowed(user.id, widget.userData);
     return Scaffold(
       backgroundColor: BACKGROUND,
       body: Column(
@@ -81,7 +88,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     return const Center(child: Text('Error al cargar el perfil'));
                   } else {
                     final profileData = profileSnapshot.data ?? {};
-                    final imageUrl = profileData['profile_picture'] as String?;
+                    // final imageUrl = profileData['profile_picture'] as String?;
                     final bio = profileData['bio'] as String?;
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -94,15 +101,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               AvatarButton.LogedUserPage(
                                 profilePictureFuture: _avatarFuture,
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: FutureBuilder(future: _followersFuture, builder: (context, snapshot) {
-                                  if(snapshot.hasData && snapshot.data!.isNotEmpty){
-                                    return Text('Seguidores: ${snapshot.data!}', style: const TextStyle(color: TEXT),);
-                                  }
-                                  return const Text('Seguidores:  ', style: TextStyle(color: TEXT),);
-                                },)
-                              )
+
                             ],
                           ),
                           const SizedBox(width: 16),
@@ -133,6 +132,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 },
               ),
             ),
+          ),
+          Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  FutureBuilder(future: _followersFuture, builder: (context, snapshot) {
+                    if(snapshot.hasData && snapshot.data!.isNotEmpty){
+                      return TextButton(
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => FollowersListPage(userData: widget.userData),));
+                          },
+                          child: Text('Seguidores: ${snapshot.data!}', style: const TextStyle(color: TEXT),));
+                    }
+                    return const Text('Seguidores:  ', style: TextStyle(color: TEXT),);
+                  },),
+                  TextButton(onPressed: () {
+                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => UserEventList(userData: widget.userData),), (route) => false);
+                  }, child: const Text('Ver eventos', style: TextStyle(color: TEXT)))
+                ],
+              )
           ),
           user.id != widget.userData.id_user ? Expanded(
             flex: 1,
@@ -165,30 +185,30 @@ class _UserProfilePageState extends State<UserProfilePage> {
           : SizedBox(),
           Expanded(
             flex: 7,
-            child: FutureBuilder<List<PostData>>(
-              future: _postsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return const Center(
-                      child: Text('Error al cargar las publicaciones'));
-                } else {
-                  final posts = snapshot.data ?? [];
-                  return GridView.builder(
-                    itemCount: posts.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
-                    itemBuilder: (context, index) => postPreview(posts[index], context),
-                  );
-                  //   ListView.builder(
-                  //   itemCount: posts.length,
-                  //   itemBuilder: (context, index) {
-                  //     return Post(postData: posts[index]);
-                  //   },
-                  // );
-                }
-              },
-            ),
+            child: FutureBuilder(future: isPrivate, builder: (context, snapshot) {
+              if(snapshot.hasData){
+                return snapshot.data! ? FutureBuilder<List<PostData>>(
+                  future: _postsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return const Center(
+                          child: Text('Error al cargar las publicaciones'));
+                    } else {
+                      final posts = snapshot.data ?? [];
+                      return GridView.builder(
+                        itemCount: posts.length,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+                        itemBuilder: (context, index) => postPreview(posts[index], context),
+                      );
+                    }
+                  },
+                )
+                    : const Center(child: Text('La cuenta de este usuario es privada', style: TextStyle(color: TEXT),),);
+              }
+              return const Center(child: CircularProgressIndicator(),);
+            },)
           ),
         ],
       ),
@@ -252,7 +272,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 }
 Widget postPreview(PostData postData, context){
-  bool hasValidImage = postData.content.isNotEmpty;
   return GestureDetector(
     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CommentPage(post: postData, hasReturnToMain: false,),)),
     child: Container(
@@ -264,4 +283,15 @@ Widget postPreview(PostData postData, context){
       ),
     ),
   );
+}
+Future<bool> hasAlreadyFollowed(String loggedId, UserData userDataPage) async {
+  var postgreQuery =
+      'and(id_user_principal.eq.$loggedId,id_user_secundario.eq.${userDataPage.id_user})';
+  var res = await supabase.from('followers').count().or(postgreQuery);
+  bool isFollowing = res == 1 || loggedId == userDataPage.id_user;
+  if(!userDataPage.privacy){
+    return true;
+  }else {
+    return isFollowing;
+  }
 }

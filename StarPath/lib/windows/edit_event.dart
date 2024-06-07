@@ -129,7 +129,7 @@ class _EditEventPageState extends State<EditEventPage> {
                 ),
               ),
             ),
-            Expanded(
+            Flexible(
               flex: 1,
               child: ElevatedButton(
                 onPressed: () {

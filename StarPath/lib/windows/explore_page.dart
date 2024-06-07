@@ -65,10 +65,27 @@ class _ExplorePageState extends State<ExplorePage> {
                     padding: const EdgeInsets.all(8.0),
                     child: ListView(
                       children: const [
-                        News(),
-                        News(),
-                        News(),
-                        News(),
+                        News(
+                          fecha: '06/06/2024',
+                          logo: 'assets/images/elpais.png',
+                          link: 'https://elpais.com/ciencia/2024-06-06/cuarto-lanzamiento-de-la-starship-de-elon-musk.html',
+                          lorem: 'Por primera vez, SpaceX ha cumplido todos los objetivos que se había planteado para un vuelo de prueba de su Starship. Aunque los tres ensayos anteriores la compañía aeroespacial de Elon Musk ya los había calificado de éxitos, pues el cohete siempre había despegado y se recopilaron valiosos datos de vuelo, todas esas misiones habían acabado con el propulsor y la nave explotando. Esta vez, ambos elementos de la gigantesca lanzadera espacial cumplieron con la trayectoria prevista y acabaron amerizando en el océano, aunque con ciertos problemas. Estos logros de hoy son avances cruciales en el desarrollo de Starship, que está destinada a convertirse en la nave en la que la primera mujer aterrice en la Luna. El éxito de hoy acerca a la NASA y a SpaceX a lograr ese sueño en los próximos años.',
+                          newsTitle: 'El megacohete ‘Starship’ completa por primera vez un vuelo sin explotar',
+                        ),
+                        News(
+                          newsTitle: 'La NASA cambiará cómo apunta el telescopio espacial Hubble',
+                          lorem: 'La NASA está trabajando para hacer que el veterano telescopio espacial Hubble funcione con un solo giroscopio, tras completar una serie de pruebas y considerar cuidadosamente las opciones. El telescopio ha interrumpido sus operaciones cientìficas tras entrar en modo seguro el 24 de mayo, debido a nuevos problemas de orientación.',
+                          link: 'https://www.europapress.es/ciencia/misiones-espaciales/noticia-nasa-cambiara-apunta-telescopio-espacial-hubble-20240605113850.html',
+                          logo: 'assets/images/ep.png',
+                          fecha: '5/06/2024',
+                        ),
+                        News(
+                          fecha: '04/06/2024',
+                          logo: 'assets/images/cnn.png',
+                          link: 'https://cnnespanol.cnn.com/video/china-publica-las-primeras-imagenes-de-la-cara-oculta-de-la-luna/',
+                          lorem: 'Estas imágenes nos revelan nuevos y fascinantes secretos de una cara oculta de la Luna, pero cada vez menos oculta a nuestra curiosidad. La Administración Nacional del espacio de China publicó este martes cuatro instantáneas del lado menos conocido de nuestro satélite natural captadas por la sonda Chang\'e-6. Tres imágenes fueron tomadas por el robot durante su aterrizaje y la cuarta es una vista panorámica de ese lugar.',
+                          newsTitle: 'China publica las primeras imágenes de la cara oculta de la Luna',
+                        )
                       ],
                 ))),
           ],
@@ -100,7 +117,7 @@ Future<List<UserData>> getRandomUsers(String idUser) async{
   for (int i = 0; i < maxUsers; i++) {
     int randomUser = r.nextInt(res.length);
     res.removeAt(randomUser);
-    userList.add(UserData(res[randomUser]['id_user'], res[randomUser]['username'], res[randomUser]['profile_picture'], '0'));
+    userList.add(UserData(res[randomUser]['id_user'], res[randomUser]['username'], res[randomUser]['profile_picture'], '0', res[randomUser]['privacy']));
   }
   return userList;
 }

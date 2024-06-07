@@ -23,10 +23,10 @@ class ProfilePictureManager implements FileChooser {
 
         CroppedFile? croppedFile = await ImageCropper().cropImage(
           sourcePath: path,
-          maxWidth: 100,
-          maxHeight: 100,
+          maxWidth: 250,
+          maxHeight: 250,
           aspectRatioPresets: [
-            CropAspectRatioPreset.ratio4x3,
+            CropAspectRatioPreset.square,
           ],
           uiSettings: [
             AndroidUiSettings(

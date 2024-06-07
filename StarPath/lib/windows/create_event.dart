@@ -49,7 +49,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
             ),
           ]),
           Expanded(
-            flex: 4,
+            flex: 6,
             child: isImageSelected
                 ? Image.file(File(filePath))
                 : const Center(
@@ -59,7 +59,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     ),
                   ),
           ),
-          Expanded(
+          Flexible(
             flex: 1,
             child: ElevatedButton(
                 onPressed: () async {
@@ -126,7 +126,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               ),
             ),
           ),
-          Expanded(
+          Flexible(
             flex: 1,
             child: ElevatedButton(
               onPressed: () {
@@ -332,8 +332,21 @@ class _CreateEventPageState extends State<CreateEventPage> {
       },
     );
   }
-
-  Future<UserData> getUserDataAsync(String id_user) async {
+  Future<void> selectDate() async{
+    DateFormat format = DateFormat.yMd();
+    var selectedDate = await showDatePicker(
+        context: context,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2100)
+    );
+    if(selectedDate != null){
+      setState(() {
+        _dateController.text = format.format(DateTime.parse(selectedDate.toString()));
+        eventDate = selectedDate;
+      });
+    }
+  }
+  Future<UserData> getUserDataAsync(String id_user) async{
     UserData user = UserData.empty();
     var res = await supabase
         .from('user')
@@ -344,18 +357,5 @@ class _CreateEventPageState extends State<CreateEventPage> {
     user.profile_picture = res.first['profile_picture'];
     user.followers = '0';
     return user;
-  }
-
-  Future<void> selectDate() async {
-    DateFormat format = DateFormat.yMd();
-    var selectedDate = await showDatePicker(
-        context: context, firstDate: DateTime.now(), lastDate: DateTime(2100));
-    if (selectedDate != null) {
-      setState(() {
-        _dateController.text =
-            format.format(DateTime.parse(selectedDate.toString()));
-        eventDate = selectedDate;
-      });
-    }
   }
 }

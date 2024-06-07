@@ -28,7 +28,7 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
     User user = context.watch<UserProvider>().user!;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       backgroundColor: BACKGROUND,
       body: Column(
         children: [
@@ -39,7 +39,7 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
             BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),),),
           ]),
           Expanded(
-            flex: 4,
+            flex: 6,
             child: isImageSelected
                 ? Image.file(File(filePath))
                 : const Center(
@@ -49,7 +49,7 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
                     ),
                   ),
           ),
-          Expanded(
+          Flexible(
             flex: 1,
             child: ElevatedButton(
                 onPressed: () async {
@@ -70,20 +70,22 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
                     style: TextStyle(color: TEXT))),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 onTapOutside: (event) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _textController,
-                decoration:
-                    const InputDecoration(hintText: "Introduce la descripción"),
-                style: const TextStyle(color: TEXT),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  labelStyle: TextStyle(color: FOCUS_ORANGE),
+                  labelText: 'Introduce la descripcion para la publicacion',
+                ),
               ),
             ),
           ),
-          Expanded(
+          Flexible(
             flex: 1,
             child: ElevatedButton(
               onPressed: () {

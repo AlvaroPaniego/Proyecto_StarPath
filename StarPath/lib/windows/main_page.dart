@@ -286,12 +286,13 @@ Future<UserData> getUserDataAsync(String id_user) async {
   UserData user = UserData.empty();
   var res = await supabase
       .from('user')
-      .select("id_user, username, profile_picture, last_login")
+      .select("id_user, username, profile_picture, last_login, privacy")
       .match({'id_user': id_user});
   user.id_user = res.first['id_user'];
   user.username = res.first['username'];
   user.profile_picture = res.first['profile_picture'];
   user.followers = '0';
+  user.privacy = res.first['privacy'];
 
   var creationDate = DateTime.parse(res.first['last_login']);
   var currentDate = DateTime.now();

@@ -64,12 +64,32 @@ class _ChatCardState extends State<ChatCard> {
             children: [
               Flexible(
                 flex: 2,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25.0),
-                  child: hasValidImage
-                      ? Image.network(widget.chatData.receiverUser.profile_picture)
-                      : Image.asset("assets/images/placeholder-image.jpg"),
-                ),
+                child: hasValidImage
+                    ? Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25.0),
+                            image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(widget.chatData.receiverUser.profile_picture)
+                            )
+                        )
+                      )
+                    : Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25.0),
+                      image: const DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage('assets/images/placeholder-image.jpg')
+                      )
+                  ),
+                )
+
+                // ClipRRect(
+                //   borderRadius: BorderRadius.circular(25.0),
+                //   child: hasValidImage
+                //       ? Image.network(widget.chatData.receiverUser.profile_picture)
+                //       : Image.asset("assets/images/placeholder-image.jpg"),
+                // ),
               ),
               const Flexible(child: SizedBox(width: 10,)),
               Flexible(
