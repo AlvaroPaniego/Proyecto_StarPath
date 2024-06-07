@@ -6,55 +6,60 @@ import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
 import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
-import 'package:starpath/widgets/back_arrow.dart';
-import 'package:starpath/widgets/event.dart';
-import 'package:starpath/widgets/search_bar.dart';
-import 'package:starpath/widgets/upper_app_bar.dart';
-import 'package:starpath/windows/create_event.dart';
-import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
+import 'package:starpath/widgets/event.dart';
 
 class MyEventList extends StatefulWidget {
-  const MyEventList({super.key});
+  const MyEventList({Key? key}) : super(key: key);
 
   @override
-  State<MyEventList> createState() => _EventMainPageState();
+  State<MyEventList> createState() => _MyEventListState();
 }
 
-class _EventMainPageState extends State<MyEventList> {
-  Future<List<EventData>> futureEvents = Future.value([EventData.empty()]);
-  UserData userData = UserData.empty();
+class _MyEventListState extends State<MyEventList> {
+  late Future<List<EventData>> futureEvents;
+  late UserData userData = UserData.empty();
+
   @override
-  Widget build(BuildContext context) {
-    User user = context.watch<UserProvider>().user!;
+  void initState() {
+    super.initState();
+    final user = context.read<UserProvider>().user!;
     futureEvents = getEvents(user);
     getUserDataAsync(user.id).then((value) => userData = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FutureBuilder(
-          future: futureEvents,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data!.isEmpty) {
-                return const Center(
-                    child: Text(
-                  'No has creado ningún evento.',
-                  style: TextStyle(color: TEXT),
-                ));
-              }
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  return Event(
-                    eventData: snapshot.data![index],
-                    canEdit: true,
-                  );
-                },
-              );
-            }
+      padding: const EdgeInsets.all(8.0),
+      child: FutureBuilder<List<EventData>>(
+        future: futureEvents,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          },
-        ));
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.data!.isEmpty) {
+            return const Center(
+              child: Text(
+                'No has creado ningún evento.',
+                style: TextStyle(color: TEXT),
+              ),
+            );
+          } else {
+            return ListView.builder(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                return Event(
+                  eventData: snapshot.data![index],
+                  canEdit: true,
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
   }
 
   Future<UserData> getUserDataAsync(String id_user) async {
@@ -89,10 +94,10 @@ class _EventMainPageState extends State<MyEventList> {
         eventDate: format.format(DateTime.parse(event['time'])),
         description: event['description'],
         username: event['name_user'],
-        asistants: asistants,
+        asistants: asistants.toString(),
         eventImage: event['event_image'] ?? 'vacio',
-        latitude: event['latitude'],
-        longitude: event['longitude'],
+        latitude: event['latitude'] ?? 0.0,
+        longitude: event['longitude'] ?? 0.0,
       );
       eventList.add(eventData);
     }

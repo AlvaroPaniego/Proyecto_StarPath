@@ -69,53 +69,56 @@ class _RegisterState extends State<Register> {
   }
 
   Future<void> _registerUser() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    if (_passwordController.text != _repeatPasswordController.text) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Error'),
+            content: Text('Las contraseñas no coinciden.'),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Aceptar'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+
+    final existenceMessage = await _checkUserEmailExistence(username, email);
+    if (existenceMessage != null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Error'),
+            content: Text(existenceMessage),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Aceptar'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
     try {
-      if (_passwordController.text != _repeatPasswordController.text) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CupertinoAlertDialog(
-              title: Text('Error'),
-              content: Text('Las contraseñas no coinciden.'),
-              actions: [
-                CupertinoDialogAction(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Aceptar'),
-                ),
-              ],
-            );
-          },
-        );
-        return;
-      }
-
-      final username = _usernameController.text.trim();
-      final email = _emailController.text.trim();
-
-      final existenceMessage = await _checkUserEmailExistence(username, email);
-      if (existenceMessage != null) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CupertinoAlertDialog(
-              title: Text('Error'),
-              content: Text(existenceMessage),
-              actions: [
-                CupertinoDialogAction(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('Aceptar'),
-                ),
-              ],
-            );
-          },
-        );
-        return;
-      }
-
       final response = await supabase.auth.signUp(
         email: email,
         password: _passwordController.text.trim(),
@@ -186,7 +189,8 @@ class _RegisterState extends State<Register> {
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
             title: Text('Error'),
-            content: Text('La dirección de correo electrónico no existe.'),
+            content: Text(
+                'Se ha producido un error al enviar el correo de confirmación a esa dirección de email.'),
             actions: [
               CupertinoDialogAction(
                 onPressed: () {
@@ -376,12 +380,29 @@ class _RegisterState extends State<Register> {
                     Column(
                       children: [
                         TextButton(
-                            onPressed: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const Login(),), (route) => false),
-                            child: const Text('Ya tengo una cuenta', style: TextStyle(color: FOCUS_ORANGE),)),
+                            onPressed: () => Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const Login(),
+                                ),
+                                (route) => false),
+                            child: const Text(
+                              'Ya tengo una cuenta',
+                              style: TextStyle(color: FOCUS_ORANGE),
+                            )),
                         ElevatedButton(
-                          style: ButtonStyle(backgroundColor: MaterialStateProperty.all(BUTTON_BACKGROUND)),
-                          onPressed: _registerUser,
-                          child: const Text('Registrarse', style: TextStyle(color: BLACK),),
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(BUTTON_BACKGROUND)),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _registerUser();
+                            }
+                          },
+                          child: const Text(
+                            'Registrarse',
+                            style: TextStyle(color: BLACK),
+                          ),
                         ),
                       ],
                     ),

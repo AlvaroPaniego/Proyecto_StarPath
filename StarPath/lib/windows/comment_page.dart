@@ -21,8 +21,8 @@ class CommentPage extends StatefulWidget {
   final PostData post;
   final bool hasReturnToMain;
 
-
-  const CommentPage({super.key, required this.post, required this.hasReturnToMain});
+  const CommentPage(
+      {super.key, required this.post, required this.hasReturnToMain});
 
   @override
   _CommentPageState createState() => _CommentPageState();
@@ -166,21 +166,29 @@ class _CommentPageState extends State<CommentPage> {
           ),
           UpperAppBar(content: [
             widget.hasReturnToMain
-                ? BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),))
-                : const BackButton()
-            ,
-            const Text('Comentarios de la publicacion', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-            const SizedBox(width: 40,)
+                ? BackArrow(
+                    route: MaterialPageRoute(
+                    builder: (context) => const MainPage(),
+                  ))
+                : const BackButton(),
+            const Text(
+              'Comentarios de la publicacion',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              width: 40,
+            )
           ]),
           Expanded(
               flex: 3,
               child: ClipRRect(
-                child: hasValidImage
-                    ? Image.network(widget.post.content)
-                    : Image.asset('assets/images/placeholder-image.jpg')
-              )
+                  child: hasValidImage
+                      ? Image.network(widget.post.content)
+                      : Image.asset('assets/images/placeholder-image.jpg'))),
+          const Divider(
+            color: FOCUS_ORANGE,
+            thickness: 2.5,
           ),
-          const Divider(color: FOCUS_ORANGE, thickness: 2.5,),
           Expanded(
             flex: 5,
             child: FutureBuilder<List<Comment>>(
@@ -189,15 +197,20 @@ class _CommentPageState extends State<CommentPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}',
-                      style: const TextStyle(color: TEXT,)));
+                  return Center(
+                      child: Text('Error: ${snapshot.error}',
+                          style: const TextStyle(
+                            color: TEXT,
+                          )));
                 } else {
                   final comments = snapshot.data!;
 
                   return ListView.builder(
                     itemCount: comments.length,
-                    itemBuilder: (context, index)  {
-                      return CommentCard(comment: comments[index],);
+                    itemBuilder: (context, index) {
+                      return CommentCard(
+                        comment: comments[index],
+                      );
                     },
                   );
                 }
@@ -213,11 +226,14 @@ class _CommentPageState extends State<CommentPage> {
                     onTapOutside: (event) =>
                         FocusManager.instance.primaryFocus?.unfocus(),
                     controller: _commentController,
-                    style: const TextStyle(color: TEXT,),
-                    decoration: const InputDecoration(
-                      hintText: 'Escribe un comentario...',
-                      hintStyle: TextStyle(color: TEXT,)
+                    style: const TextStyle(
+                      color: TEXT,
                     ),
+                    decoration: const InputDecoration(
+                        hintText: 'Escribe un comentario...',
+                        hintStyle: TextStyle(
+                          color: TEXT,
+                        )),
                   ),
                 ),
                 IconButton(
@@ -231,7 +247,8 @@ class _CommentPageState extends State<CommentPage> {
       ),
     );
   }
-  Future<void>translateComment(String comment, bool isEnglish) async{
+
+  Future<void> translateComment(String comment, bool isEnglish) async {
     var data = jsonEncode({
       'q': comment,
       'source': isEnglish ? 'EN' : 'ES',
@@ -239,15 +256,15 @@ class _CommentPageState extends State<CommentPage> {
     });
     print(data);
     final res = await http.post(
-        Uri.parse('https://deep-translate1.p.rapidapi.com/language/translate/v2'),
-      headers: {
-        'x-rapidapi-key': TRANSLATOR_API_KEY,
-        'Content-Type': 'application/json',
-        'X-RapidAPI-Host': 'deep-translate1.p.rapidapi.com',
-      },
-      body: data
-    );
-    if(res.statusCode == 200){
+        Uri.parse(
+            'https://deep-translate1.p.rapidapi.com/language/translate/v2'),
+        headers: {
+          'x-rapidapi-key': TRANSLATOR_API_KEY,
+          'Content-Type': 'application/json',
+          'X-RapidAPI-Host': 'deep-translate1.p.rapidapi.com',
+        },
+        body: data);
+    if (res.statusCode == 200) {
       final responseData = utf8.decode(res.bodyBytes);
       final jsonData = jsonDecode(responseData);
       var resComment = jsonData['data']['translations']['translatedText'];
@@ -259,6 +276,7 @@ class _CommentPageState extends State<CommentPage> {
       });
     }
   }
+
   Future<String> getCommentUsernameAsync(String userId) async {
     String userName =
         "Cargando Usuario"; // texto temporal mientras se carga el nombre de usuario
@@ -269,7 +287,8 @@ class _CommentPageState extends State<CommentPage> {
     userName = res[0]['username'];
     return userName;
   }
-  Future<UserData> getUserDataAsync(String id_user) async{
+
+  Future<UserData> getUserDataAsync(String id_user) async {
     UserData user = UserData.empty();
     var res = await supabase
         .from('user')

@@ -39,6 +39,7 @@ class _EventMainPageState extends State<EventMainPage> {
       _selectedIndex = index;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     futureEvents = getEvents();
@@ -77,15 +78,11 @@ class _EventMainPageState extends State<EventMainPage> {
                 builder: (context) => const MainPage(),
               )),
               const Expanded(
-                flex: 3,
-                child: Text('EVENTOS',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0
-                  )
-                )
-              ),
+                  flex: 3,
+                  child: Text('EVENTOS',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 20.0))),
               Expanded(
                   flex: 1,
                   child: GestureDetector(

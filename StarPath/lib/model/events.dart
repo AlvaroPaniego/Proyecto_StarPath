@@ -26,7 +26,10 @@ class EventData {
   });
 
   static List<EventData> filterEventsByProximity(
-      List<EventData> events, Position userPosition, double maxDistance) {
+    List<EventData> events,
+    Position userPosition,
+    double maxDistance,
+  ) {
     return events.where((event) {
       double distance = Geolocator.distanceBetween(
         userPosition.latitude,
@@ -34,9 +37,6 @@ class EventData {
         event.latitude,
         event.longitude,
       );
-      print(
-          'Latitud del evento: ${event.latitude}, Longitud del evento: ${event.longitude}');
-
       return distance <= maxDistance;
     }).toList();
   }

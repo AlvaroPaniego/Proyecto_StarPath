@@ -79,7 +79,7 @@ class _TodayEventListState extends State<TodayEventList> {
               );
             }
             final nearbyEvents = EventData.filterEventsByProximity(
-                events, userPosition, 10000); // 10km
+                events, userPosition, 3000); // 3km
 
             if (nearbyEvents.isEmpty) {
               return const Center(
@@ -92,7 +92,11 @@ class _TodayEventListState extends State<TodayEventList> {
             return ListView.builder(
               itemCount: nearbyEvents.length,
               itemBuilder: (context, index) {
-                return Event(eventData: nearbyEvents[index], canEdit: false);
+                return Event(
+                  eventData: nearbyEvents[index],
+                  canEdit: false,
+                  userPosition: userPosition,
+                );
               },
             );
           }
@@ -116,8 +120,8 @@ class _TodayEventListState extends State<TodayEventList> {
         eventDate: format.format(DateTime.parse(event['time'])),
         eventImage: event['event_image'] ?? 'vacio',
         asistants: '0',
-        latitude: event['latitude'],
-        longitude: event['longitude'],
+        latitude: event['latitude'] ?? 0.0,
+        longitude: event['longitude'] ?? 0.0,
       );
       eventList.add(eventData);
     }
