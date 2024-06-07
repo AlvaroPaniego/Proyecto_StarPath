@@ -52,7 +52,8 @@ class _ChatCardState extends State<ChatCard> {
       padding: const EdgeInsets.all(8.0),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(receiverUser: widget.chatData.receiverUser ),));
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => ChatPage(receiverUser: widget.chatData.receiverUser ), ),
+                  (Route<dynamic> route) => false);
         },
         child: Container(
           height: 75,
