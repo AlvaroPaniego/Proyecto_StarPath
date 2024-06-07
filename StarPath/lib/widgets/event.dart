@@ -7,6 +7,7 @@ import 'package:starpath/widgets/follow_button.dart';
 import 'package:starpath/windows/edit_event.dart';
 import 'package:supabase/supabase.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Event extends StatefulWidget {
   final EventData eventData;
@@ -141,7 +142,22 @@ class _EventState extends State<Event> {
                             }
                             return const Text("Asistentes:");
                           },
-                        )
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            _openGoogleMaps(
+                              widget.eventData.latitude,
+                              widget.eventData.longitude,
+                            );
+                          },
+                          style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(BUTTON_BACKGROUND)),
+                          child: const Text(
+                            'Abrir en Google Maps',
+                            style: TextStyle(color: TEXT),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -160,5 +176,19 @@ class _EventState extends State<Event> {
         await supabase.from('event_followers').count().eq('id_event', idEvent);
     asistants = res.toString();
     return asistants;
+  }
+
+  void _openGoogleMaps(double latitude, double longitude) async {
+    final googleMapsUrl =
+        'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    final uri = Uri.parse(googleMapsUrl);
+    bool canLaunch = await canLaunchUrl(uri);
+    print('Can launch URL: $canLaunch');
+    if (canLaunch) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      print('Could not launch $googleMapsUrl');
+      throw 'No se pudo abrir Google Maps';
+    }
   }
 }
