@@ -112,10 +112,10 @@ class _UserEventListState extends State<UserEventList> {
         eventDate: format.format(DateTime.parse(event['time'])),
         description: event['description'],
         username: event['name_user'],
-        asistants: asistants,
+        asistants: asistants.toString(),
         eventImage: event['event_image'] ?? 'vacio',
-        latitude: event['latitude'],
-        longitude: event['longitude'],
+        latitude: event['latitude'] ?? 0.0,
+        longitude: event['longitude'] ?? 0.0,
       );
       eventList.add(eventData);
     }
