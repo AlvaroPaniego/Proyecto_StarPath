@@ -79,7 +79,7 @@ class _TodayEventListState extends State<TodayEventList> {
               );
             }
             final nearbyEvents = EventData.filterEventsByProximity(
-                events, userPosition, 10000); // 10km
+                events, userPosition, 3000); // 3km
 
             if (nearbyEvents.isEmpty) {
               return const Center(

@@ -35,8 +35,10 @@ class _EditEventPageState extends State<EditEventPage> {
     _dateController.text = widget.eventData.eventDate;
     _descriptionController.text = widget.eventData.description;
     var date = widget.eventData.eventDate.split('/');
-    eventDate = DateTime(int.parse(date[2]), int.parse(date[0]), int.parse(date[1]));
+    eventDate =
+        DateTime(int.parse(date[2]), int.parse(date[0]), int.parse(date[1]));
   }
+
   @override
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
@@ -49,31 +51,34 @@ class _EditEventPageState extends State<EditEventPage> {
             SizedBox(
               height: MediaQuery.of(context).viewPadding.top,
             ),
-            UpperAppBar(
-                content: [
-                  BackArrow(route: MaterialPageRoute(builder: (context) => const EventMainPage(),))
-                ]
-            ),
-            Expanded(flex: 4,child: hasLocalImage
-                ? Image.file(File(filePath))
-                : Image.network(widget.eventData.eventImage) ),
+            UpperAppBar(content: [
+              BackArrow(
+                  route: MaterialPageRoute(
+                builder: (context) => const EventMainPage(),
+              ))
+            ]),
+            Expanded(
+                flex: 4,
+                child: hasLocalImage
+                    ? Image.file(File(filePath))
+                    : Image.network(widget.eventData.eventImage)),
             Expanded(
               flex: 1,
               child: ElevatedButton(
                   onPressed: () async {
-                    FilePickerResult? result =
-                    await FilePicker.platform.pickFiles(type: FileType.media);
+                    FilePickerResult? result = await FilePicker.platform
+                        .pickFiles(type: FileType.media);
                     if (result != null) {
                       setState(() {
-                        filePath = result.files.single.path!; //nunca será nulo
-                        fileName = result.files.single.name!; //nunca será nulo
+                        filePath = result.files.single.path!;
+                        fileName = result.files.single.name!;
                         hasLocalImage = true;
                       });
                     }
                   },
                   style: const ButtonStyle(
                       backgroundColor:
-                      MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                          MaterialStatePropertyAll(BUTTON_BACKGROUND)),
                   child: const Text("Seleccionar foto",
                       style: TextStyle(color: TEXT))),
             ),
@@ -86,11 +91,12 @@ class _EditEventPageState extends State<EditEventPage> {
                       FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _titleController,
                   decoration:
-                  const InputDecoration(hintText: "Introduce el título"),
+                      const InputDecoration(hintText: "Introduce el título"),
                   style: const TextStyle(color: TEXT),
                 ),
               ),
-            ),Expanded(
+            ),
+            Expanded(
               flex: 1,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -98,8 +104,8 @@ class _EditEventPageState extends State<EditEventPage> {
                   onTapOutside: (event) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _descriptionController,
-                  decoration:
-                  const InputDecoration(hintText: "Introduce la descripción"),
+                  decoration: const InputDecoration(
+                      hintText: "Introduce la descripción"),
                   style: const TextStyle(color: TEXT),
                 ),
               ),
@@ -112,11 +118,9 @@ class _EditEventPageState extends State<EditEventPage> {
                   onTapOutside: (event) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _dateController,
-                  decoration:
-                  const InputDecoration(
+                  decoration: const InputDecoration(
                       labelText: "Introduce la fecha",
-                      prefixIcon: Icon((Icons.calendar_month))
-                  ),
+                      prefixIcon: Icon((Icons.calendar_month))),
                   readOnly: true,
                   onTap: () {
                     selectDate();
@@ -129,15 +133,15 @@ class _EditEventPageState extends State<EditEventPage> {
               flex: 1,
               child: ElevatedButton(
                 onPressed: () {
-                  if(eventDate == null){
+                  if (eventDate == null) {
                     _showErrorDialogDate();
-                  }
-                  else {
+                  } else {
                     _showConfirmationDialog(user);
                   }
                 },
                 style: const ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                    backgroundColor:
+                        MaterialStatePropertyAll(BUTTON_BACKGROUND)),
                 child: const Text(
                   "Modificar",
                   style: TextStyle(color: TEXT),
@@ -145,16 +149,17 @@ class _EditEventPageState extends State<EditEventPage> {
               ),
             )
           ],
-        )
-    );
+        ));
   }
+
   Future<void> _showErrorDialogDate() async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Error'),
-          content: const Text('No se ha seleccionado ninguna fecha para el evento.'),
+          content:
+              const Text('No se ha seleccionado ninguna fecha para el evento.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -167,20 +172,20 @@ class _EditEventPageState extends State<EditEventPage> {
       },
     );
   }
-  Future<void> selectDate() async{
+
+  Future<void> selectDate() async {
     DateFormat format = DateFormat.yMd();
     var selectedDate = await showDatePicker(
-        context: context,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100)
-    );
-    if(selectedDate != null){
+        context: context, firstDate: DateTime.now(), lastDate: DateTime(2100));
+    if (selectedDate != null) {
       setState(() {
-        _dateController.text = format.format(DateTime.parse(selectedDate.toString()));
+        _dateController.text =
+            format.format(DateTime.parse(selectedDate.toString()));
         eventDate = selectedDate;
       });
     }
   }
+
   Future<void> _showConfirmationDialog(User user) async {
     return showDialog<void>(
       context: context,
@@ -188,16 +193,24 @@ class _EditEventPageState extends State<EditEventPage> {
         return AlertDialog(
           title: const Text('Confirmación'),
           content:
-          const Text('¿Estás seguro de que deseas modificar este evento?'),
+              const Text('¿Estás seguro de que deseas modificar este evento?'),
           actions: <Widget>[
             TextButton(
               //poner booleano para que solo suba una foto a la vez
               onPressed: () async {
                 await updateEvent(
-                    widget.eventData.username, filePath, fileName, _titleController.text.trim(), _descriptionController.text.trim(), eventDate, widget.eventData.idEvent);
+                    widget.eventData.username,
+                    filePath,
+                    fileName,
+                    _titleController.text.trim(),
+                    _descriptionController.text.trim(),
+                    eventDate,
+                    widget.eventData.idEvent);
                 Navigator.of(context).pop();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const EventMainPage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const EventMainPage()));
               },
               child: const Text('Aceptar'),
             ),
@@ -212,11 +225,13 @@ class _EditEventPageState extends State<EditEventPage> {
       },
     );
   }
-  Future<void> updateEvent(String username, String path, String fileName, String title, String description, DateTime? time, String idEvent) async {
+
+  Future<void> updateEvent(String username, String path, String fileName,
+      String title, String description, DateTime? time, String idEvent) async {
     String res;
-    if(path.isEmpty){
+    if (path.isEmpty) {
       res = widget.eventData.eventImage;
-    }else{
+    } else {
       await supabase.storage.from("publicacion").upload(fileName, File(path),
           fileOptions: const FileOptions(upsert: true));
       res = supabase.storage.from("publicacion").getPublicUrl(fileName);

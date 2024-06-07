@@ -28,7 +28,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   String filePath = "";
   bool isImageSelected = false;
   DateTime? eventDate;
-  Position? userPosition; // Agregar la posición del usuario
+  Position? userPosition;
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +67,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       await FilePicker.platform.pickFiles(type: FileType.media);
                   if (result != null) {
                     setState(() {
-                      filePath = result.files.single.path!; //nunca será nulo
-                      fileName = result.files.single.name!; //nunca será nulo
+                      filePath = result.files.single.path!;
+                      fileName = result.files.single.name!;
                       isImageSelected = true;
                     });
                   }
@@ -218,7 +218,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
   Future<void> uploadContent(User user, String path, String fileName,
       String title, String description, DateTime? time) async {
-    // Subir la imagen
     await supabase.storage.from("publicacion").upload(fileName, File(path),
         fileOptions: const FileOptions(upsert: true));
     var res = supabase.storage.from("publicacion").getPublicUrl(fileName);
@@ -256,7 +255,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
           'Error al insertar la ubicación del evento: ${locationInsertionResponse.error!.message}');
     }
 
-// Insertar el evento y el usuario en la tabla event_followers
+    // Insertar el evento y el usuario en la tabla event_followers
     final followersInsertionResponse =
         await supabase.from("event_followers").insert({
       'id_event': eventId,

@@ -15,9 +15,9 @@ import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/user_profile_page.dart';
 
 class EditProfilePage extends StatefulWidget {
-  final UserData userData; // Agregamos este campo
+  final UserData userData;
 
-  EditProfilePage({required this.userData}); // Actualizamos el constructor
+  EditProfilePage({required this.userData});
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -129,18 +129,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } */
 
     // if (pickedFile != null) {
-      final userProvider = context.read<UserProvider>();
-      final user = userProvider.user!;
+    final userProvider = context.read<UserProvider>();
+    final user = userProvider.user!;
 
-      final newUrl =
-          await _profilePictureManager.uploadContent(user, '', "");
+    final newUrl = await _profilePictureManager.uploadContent(user, '', "");
 
-      if (newUrl != null) {
-        setState(() {
-          _profilePictureUrl = newUrl;
-        });
-        userProvider.updateProfilePictureUrl(newUrl);
-      }
+    if (newUrl != null) {
+      setState(() {
+        _profilePictureUrl = newUrl;
+      });
+      userProvider.updateProfilePictureUrl(newUrl);
+    }
     // }
   }
 
@@ -154,12 +153,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             height: MediaQuery.of(context).viewPadding.top,
           ),
           UpperAppBar(content: [
-            BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),)),
-            const Text('Editar usuario', style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold
-            ),),
-            SizedBox(width: 50,)
+            BackArrow(
+                route: MaterialPageRoute(
+              builder: (context) => const MainPage(),
+            )),
+            const Text(
+              'Editar usuario',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              width: 50,
+            )
           ]),
           Expanded(
             flex: 9,
@@ -233,7 +237,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           maxLength: 150,
                         ),
                         SwitchListTile(
-                          title: const Text('Perfil Público', style: TextStyle(color: Colors.white)),
+                          title: const Text('Perfil Público',
+                              style: TextStyle(color: Colors.white)),
                           value: _isPublic,
                           onChanged: (value) {
                             setState(() {

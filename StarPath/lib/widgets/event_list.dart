@@ -90,7 +90,7 @@ class _EventMainPageState extends State<EventMainList> {
                 } else {
                   final events = snapshot.data!;
                   final nearbyEvents = EventData.filterEventsByProximity(
-                      events, userPosition, 10000); // 10km
+                      events, userPosition, 3000); // 3km
 
                   if (nearbyEvents.isEmpty) {
                     return const Center(
