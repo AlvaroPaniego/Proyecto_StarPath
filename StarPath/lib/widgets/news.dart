@@ -52,9 +52,19 @@ class _NewsState extends State<News> {
         ),
         leading: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(45.0),
-            child: Image.asset(widget.logo)
+          child: GestureDetector(
+            onTap: () async{
+              final url = Uri.parse(widget.link);
+              if (await canLaunchUrl(url)) {
+                await launchUrl(
+                url
+                );
+              }
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(45.0),
+              child: Image.asset(widget.logo)
+            ),
           ),
         ),
         children: [
@@ -67,22 +77,22 @@ class _NewsState extends State<News> {
             ),
           ),
           Image.asset(widget.logo),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: RichText(
-                text: TextSpan(
-                  text: "Ver más",
-                  recognizer: TapGestureRecognizer()..onTap = () async {
-                    final url = Uri.parse(widget.link);
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(
-                        url
-                      );
-                    }
-                  },
-                )
-            ),
-          )
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: RichText(
+          //       text: TextSpan(
+          //         text: "Ver más",
+          //         recognizer: TapGestureRecognizer()..onTap = () async {
+          //           final url = Uri.parse(widget.link);
+          //           if (await canLaunchUrl(url)) {
+          //             await launchUrl(
+          //               url
+          //             );
+          //           }
+          //         },
+          //       )
+          //   ),
+          // )
           // TextButton(
           //     onPressed: () {
           //
