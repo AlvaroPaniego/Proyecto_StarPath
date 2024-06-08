@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:starpath/misc/constants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class News extends StatefulWidget {
   final String newsTitle;
@@ -10,7 +11,8 @@ class News extends StatefulWidget {
   final String lorem;
   final String link;
   final String logo;
-  const News({super.key, required this.newsTitle, required this.fecha, required this.lorem, required this.link, required this.logo});
+  final String imageNew;
+  const News({super.key, required this.newsTitle, required this.fecha, required this.lorem, required this.link, required this.logo, required this.imageNew});
 
   @override
   State<News> createState() => _NewsState();
@@ -50,42 +52,57 @@ class _NewsState extends State<News> {
         ),
         leading: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(45.0),
-            child: Image.asset(widget.logo)
+          child: GestureDetector(
+            onTap: () async{
+              final url = Uri.parse(widget.link);
+              if (await canLaunchUrl(url)) {
+                await launchUrl(
+                url
+                );
+              }
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(45.0),
+              child: Image.asset(widget.logo)
+            ),
           ),
         ),
         children: [
-          Text(widget.lorem,
-            style: const TextStyle(
-              color: TEXT,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(widget.lorem,
+              style: const TextStyle(
+                color: TEXT,
+              ),
             ),
           ),
           Image.asset(widget.logo),
-          // RichText(
-          //     text: TextSpan(
-          //       text: "Ver más",
-          //       recognizer: TapGestureRecognizer()..onTap = () async {
-          //         final url = 'https://github.com/flutter/gallery/';
-          //         if (await canLaunch(url)) {
-          //           await launch(
-          //             url,
-          //             forceSafariVC: false,
-          //           );
-          //         }
-          //       },
-          //     )
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: RichText(
+          //       text: TextSpan(
+          //         text: "Ver más",
+          //         recognizer: TapGestureRecognizer()..onTap = () async {
+          //           final url = Uri.parse(widget.link);
+          //           if (await canLaunchUrl(url)) {
+          //             await launchUrl(
+          //               url
+          //             );
+          //           }
+          //         },
+          //       )
+          //   ),
           // )
-          TextButton(
-              onPressed: () {
-
-              },
-              child: const Text("Ver más",
-              style: TextStyle(
-                color: TEXT,
-              )
-            )
-          ),
+          // TextButton(
+          //     onPressed: () {
+          //
+          //     },
+          //     child: const Text("Ver más",
+          //     style: TextStyle(
+          //       color: TEXT,
+          //     )
+          //   )
+          // ),
         ],
       ),
     );

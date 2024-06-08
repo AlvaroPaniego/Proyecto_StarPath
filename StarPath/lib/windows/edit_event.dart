@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +45,7 @@ class _EditEventPageState extends State<EditEventPage> {
     User user = context.watch<UserProvider>().user!;
     bool hasLocalImage = filePath.isNotEmpty;
     return Scaffold(
-        // resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
         body: Column(
           children: [
@@ -55,14 +56,16 @@ class _EditEventPageState extends State<EditEventPage> {
               BackArrow(
                   route: MaterialPageRoute(
                 builder: (context) => const EventMainPage(),
-              ))
+              )),
+              const Text('Editar evento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              const SizedBox(width: 50,)
             ]),
             Expanded(
                 flex: 4,
                 child: hasLocalImage
                     ? Image.file(File(filePath))
                     : Image.network(widget.eventData.eventImage)),
-            Expanded(
+            Flexible(
               flex: 1,
               child: ElevatedButton(
                   onPressed: () async {
@@ -91,7 +94,7 @@ class _EditEventPageState extends State<EditEventPage> {
                       FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _titleController,
                   decoration:
-                      const InputDecoration(hintText: "Introduce el título"),
+                      const InputDecoration(hintText: "Introduce el título", hintStyle: TextStyle(color: TEXT)),
                   style: const TextStyle(color: TEXT),
                 ),
               ),
@@ -104,8 +107,14 @@ class _EditEventPageState extends State<EditEventPage> {
                   onTapOutside: (event) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _descriptionController,
-                  decoration: const InputDecoration(
-                      hintText: "Introduce la descripción"),
+                  decoration: InputDecoration(
+                      hintText: "Introduce la descripción",
+                      hintStyle: const TextStyle(color: TEXT),
+                      counterText: '${_descriptionController.text.length}/150',
+                      counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                    ),
+                  maxLines: null,
+                  maxLength: 150,
                   style: const TextStyle(color: TEXT),
                 ),
               ),
@@ -120,7 +129,8 @@ class _EditEventPageState extends State<EditEventPage> {
                   controller: _dateController,
                   decoration: const InputDecoration(
                       labelText: "Introduce la fecha",
-                      prefixIcon: Icon((Icons.calendar_month))),
+                      labelStyle: TextStyle(color: FOCUS_ORANGE),
+                      prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
                   readOnly: true,
                   onTap: () {
                     selectDate();

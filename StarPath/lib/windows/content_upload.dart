@@ -78,10 +78,14 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _textController,
                 style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  labelStyle: TextStyle(color: FOCUS_ORANGE),
+                decoration: InputDecoration(
+                  labelStyle: const TextStyle(color: FOCUS_ORANGE),
                   labelText: 'Introduce la descripcion para la publicacion',
+                  counterText: '${_textController.text.length}/150',
+                  counterStyle: const TextStyle(color: FOCUS_ORANGE),
                 ),
+                maxLines: null,
+                maxLength: 150,
               ),
             ),
           ),
