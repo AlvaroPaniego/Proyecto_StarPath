@@ -136,7 +136,6 @@ class _EventMainPageState extends State<EventMainList> {
 
     DateFormat format = DateFormat.yMd();
     for (var event in eventsRes ?? []) {
-      // Para cada evento su ubicación
       var locationRes = await supabase
           .from('event_location')
           .select('latitude, longitude')
