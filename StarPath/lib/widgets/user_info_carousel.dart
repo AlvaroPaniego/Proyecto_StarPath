@@ -70,24 +70,24 @@ class _UserInfoCarouselState extends State<UserInfoCarousel> {
                           style: const TextStyle(
                               color: TEXT, fontWeight: FontWeight.bold),
                         ),
-                        FutureBuilder(future: futureFollowers, builder: (context, snapshot) {
-                          if(snapshot.hasData){
-                            if(snapshot.data != 'vacio'){
-                              return Text(
-                                "Seguidores: ${snapshot.data}",
-                                style: const TextStyle(
-                                  color: TEXT,
-                                ),
-                              );
-                            }
-                          }
-                          return const Text(
-                            "Seguidores:",
-                            style: TextStyle(
-                              color: TEXT,
-                            ),
-                          );
-                        },)
+                        // FutureBuilder(future: futureFollowers, builder: (context, snapshot) {
+                        //   if(snapshot.hasData){
+                        //     if(snapshot.data != 'vacio'){
+                        //       return Text(
+                        //         "Seguidores: ${snapshot.data}",
+                        //         style: const TextStyle(
+                        //           color: TEXT,
+                        //         ),
+                        //       );
+                        //     }
+                        //   }
+                        //   return const Text(
+                        //     "Seguidores:",
+                        //     style: TextStyle(
+                        //       color: TEXT,
+                        //     ),
+                        //   );
+                        // },)
                       ],
                     ),
                   )),

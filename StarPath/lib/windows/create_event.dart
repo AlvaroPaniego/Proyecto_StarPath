@@ -34,7 +34,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       backgroundColor: BACKGROUND,
       body: Column(
         children: [
@@ -88,7 +88,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _titleController,
                 decoration:
-                    const InputDecoration(hintText: "Introduce el título"),
+                    const InputDecoration(
+                      hintText: "Introduce el título",
+                      hintStyle: TextStyle(color: TEXT),
+                    ),
                 style: const TextStyle(color: TEXT),
               ),
             ),
@@ -102,7 +105,13 @@ class _CreateEventPageState extends State<CreateEventPage> {
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _descriptionController,
                 decoration:
-                    const InputDecoration(hintText: "Introduce la descripción"),
+                    InputDecoration(hintText: "Introduce la descripción",
+                        hintStyle: const TextStyle(color: TEXT),
+                        counterText: '${_descriptionController.text.length}/150',
+                        counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                    ),
+                maxLines: null,
+                maxLength: 150,
                 style: const TextStyle(color: TEXT),
               ),
             ),
@@ -117,7 +126,8 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 controller: _dateController,
                 decoration: const InputDecoration(
                     labelText: "Introduce la fecha",
-                    prefixIcon: Icon((Icons.calendar_month))),
+                    labelStyle: TextStyle(color: FOCUS_ORANGE),
+                    prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
                 readOnly: true,
                 onTap: () {
                   selectDate();
