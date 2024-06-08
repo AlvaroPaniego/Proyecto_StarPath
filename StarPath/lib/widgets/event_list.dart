@@ -11,7 +11,10 @@ import 'package:starpath/widgets/event.dart';
 import 'package:supabase/supabase.dart';
 
 class EventMainList extends StatefulWidget {
-  const EventMainList({Key? key}) : super(key: key);
+  final double selectedDistance;
+
+  const EventMainList({Key? key, required this.selectedDistance})
+      : super(key: key);
 
   @override
   State<EventMainList> createState() => _EventMainPageState();
@@ -90,14 +93,18 @@ class _EventMainPageState extends State<EventMainList> {
                 } else {
                   final events = snapshot.data!;
                   final nearbyEvents = EventData.filterEventsByProximity(
-                      events, userPosition, 3000); // 3km
+                    events,
+                    userPosition,
+                    widget.selectedDistance,
+                  );
 
                   if (nearbyEvents.isEmpty) {
                     return const Center(
-                        child: Text(
-                      'No hay eventos cercanos en la base de datos.',
-                      style: TextStyle(color: TEXT),
-                    ));
+                      child: Text(
+                        'No hay eventos cercanos en la base de datos.',
+                        style: TextStyle(color: TEXT),
+                      ),
+                    );
                   }
 
                   return ListView.builder(
@@ -135,14 +142,14 @@ class _EventMainPageState extends State<EventMainList> {
         .filter('time', 'gte', dateToday);
 
     DateFormat format = DateFormat.yMd();
+    // Para cada evento su ubicación
     for (var event in eventsRes ?? []) {
       var locationRes = await supabase
           .from('event_location')
           .select('latitude, longitude')
           .filter('id', 'eq', event['id']);
-
-      // Si la consulta va guay combinar info del evento y la ubicación
       if (locationRes.isNotEmpty) {
+        // Si la consulta va guay combinar info del evento y la ubicación
         var locationData = locationRes[0];
         eventData = EventData(
           idEvent: event['id'].toString(),
