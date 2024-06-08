@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -76,7 +73,7 @@ class _NewsState extends State<News> {
               ),
             ),
           ),
-          Image.asset(widget.logo),
+          Image.asset(widget.imageNew),
           // Padding(
           //   padding: const EdgeInsets.all(8.0),
           //   child: RichText(
