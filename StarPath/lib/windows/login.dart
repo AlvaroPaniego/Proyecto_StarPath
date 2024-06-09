@@ -353,7 +353,7 @@ class _LoginState extends State<Login> {
   }
 
   void _showErrorDialog(String message) {
-    showDialog(
+    showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(

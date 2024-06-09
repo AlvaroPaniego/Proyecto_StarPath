@@ -9,6 +9,7 @@ import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
+import 'package:flutter/cupertino.dart';
 
 class ContentUploadPage extends StatefulWidget {
   const ContentUploadPage({super.key});
@@ -36,7 +37,11 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
             height: MediaQuery.of(context).viewPadding.top,
           ),
           UpperAppBar(content: [
-            BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),),),
+            BackArrow(
+              route: MaterialPageRoute(
+                builder: (context) => const MainPage(),
+              ),
+            ),
           ]),
           Expanded(
             flex: 6,
@@ -113,26 +118,27 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
   }
 
   Future<void> _showConfirmationDialog(User user) async {
-    return showDialog<void>(
+    return showCupertinoDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Confirmación'),
           content:
               const Text('¿Estás seguro de que deseas subir esta publicación?'),
           actions: <Widget>[
-            TextButton(
-              //poner booleano para que solo suba una foto a la vez
+            CupertinoDialogAction(
               onPressed: () async {
                 await uploadContent(
                     user, filePath, fileName, _textController.text.trim());
                 Navigator.of(context).pop();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const MainPage()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MainPage()),
+                );
               },
               child: const Text('Aceptar'),
             ),
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -158,14 +164,14 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
   }
 
   Future<void> _showErrorDialog() async {
-    return showDialog<void>(
+    return showCupertinoDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Error'),
           content: const Text('No se ha seleccionado ninguna foto.'),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },

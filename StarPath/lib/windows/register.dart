@@ -75,7 +75,7 @@ class _RegisterState extends State<Register> {
     }
 
     if (_passwordController.text != _repeatPasswordController.text) {
-      showDialog(
+      showCupertinoDialog(
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
@@ -92,6 +92,7 @@ class _RegisterState extends State<Register> {
           );
         },
       );
+
       return;
     }
 
@@ -100,7 +101,7 @@ class _RegisterState extends State<Register> {
 
     final existenceMessage = await _checkUserEmailExistence(username, email);
     if (existenceMessage != null) {
-      showDialog(
+      showCupertinoDialog(
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
@@ -117,6 +118,7 @@ class _RegisterState extends State<Register> {
           );
         },
       );
+
       return;
     }
     try {
@@ -132,33 +134,7 @@ class _RegisterState extends State<Register> {
 
       if (response == null) {
         print('Error al registrar usuario.');
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return CupertinoAlertDialog(
-              title: Text('Registro Exitoso'),
-              content: Text(
-                'Se ha enviado un enlace de verificación a su correo electrónico. Por favor, revise su bandeja de entrada y confirme su cuenta antes de iniciar sesión.',
-              ),
-              actions: [
-                CupertinoDialogAction(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Login(),
-                      ),
-                    );
-                  },
-                  child: Text('Aceptar'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
+        showCupertinoDialog(
           context: context,
           builder: (BuildContext context) {
             return CupertinoAlertDialog(
@@ -184,14 +160,40 @@ class _RegisterState extends State<Register> {
           },
         );
       }
+      showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Registro Exitoso'),
+            content: Text(
+              'Se ha enviado un enlace de verificación a su correo electrónico. Por favor, revise su bandeja de entrada y confirme su cuenta antes de iniciar sesión.',
+            ),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Login(),
+                    ),
+                  );
+                },
+                child: Text('Aceptar'),
+              ),
+            ],
+          );
+        },
+      );
     } catch (error) {
-      showDialog(
+      showCupertinoDialog(
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
             title: Text('Error'),
             content: Text(
-                'Se ha producido un error al enviar el correo de confirmación a esa dirección de email.'),
+              'Se ha producido un error al enviar el correo de confirmación a esa dirección de email.',
+            ),
             actions: [
               CupertinoDialogAction(
                 onPressed: () {
@@ -242,6 +244,7 @@ class _RegisterState extends State<Register> {
                       decoration: InputDecoration(
                         hintText: "Introduzca nombre de usuario",
                         hintStyle: const TextStyle(color: HINT),
+                        counterText: '${_usernameController.text.length}/20',
                         labelText: "Usuario",
                         labelStyle: const TextStyle(color: TEXT),
                         border: OutlineInputBorder(
@@ -255,6 +258,8 @@ class _RegisterState extends State<Register> {
                               const BorderSide(color: FOCUS_ORANGE, width: 1.0),
                         ),
                       ),
+                      maxLines: null,
+                      maxLength: 20,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Usuario requerido.';

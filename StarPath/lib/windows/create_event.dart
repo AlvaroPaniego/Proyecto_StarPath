@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -79,55 +80,69 @@ class _CreateEventPageState extends State<CreateEventPage> {
                 child: const Text("Seleccionar foto",
                     style: TextStyle(color: TEXT))),
           ),
+          SizedBox(height: 10),
           Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: TextField(
                 onTapOutside: (event) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _titleController,
-                decoration:
-                    const InputDecoration(
-                      hintText: "Introduce el título",
-                      hintStyle: TextStyle(color: TEXT),
-                    ),
+                decoration: InputDecoration(
+                  hintText: "Introduce el título",
+                  hintStyle: const TextStyle(color: TEXT),
+                  counterText: '${_titleController.text.length}/30',
+                  counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                ),
                 style: const TextStyle(color: TEXT),
+                maxLines: null,
+                maxLength: 30,
               ),
             ),
           ),
           Expanded(
-            flex: 1,
+            flex: 3,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: TextField(
                 onTapOutside: (event) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _descriptionController,
-                decoration:
-                    InputDecoration(hintText: "Introduce la descripción",
-                        hintStyle: const TextStyle(color: TEXT),
-                        counterText: '${_descriptionController.text.length}/150',
-                        counterStyle: const TextStyle(color: FOCUS_ORANGE),
-                    ),
+                decoration: InputDecoration(
+                  hintText: "Introduce la descripción",
+                  hintStyle: const TextStyle(color: TEXT),
+                  counterText: '${_descriptionController.text.length}/150',
+                  counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                ),
                 maxLines: null,
                 maxLength: 150,
                 style: const TextStyle(color: TEXT),
+                onChanged: (value) {
+                  setState(() {});
+                },
               ),
             ),
           ),
           Expanded(
             flex: 1,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: TextField(
                 onTapOutside: (event) =>
                     FocusManager.instance.primaryFocus?.unfocus(),
                 controller: _dateController,
-                decoration: const InputDecoration(
-                    labelText: "Introduce la fecha",
-                    labelStyle: TextStyle(color: FOCUS_ORANGE),
-                    prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
+                decoration: InputDecoration(
+                  labelText: eventDate == null ? "Introduce la fecha" : "",
+                  labelStyle: TextStyle(
+                    color:
+                        eventDate == null ? FOCUS_ORANGE : Colors.transparent,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.calendar_month,
+                    color: TEXT,
+                  ),
+                ),
                 readOnly: true,
                 onTap: () {
                   selectDate();
@@ -183,14 +198,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _showConfirmationDialog(User user) async {
-    return showDialog<void>(
+    return showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Confirmación'),
           content: const Text('¿Estás seguro de que deseas crear este evento?'),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () async {
                 try {
                   await uploadContent(
@@ -214,7 +229,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               },
               child: const Text('Aceptar'),
             ),
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -261,8 +276,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
     if (locationInsertionResponse != null &&
         locationInsertionResponse.error != null) {
-      throw Exception(
-          'Error al insertar la ubicación del evento: ${locationInsertionResponse.error!.message}');
+      throw Exception('Error al insertar la ubicación del evento');
     }
 
     // Insertar el evento y el usuario en la tabla event_followers
@@ -274,8 +288,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
     if (followersInsertionResponse != null &&
         followersInsertionResponse.error != null) {
-      throw Exception(
-          'Error al insertar el seguidor del evento: ${followersInsertionResponse.error!.message}');
+      throw Exception('Error al insertar el seguidor del evento');
     }
 
     // Si todo guay navegar a la página de Mis Eventos
@@ -283,14 +296,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _showErrorDialog2(String errorMessage) async {
-    return showDialog<void>(
+    return showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Error'),
           content: Text(errorMessage),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -303,14 +316,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _showErrorDialog() async {
-    return showDialog<void>(
+    return showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Error'),
           content: const Text('No se ha seleccionado ninguna foto.'),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -323,15 +336,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _showErrorDialogDate() async {
-    return showDialog<void>(
+    return showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Error'),
           content:
               const Text('No se ha seleccionado ninguna fecha para el evento.'),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -342,21 +355,21 @@ class _CreateEventPageState extends State<CreateEventPage> {
       },
     );
   }
-  Future<void> selectDate() async{
+
+  Future<void> selectDate() async {
     DateFormat format = DateFormat.yMd();
     var selectedDate = await showDatePicker(
-        context: context,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100)
-    );
-    if(selectedDate != null){
+        context: context, firstDate: DateTime.now(), lastDate: DateTime(2100));
+    if (selectedDate != null) {
       setState(() {
-        _dateController.text = format.format(DateTime.parse(selectedDate.toString()));
+        _dateController.text =
+            format.format(DateTime.parse(selectedDate.toString()));
         eventDate = selectedDate;
       });
     }
   }
-  Future<UserData> getUserDataAsync(String id_user) async{
+
+  Future<UserData> getUserDataAsync(String id_user) async {
     UserData user = UserData.empty();
     var res = await supabase
         .from('user')

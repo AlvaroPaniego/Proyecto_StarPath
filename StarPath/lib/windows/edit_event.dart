@@ -57,8 +57,13 @@ class _EditEventPageState extends State<EditEventPage> {
                   route: MaterialPageRoute(
                 builder: (context) => const EventMainPage(),
               )),
-              const Text('Editar evento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-              const SizedBox(width: 50,)
+              const Text(
+                'Editar evento',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                width: 50,
+              )
             ]),
             Expanded(
                 flex: 4,
@@ -93,8 +98,9 @@ class _EditEventPageState extends State<EditEventPage> {
                   onTapOutside: (event) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _titleController,
-                  decoration:
-                      const InputDecoration(hintText: "Introduce el título", hintStyle: TextStyle(color: TEXT)),
+                  decoration: const InputDecoration(
+                      hintText: "Introduce el título",
+                      hintStyle: TextStyle(color: TEXT)),
                   style: const TextStyle(color: TEXT),
                 ),
               ),
@@ -108,11 +114,11 @@ class _EditEventPageState extends State<EditEventPage> {
                       FocusManager.instance.primaryFocus?.unfocus(),
                   controller: _descriptionController,
                   decoration: InputDecoration(
-                      hintText: "Introduce la descripción",
-                      hintStyle: const TextStyle(color: TEXT),
-                      counterText: '${_descriptionController.text.length}/150',
-                      counterStyle: const TextStyle(color: FOCUS_ORANGE),
-                    ),
+                    hintText: "Introduce la descripción",
+                    hintStyle: const TextStyle(color: TEXT),
+                    counterText: '${_descriptionController.text.length}/150',
+                    counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                  ),
                   maxLines: null,
                   maxLength: 150,
                   style: const TextStyle(color: TEXT),
@@ -130,7 +136,10 @@ class _EditEventPageState extends State<EditEventPage> {
                   decoration: const InputDecoration(
                       labelText: "Introduce la fecha",
                       labelStyle: TextStyle(color: FOCUS_ORANGE),
-                      prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
+                      prefixIcon: Icon(
+                        (Icons.calendar_month),
+                        color: TEXT,
+                      )),
                   readOnly: true,
                   onTap: () {
                     selectDate();
@@ -163,15 +172,15 @@ class _EditEventPageState extends State<EditEventPage> {
   }
 
   Future<void> _showErrorDialogDate() async {
-    return showDialog<void>(
+    return showCupertinoDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Error'),
           content:
               const Text('No se ha seleccionado ninguna fecha para el evento.'),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -197,16 +206,15 @@ class _EditEventPageState extends State<EditEventPage> {
   }
 
   Future<void> _showConfirmationDialog(User user) async {
-    return showDialog<void>(
+    return showCupertinoDialog<void>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Confirmación'),
           content:
               const Text('¿Estás seguro de que deseas modificar este evento?'),
           actions: <Widget>[
-            TextButton(
-              //poner booleano para que solo suba una foto a la vez
+            CupertinoDialogAction(
               onPressed: () async {
                 await updateEvent(
                     widget.eventData.username,
@@ -224,7 +232,7 @@ class _EditEventPageState extends State<EditEventPage> {
               },
               child: const Text('Aceptar'),
             ),
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
