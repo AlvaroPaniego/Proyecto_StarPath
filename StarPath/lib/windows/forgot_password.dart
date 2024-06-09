@@ -20,12 +20,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   final formKey = GlobalKey<FormState>();
 
   void _showErrorDialog(String message) {
-    showDialog(
+    showCupertinoDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => CupertinoAlertDialog(
         content: Text(message),
         actions: [
-          TextButton(
+          CupertinoDialogAction(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('OK'),
           ),
@@ -109,15 +109,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             await supabaseClient.auth
                                 .resetPasswordForEmail(email);
 
-                            showDialog(
+                            showCupertinoDialog(
                               context: context,
-                              builder: (context) => AlertDialog(
+                              builder: (context) => CupertinoAlertDialog(
                                 content: const Text(
-                                    '¡Revise su bandeja de entrada del correo electrónico para ver el código!',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: BLACK)),
+                                  '¡Revise su bandeja de entrada del correo electrónico para ver el código!',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: BLACK),
+                                ),
                                 actions: [
-                                  TextButton(
+                                  CupertinoDialogAction(
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                       Navigator.push(

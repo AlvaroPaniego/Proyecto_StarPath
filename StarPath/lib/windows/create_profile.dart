@@ -9,6 +9,7 @@ import 'package:starpath/windows/login.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:supabase/supabase.dart';
 import 'package:starpath/model/user.dart';
+import 'package:flutter/cupertino.dart';
 
 class NewProfilePage extends StatefulWidget {
   const NewProfilePage({Key? key}) : super(key: key);
@@ -36,14 +37,14 @@ class _NewProfilePageState extends State<NewProfilePage> {
 
   void _showInfoDialog() {
     WidgetsBinding.instance!.addPostFrameCallback((_) {
-      showDialog(
+      showCupertinoDialog(
         context: context,
-        builder: (BuildContext context) => AlertDialog(
+        builder: (BuildContext context) => CupertinoAlertDialog(
           title: Text("Información"),
           content: Text(
               "Aquí puede insertar una biografía, una foto de perfil y ajustar la privacidad del perfil."),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -56,20 +57,20 @@ class _NewProfilePageState extends State<NewProfilePage> {
   }
 
   void _showUploadDialog() {
-    showDialog(
+    showCupertinoDialog(
       context: context,
-      builder: (BuildContext context) => AlertDialog(
+      builder: (BuildContext context) => CupertinoAlertDialog(
         title: Text("Subir foto de perfil"),
         content: Text("¿Desea subir una foto de perfil?"),
         actions: [
-          TextButton(
+          CupertinoDialogAction(
             onPressed: () {
               Navigator.of(context).pop();
               _uploadProfilePicture();
             },
             child: Text("Sí"),
           ),
-          TextButton(
+          CupertinoDialogAction(
             onPressed: () {
               Navigator.of(context).pop();
             },

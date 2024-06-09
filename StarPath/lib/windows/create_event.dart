@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:intl/intl.dart';
@@ -323,14 +324,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _showConfirmationDialog(User user) async {
-    return showDialog<void>(
+    return showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Confirmación'),
           content: const Text('¿Estás seguro de que deseas crear este evento?'),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () async {
                 try {
                   await uploadContent(
@@ -354,7 +355,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
               },
               child: const Text('Aceptar'),
             ),
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -401,8 +402,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
     if (locationInsertionResponse != null &&
         locationInsertionResponse.error != null) {
-      throw Exception(
-          'Error al insertar la ubicación del evento: ${locationInsertionResponse.error!.message}');
+      throw Exception('Error al insertar la ubicación del evento');
     }
 
     // Insertar el evento y el usuario en la tabla event_followers
@@ -414,8 +414,7 @@ class _CreateEventPageState extends State<CreateEventPage> {
 
     if (followersInsertionResponse != null &&
         followersInsertionResponse.error != null) {
-      throw Exception(
-          'Error al insertar el seguidor del evento: ${followersInsertionResponse.error!.message}');
+      throw Exception('Error al insertar el seguidor del evento');
     }
 
     // Si todo guay navegar a la página de Mis Eventos
@@ -423,14 +422,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _showErrorDialog2(String errorMessage) async {
-    return showDialog<void>(
+    return showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Error'),
           content: Text(errorMessage),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -443,14 +442,14 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _showErrorDialog() async {
-    return showDialog<void>(
+    return showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Error'),
           content: const Text('No se ha seleccionado ninguna foto.'),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -463,15 +462,15 @@ class _CreateEventPageState extends State<CreateEventPage> {
   }
 
   Future<void> _showErrorDialogDate() async {
-    return showDialog<void>(
+    return showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return CupertinoAlertDialog(
           title: const Text('Error'),
           content:
               const Text('No se ha seleccionado ninguna fecha para el evento.'),
           actions: <Widget>[
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.of(context).pop();
               },

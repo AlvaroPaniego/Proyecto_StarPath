@@ -163,10 +163,11 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ElevatedButton(
                       onPressed: () async {
                         if (formKey.currentState!.validate()) {
-                          showDialog(
+                          showCupertinoDialog(
                             context: context,
-                            builder: (context) => const Center(
-                                child: CircularProgressIndicator()),
+                            builder: (context) => Center(
+                              child: const CircularProgressIndicator(),
+                            ),
                           );
                           try {
                             await Supabase.instance.client.auth.verifyOTP(
@@ -175,15 +176,17 @@ class _ResetPasswordState extends State<ResetPassword> {
                               type: OtpType.recovery,
                             );
                             await Supabase.instance.client.auth.updateUser(
-                                UserAttributes(password: passwordC.text));
+                              UserAttributes(password: passwordC.text),
+                            );
                             Navigator.of(context, rootNavigator: true).pop();
-                            showDialog(
+                            showCupertinoDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return CupertinoAlertDialog(
                                   title: Text('Éxito'),
                                   content: Text(
-                                      'El cambio de la contraseña se ha realizado correctamente. Inicie sesión nuevamente.'),
+                                    'El cambio de la contraseña se ha realizado correctamente. Inicie sesión nuevamente.',
+                                  ),
                                   actions: [
                                     CupertinoDialogAction(
                                       onPressed: () {
@@ -197,7 +200,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                             );
                           } catch (error) {
                             Navigator.of(context, rootNavigator: true).pop();
-                            showDialog(
+                            showCupertinoDialog(
                               context: context,
                               builder: (BuildContext context) {
                                 return CupertinoAlertDialog(

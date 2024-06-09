@@ -73,7 +73,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final usernameAvailable = await _checkUsernameAvailability(username);
 
     if (!usernameAvailable) {
-      showDialog(
+      showCupertinoDialog(
         context: context,
         builder: (BuildContext context) {
           return CupertinoAlertDialog(
@@ -90,6 +90,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           );
         },
       );
+
       return;
     }
 
