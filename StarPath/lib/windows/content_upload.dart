@@ -64,7 +64,10 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
                   )
               ),
               isImageSelected
-                  ? Image.file(File(filePath))
+                  ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Image.file(File(filePath)),
+                  )
                   : SizedBox(
                     height: MediaQuery.of(context).size.height*0.4,
                     child: const Center(

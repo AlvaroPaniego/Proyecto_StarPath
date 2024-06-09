@@ -85,8 +85,14 @@ class _EditEventPageState extends State<EditEventPage> {
                     )
                 ),
                 hasLocalImage
-                    ? Image.file(File(filePath))
-                    : Image.network(widget.eventData.eventImage),
+                    ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.file(File(filePath)),
+                    )
+                    : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.network(widget.eventData.eventImage),
+                    ),
                 ElevatedButton(
                     onPressed: () async {
                       FilePickerResult? result = await FilePicker.platform
