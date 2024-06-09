@@ -44,9 +44,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       body: Column(
         children: [
           UpperAppBar(content: [
-            BackArrow(route: MaterialPageRoute(builder: (context) => const Login(),)),
-            const Text('Olvidé la contraseña', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-            const SizedBox(width: 40,)
+            BackArrow(
+                route: MaterialPageRoute(
+              builder: (context) => const Login(),
+            )),
+            const Text(
+              'Olvidé la contraseña',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(
+              width: 40,
+            )
           ]),
           Expanded(
             flex: 9,
@@ -61,11 +69,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       controller: emailC,
                       style: TextStyle(color: TEXT),
                       decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(8))),
-                        hintText: 'Email',
-                        hintStyle: TextStyle(color: TEXT)
-                      ),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8))),
+                          hintText: 'Email',
+                          hintStyle: TextStyle(color: TEXT)),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) => !EmailValidator.validate(value!)
                           ? 'El formato de email es incorrecto'
@@ -93,19 +101,21 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
                             final userList = emailCheckResponse as List;
                             if (userList.isEmpty) {
-                              _showErrorDialog('El correo electrónico no existe.');
+                              _showErrorDialog(
+                                  'El correo electrónico no existe.');
                               return;
                             }
 
-                            await supabaseClient.auth.resetPasswordForEmail(email);
+                            await supabaseClient.auth
+                                .resetPasswordForEmail(email);
 
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
                                 content: const Text(
-                                  '¡Revise su bandeja de entrada del correo electrónico para ver el TOKEN!',
-                                  textAlign: TextAlign.center, style: TextStyle(color: BLACK)
-                                ),
+                                    '¡Revise su bandeja de entrada del correo electrónico para ver el código!',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: BLACK)),
                                 actions: [
                                   TextButton(
                                     onPressed: () {
@@ -113,7 +123,8 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => const ResetPassword(),
+                                          builder: (context) =>
+                                              const ResetPassword(),
                                         ),
                                       );
                                     },
@@ -128,11 +139,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           }
                         }
                       },
-                      child: const Text('Recuperar contraseña', style: TextStyle(color: BLACK),),
+                      child: const Text(
+                        'Recuperar contraseña',
+                        style: TextStyle(color: BLACK),
+                      ),
                     ),
                     const SizedBox(width: 16, height: 16),
                     Text(
-                        '¿Has olvidado la contraseña? Te enviamos un TOKEN al correo electronico de su cuenta para poder cambiarla por una nueva.', style: TextStyle(color: TEXT)),
+                        '¿Has olvidado la contraseña? Te enviamos un código al correo electronico de su cuenta para poder cambiarla por una nueva.',
+                        style: TextStyle(color: TEXT)),
                   ],
                 ),
               ),

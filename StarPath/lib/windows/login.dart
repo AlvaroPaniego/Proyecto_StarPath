@@ -11,6 +11,7 @@ import 'package:starpath/windows/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:starpath/windows/create_profile.dart';
 import 'package:starpath/windows/forgot_password.dart';
+import 'package:email_validator/email_validator.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -44,25 +45,12 @@ class _LoginState extends State<Login> {
     }
   }
 
-  // Future<void> _saveProfileCompletion() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.setBool('profileCompleted', true);
-  //   setState(() {
-  //     _profileCompleted = true;
-  //   });
-  // }
-
   void _loadRememberStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       remember = prefs.getBool('remember') ?? false;
     });
   }
-
-  // void _saveRememberStatus(bool value) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   await prefs.setBool('remember', value);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -120,12 +108,9 @@ class _LoginState extends State<Login> {
                                 color: FOCUS_ORANGE, width: 1.0),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'El correo electrónico está vacío';
-                          }
-                          return null;
-                        },
+                        validator: (value) => !EmailValidator.validate(value!)
+                            ? 'El formato de email es incorrecto.'
+                            : null,
                       ),
                       const SizedBox(height: 60.0),
                       TextFormField(
@@ -163,13 +148,13 @@ class _LoginState extends State<Login> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'La contraseña está vacía';
+                            return 'La contraseña está vacía.';
                           } else if (value.length < 6) {
-                            return 'La contraseña debe tener al menos 6 caracteres';
+                            return 'La contraseña debe tener al menos 6 caracteres.';
                           } else if (!RegExp(
                                   r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
                               .hasMatch(value)) {
-                            return 'La contraseña debe contener al menos un número y un carácter especial';
+                            return 'La contraseña debe contener al menos un número \ny un carácter especial';
                           }
                           return null;
                         },

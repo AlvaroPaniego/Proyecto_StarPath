@@ -73,11 +73,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final usernameAvailable = await _checkUsernameAvailability(username);
 
     if (!usernameAvailable) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('El nombre de usuario ya está en uso.'),
-          backgroundColor: Colors.red,
-        ),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Error'),
+            content: Text('El nombre de usuario ya está en uso.'),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Aceptar'),
+              ),
+            ],
+          );
+        },
       );
       return;
     }

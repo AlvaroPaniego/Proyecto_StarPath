@@ -87,12 +87,13 @@ class _MainPageState extends State<MainPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(5.0),
+                        borderRadius: BorderRadius.circular(5.0),
                         child: Image.asset('assets/images/logo.png')),
-                    const Text('STARPATH', style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25
-                    ),)
+                    const Text(
+                      'STARPATH',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                    )
                   ],
                 ),
               ),
@@ -100,7 +101,12 @@ class _MainPageState extends State<MainPage> {
                 flex: 1,
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SearchPage(),), (route) => false);
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SearchPage(),
+                        ),
+                        (route) => false);
                   },
                   child: const Icon(Icons.search),
                 ),
@@ -138,7 +144,11 @@ class _MainPageState extends State<MainPage> {
                       const CameraButton(),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const WikiPage(),), (route) => false);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const WikiPage(),
+                              ));
                         },
                         child: const Icon(Icons.account_balance),
                       ),
@@ -164,7 +174,11 @@ class _MainPageState extends State<MainPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatListPage(),));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ChatListPage(),
+                              ));
                         },
                         child: const Icon(Icons.chat),
                       ),
@@ -193,11 +207,9 @@ class _MainPageState extends State<MainPage> {
                   decoration: BoxDecoration(
                       image: DecorationImage(
                           fit: BoxFit.cover,
-                          image: NetworkImage(snapshot.data!.profile_picture)
-                      )
-                  ),
+                          image: NetworkImage(snapshot.data!.profile_picture))),
                 );
-                  //Image.network(snapshot.data!.profile_picture );
+                //Image.network(snapshot.data!.profile_picture );
               } else if (snapshot.hasError) {
                 return Image.asset("assets/images/placeholder-avatar.jpg");
               }
@@ -206,34 +218,54 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
         itemBuilder: (context) => <PopupMenuEntry>[
-          PopupMenuItem(child: FutureBuilder(future: userData, builder: (context, snapshot) {
-            if(snapshot.hasData){
-              return GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage(userData: snapshot.data!),)),
-                child: const Text('Editar perfil'),
-              );
-            }
-            return const Text('Editar perfil');
-          },)),
-          PopupMenuItem(child: FutureBuilder(future: userData, builder: (context, snapshot) {
-            if(snapshot.hasData){
-              return GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => UserProfilePage(userData: snapshot.data!),)),
-                child: const Text('Ver perfil'),
-              );
-            }
-            return const Text('Ver perfil');
-          },)),
-          PopupMenuItem(child: GestureDetector(
-              onTap: () {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Login()),
-                      (Route<dynamic> route) => false,
+          PopupMenuItem(
+              child: FutureBuilder(
+            future: userData,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditProfilePage(userData: snapshot.data!),
+                      )),
+                  child: const Text('Editar perfil'),
                 );
-              },
-              child: const Text("Cerrar sesion"))),
-        ] ,),
+              }
+              return const Text('Editar perfil');
+            },
+          )),
+          PopupMenuItem(
+              child: FutureBuilder(
+            future: userData,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            UserProfilePage(userData: snapshot.data!),
+                      )),
+                  child: const Text('Ver perfil'),
+                );
+              }
+              return const Text('Ver perfil');
+            },
+          )),
+          PopupMenuItem(
+              child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Login()),
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                  child: const Text("Cerrar sesion"))),
+        ],
+      ),
     );
   }
 

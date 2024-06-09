@@ -3,6 +3,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/windows/login.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:email_validator/email_validator.dart';
 
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
@@ -24,12 +25,12 @@ class _RegisterState extends State<Register> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'La contraseña está vacía';
+      return 'La contraseña está vacía.';
     } else if (value.length < 6) {
-      return 'La contraseña debe tener al menos 6 caracteres';
+      return 'La contraseña debe tener al menos 6 caracteres.';
     } else if (!RegExp(r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
         .hasMatch(value)) {
-      return 'La contraseña debe contener al menos un número y un carácter especial';
+      return 'La contraseña debe contener al menos un número \ny un carácter especial.';
     }
     return null;
   }
@@ -130,7 +131,7 @@ class _RegisterState extends State<Register> {
       );
 
       if (response == null) {
-        print('Error al registrar usuario');
+        print('Error al registrar usuario.');
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -256,7 +257,7 @@ class _RegisterState extends State<Register> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Usuario requerido';
+                          return 'Usuario requerido.';
                         }
                         return null;
                       },
@@ -284,12 +285,9 @@ class _RegisterState extends State<Register> {
                               const BorderSide(color: FOCUS_ORANGE, width: 1.0),
                         ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Correo electrónico requerido';
-                        }
-                        return null;
-                      },
+                      validator: (value) => !EmailValidator.validate(value!)
+                          ? 'El formato de email es incorrecto.'
+                          : null,
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
@@ -369,9 +367,9 @@ class _RegisterState extends State<Register> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Repetir contraseña requerida';
+                          return 'Repetir contraseña requerido.';
                         } else if (value != _passwordController.text) {
-                          return 'Las contraseñas no coinciden';
+                          return 'Las contraseñas no coinciden.';
                         }
                         return null;
                       },
