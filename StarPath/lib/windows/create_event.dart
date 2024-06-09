@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
@@ -34,131 +35,270 @@ class _CreateEventPageState extends State<CreateEventPage> {
   Widget build(BuildContext context) {
     User user = context.watch<UserProvider>().user!;
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
-      backgroundColor: BACKGROUND,
-      body: Column(
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).viewPadding.top,
-          ),
-          UpperAppBar(content: [
-            BackArrow(
-              route: MaterialPageRoute(
-                builder: (context) => const EventMainPage(),
-              ),
-            ),
-          ]),
-          Expanded(
-            flex: 6,
-            child: isImageSelected
-                ? Image.file(File(filePath))
-                : const Center(
-                    child: Text(
-                      "Ninguna imagen seleccionada para subir",
-                      style: TextStyle(color: TEXT),
+        // resizeToAvoidBottomInset: false,
+        backgroundColor: BACKGROUND,
+        body: KeyboardVisibilityBuilder(
+          builder: (p0, isKeyboardVisible) {
+            return SingleChildScrollView(
+              child: Column(
+                // mainAxisSize: MainAxisSize.max,
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).viewPadding.top,
+                  ),
+                  // UpperAppBar(content: [
+                  //   BackArrow(
+                  //     route: MaterialPageRoute(
+                  //       builder: (context) => const EventMainPage(),
+                  //     ),
+                  //   ),
+                  // ]),
+                  Container(
+                      decoration: const BoxDecoration(
+                          color: BUTTON_BAR_BACKGROUND,
+                          borderRadius:
+                          BorderRadius.vertical(bottom: Radius.circular(30.0))),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                          BackArrow(
+                              route: MaterialPageRoute(
+                                builder: (context) => const EventMainPage(),
+                              ),
+                            ),
+                            const Text('Crear evento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                            const SizedBox(width: 40,)
+                          ],
+                        ),
+                      )
+                  ),
+                  isImageSelected
+                      ? Image.file(File(filePath))
+                      : SizedBox(
+                        height: MediaQuery.of(context).size.height*0.4,
+                        child: const Center(
+                          child: Text(
+                              "Ninguna imagen seleccionada para subir",
+                              style: TextStyle(color: TEXT),
+                            ),
+                        ),
+                      ),
+                  ElevatedButton(
+                      onPressed: () async {
+                        FilePickerResult? result = await FilePicker.platform
+                            .pickFiles(type: FileType.media);
+                        if (result != null) {
+                          setState(() {
+                            filePath = result.files.single.path!;
+                            fileName = result.files.single.name!;
+                            isImageSelected = true;
+                          });
+                        }
+                      },
+                      style: const ButtonStyle(
+                          backgroundColor:
+                              MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                      child: const Text("Seleccionar foto",
+                          style: TextStyle(color: TEXT))),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      controller: _titleController,
+                      decoration: const InputDecoration(
+                        hintText: "Introduce el título",
+                        hintStyle: TextStyle(color: TEXT),
+                      ),
+                      style: const TextStyle(color: TEXT),
                     ),
                   ),
-          ),
-          Flexible(
-            flex: 1,
-            child: ElevatedButton(
-                onPressed: () async {
-                  FilePickerResult? result =
-                      await FilePicker.platform.pickFiles(type: FileType.media);
-                  if (result != null) {
-                    setState(() {
-                      filePath = result.files.single.path!;
-                      fileName = result.files.single.name!;
-                      isImageSelected = true;
-                    });
-                  }
-                },
-                style: const ButtonStyle(
-                    backgroundColor:
-                        MaterialStatePropertyAll(BUTTON_BACKGROUND)),
-                child: const Text("Seleccionar foto",
-                    style: TextStyle(color: TEXT))),
-          ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                onTapOutside: (event) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
-                controller: _titleController,
-                decoration:
-                    const InputDecoration(
-                      hintText: "Introduce el título",
-                      hintStyle: TextStyle(color: TEXT),
-                    ),
-                style: const TextStyle(color: TEXT),
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                onTapOutside: (event) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
-                controller: _descriptionController,
-                decoration:
-                    InputDecoration(hintText: "Introduce la descripción",
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
+                        hintText: "Introduce la descripción",
                         hintStyle: const TextStyle(color: TEXT),
-                        counterText: '${_descriptionController.text.length}/150',
+                        counterText:
+                            '${_descriptionController.text.length}/150',
                         counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                      ),
+                      maxLines: null,
+                      maxLength: 150,
+                      style: const TextStyle(color: TEXT),
                     ),
-                maxLines: null,
-                maxLength: 150,
-                style: const TextStyle(color: TEXT),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      onTapOutside: (event) =>
+                          FocusManager.instance.primaryFocus?.unfocus(),
+                      controller: _dateController,
+                      decoration: const InputDecoration(
+                          labelText: "Introduce la fecha",
+                          labelStyle: TextStyle(color: FOCUS_ORANGE),
+                          prefixIcon: Icon(
+                            (Icons.calendar_month),
+                            color: TEXT,
+                          )),
+                      readOnly: true,
+                      onTap: () {
+                        selectDate();
+                      },
+                      style: const TextStyle(color: TEXT),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (!isImageSelected) {
+                        _showErrorDialog();
+                      } else if (eventDate == null) {
+                        _showErrorDialogDate();
+                      } else {
+                        _onCreateEventButtonPressed(user);
+                      }
+                    },
+                    style: const ButtonStyle(
+                        backgroundColor:
+                            MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                    child: const Text(
+                      "Crear evento",
+                      style: TextStyle(color: TEXT),
+                    ),
+                  )
+                ],
               ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                onTapOutside: (event) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
-                controller: _dateController,
-                decoration: const InputDecoration(
-                    labelText: "Introduce la fecha",
-                    labelStyle: TextStyle(color: FOCUS_ORANGE),
-                    prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
-                readOnly: true,
-                onTap: () {
-                  selectDate();
-                },
-                style: const TextStyle(color: TEXT),
-              ),
-            ),
-          ),
-          Flexible(
-            flex: 1,
-            child: ElevatedButton(
-              onPressed: () {
-                if (!isImageSelected) {
-                  _showErrorDialog();
-                } else if (eventDate == null) {
-                  _showErrorDialogDate();
-                } else {
-                  _onCreateEventButtonPressed(user);
-                }
-              },
-              style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
-              child: const Text(
-                "Crear evento",
-                style: TextStyle(color: TEXT),
-              ),
-            ),
-          )
-        ],
-      ),
-    );
+            );
+          },
+        )
+        // Column(
+        //   children: [
+        //     SizedBox(
+        //       height: MediaQuery.of(context).viewPadding.top,
+        //     ),
+        //     UpperAppBar(content: [
+        //       BackArrow(
+        //         route: MaterialPageRoute(
+        //           builder: (context) => const EventMainPage(),
+        //         ),
+        //       ),
+        //     ]),
+        //     Expanded(
+        //       flex: 6,
+        //       child: isImageSelected
+        //           ? Image.file(File(filePath))
+        //           : const Center(
+        //               child: Text(
+        //                 "Ninguna imagen seleccionada para subir",
+        //                 style: TextStyle(color: TEXT),
+        //               ),
+        //             ),
+        //     ),
+        //     Flexible(
+        //       flex: 1,
+        //       child: ElevatedButton(
+        //           onPressed: () async {
+        //             FilePickerResult? result =
+        //                 await FilePicker.platform.pickFiles(type: FileType.media);
+        //             if (result != null) {
+        //               setState(() {
+        //                 filePath = result.files.single.path!;
+        //                 fileName = result.files.single.name!;
+        //                 isImageSelected = true;
+        //               });
+        //             }
+        //           },
+        //           style: const ButtonStyle(
+        //               backgroundColor:
+        //                   MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+        //           child: const Text("Seleccionar foto",
+        //               style: TextStyle(color: TEXT))),
+        //     ),
+        //     Expanded(
+        //       flex: 1,
+        //       child: Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: TextField(
+        //           onTapOutside: (event) =>
+        //               FocusManager.instance.primaryFocus?.unfocus(),
+        //           controller: _titleController,
+        //           decoration:
+        //               const InputDecoration(
+        //                 hintText: "Introduce el título",
+        //                 hintStyle: TextStyle(color: TEXT),
+        //               ),
+        //           style: const TextStyle(color: TEXT),
+        //         ),
+        //       ),
+        //     ),
+        //     Expanded(
+        //       flex: 1,
+        //       child: Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: TextField(
+        //           onTapOutside: (event) =>
+        //               FocusManager.instance.primaryFocus?.unfocus(),
+        //           controller: _descriptionController,
+        //           decoration:
+        //               InputDecoration(hintText: "Introduce la descripción",
+        //                   hintStyle: const TextStyle(color: TEXT),
+        //                   counterText: '${_descriptionController.text.length}/150',
+        //                   counterStyle: const TextStyle(color: FOCUS_ORANGE),
+        //               ),
+        //           maxLines: null,
+        //           maxLength: 150,
+        //           style: const TextStyle(color: TEXT),
+        //         ),
+        //       ),
+        //     ),
+        //     Expanded(
+        //       flex: 1,
+        //       child: Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: TextField(
+        //           onTapOutside: (event) =>
+        //               FocusManager.instance.primaryFocus?.unfocus(),
+        //           controller: _dateController,
+        //           decoration: const InputDecoration(
+        //               labelText: "Introduce la fecha",
+        //               labelStyle: TextStyle(color: FOCUS_ORANGE),
+        //               prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
+        //           readOnly: true,
+        //           onTap: () {
+        //             selectDate();
+        //           },
+        //           style: const TextStyle(color: TEXT),
+        //         ),
+        //       ),
+        //     ),
+        //     Flexible(
+        //       flex: 1,
+        //       child: ElevatedButton(
+        //         onPressed: () {
+        //           if (!isImageSelected) {
+        //             _showErrorDialog();
+        //           } else if (eventDate == null) {
+        //             _showErrorDialogDate();
+        //           } else {
+        //             _onCreateEventButtonPressed(user);
+        //           }
+        //         },
+        //         style: const ButtonStyle(
+        //             backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+        //         child: const Text(
+        //           "Crear evento",
+        //           style: TextStyle(color: TEXT),
+        //         ),
+        //       ),
+        //     )
+        //   ],
+        // ),
+        );
   }
 
   void _onCreateEventButtonPressed(User user) {
@@ -342,21 +482,21 @@ class _CreateEventPageState extends State<CreateEventPage> {
       },
     );
   }
-  Future<void> selectDate() async{
+
+  Future<void> selectDate() async {
     DateFormat format = DateFormat.yMd();
     var selectedDate = await showDatePicker(
-        context: context,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(2100)
-    );
-    if(selectedDate != null){
+        context: context, firstDate: DateTime.now(), lastDate: DateTime(2100));
+    if (selectedDate != null) {
       setState(() {
-        _dateController.text = format.format(DateTime.parse(selectedDate.toString()));
+        _dateController.text =
+            format.format(DateTime.parse(selectedDate.toString()));
         eventDate = selectedDate;
       });
     }
   }
-  Future<UserData> getUserDataAsync(String id_user) async{
+
+  Future<UserData> getUserDataAsync(String id_user) async {
     UserData user = UserData.empty();
     var res = await supabase
         .from('user')

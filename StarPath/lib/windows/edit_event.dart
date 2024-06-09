@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
@@ -45,121 +46,243 @@ class _EditEventPageState extends State<EditEventPage> {
     User user = context.watch<UserProvider>().user!;
     bool hasLocalImage = filePath.isNotEmpty;
     return Scaffold(
-        resizeToAvoidBottomInset: false,
+        // resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
-        body: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).viewPadding.top,
-            ),
-            UpperAppBar(content: [
-              BackArrow(
-                  route: MaterialPageRoute(
-                builder: (context) => const EventMainPage(),
-              )),
-              const Text('Editar evento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-              const SizedBox(width: 50,)
-            ]),
-            Expanded(
-                flex: 4,
-                child: hasLocalImage
-                    ? Image.file(File(filePath))
-                    : Image.network(widget.eventData.eventImage)),
-            Flexible(
-              flex: 1,
-              child: ElevatedButton(
-                  onPressed: () async {
-                    FilePickerResult? result = await FilePicker.platform
-                        .pickFiles(type: FileType.media);
-                    if (result != null) {
-                      setState(() {
-                        filePath = result.files.single.path!;
-                        fileName = result.files.single.name!;
-                        hasLocalImage = true;
-                      });
-                    }
-                  },
-                  style: const ButtonStyle(
-                      backgroundColor:
-                          MaterialStatePropertyAll(BUTTON_BACKGROUND)),
-                  child: const Text("Seleccionar foto",
-                      style: TextStyle(color: TEXT))),
-            ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  onTapOutside: (event) =>
-                      FocusManager.instance.primaryFocus?.unfocus(),
-                  controller: _titleController,
-                  decoration:
-                      const InputDecoration(hintText: "Introduce el título", hintStyle: TextStyle(color: TEXT)),
-                  style: const TextStyle(color: TEXT),
+        body: KeyboardVisibilityBuilder(builder: (p0, isKeyboardVisible) {
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).viewPadding.top,
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  onTapOutside: (event) =>
-                      FocusManager.instance.primaryFocus?.unfocus(),
-                  controller: _descriptionController,
-                  decoration: InputDecoration(
+                // UpperAppBar(content: [
+                //   BackArrow(
+                //       route: MaterialPageRoute(
+                //         builder: (context) => const EventMainPage(),
+                //       )),
+                //   const Text('Editar evento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                //   const SizedBox(width: 50,)
+                // ]),
+                Container(
+                    decoration: const BoxDecoration(
+                        color: BUTTON_BAR_BACKGROUND,
+                        borderRadius:
+                        BorderRadius.vertical(bottom: Radius.circular(30.0))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          BackArrow(
+                            route: MaterialPageRoute(
+                              builder: (context) => const EventMainPage(),
+                            ),
+                          ),
+                          const Text('Editar evento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                          const SizedBox(width: 40,)
+                        ],
+                      ),
+                    )
+                ),
+                hasLocalImage
+                    ? Image.file(File(filePath))
+                    : Image.network(widget.eventData.eventImage),
+                ElevatedButton(
+                    onPressed: () async {
+                      FilePickerResult? result = await FilePicker.platform
+                          .pickFiles(type: FileType.media);
+                      if (result != null) {
+                        setState(() {
+                          filePath = result.files.single.path!;
+                          fileName = result.files.single.name!;
+                          hasLocalImage = true;
+                        });
+                      }
+                    },
+                    style: const ButtonStyle(
+                        backgroundColor:
+                        MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                    child: const Text("Seleccionar foto",
+                        style: TextStyle(color: TEXT))),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    onTapOutside: (event) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                    controller: _titleController,
+                    decoration:
+                    const InputDecoration(hintText: "Introduce el título", hintStyle: TextStyle(color: TEXT)),
+                    style: const TextStyle(color: TEXT),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    onTapOutside: (event) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                    controller: _descriptionController,
+                    decoration: InputDecoration(
                       hintText: "Introduce la descripción",
                       hintStyle: const TextStyle(color: TEXT),
                       counterText: '${_descriptionController.text.length}/150',
                       counterStyle: const TextStyle(color: FOCUS_ORANGE),
                     ),
-                  maxLines: null,
-                  maxLength: 150,
-                  style: const TextStyle(color: TEXT),
+                    maxLines: null,
+                    maxLength: 150,
+                    style: const TextStyle(color: TEXT),
+                  ),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextField(
-                  onTapOutside: (event) =>
-                      FocusManager.instance.primaryFocus?.unfocus(),
-                  controller: _dateController,
-                  decoration: const InputDecoration(
-                      labelText: "Introduce la fecha",
-                      labelStyle: TextStyle(color: FOCUS_ORANGE),
-                      prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
-                  readOnly: true,
-                  onTap: () {
-                    selectDate();
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    onTapOutside: (event) =>
+                        FocusManager.instance.primaryFocus?.unfocus(),
+                    controller: _dateController,
+                    decoration: const InputDecoration(
+                        labelText: "Introduce la fecha",
+                        labelStyle: TextStyle(color: FOCUS_ORANGE),
+                        prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
+                    readOnly: true,
+                    onTap: () {
+                      selectDate();
+                    },
+                    style: const TextStyle(color: TEXT),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (eventDate == null) {
+                      _showErrorDialogDate();
+                    } else {
+                      _showConfirmationDialog(user);
+                    }
                   },
-                  style: const TextStyle(color: TEXT),
-                ),
-              ),
+                  style: const ButtonStyle(
+                      backgroundColor:
+                      MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                  child: const Text(
+                    "Modificar",
+                    style: TextStyle(color: TEXT),
+                  ),
+                )
+              ],
             ),
-            Flexible(
-              flex: 1,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (eventDate == null) {
-                    _showErrorDialogDate();
-                  } else {
-                    _showConfirmationDialog(user);
-                  }
-                },
-                style: const ButtonStyle(
-                    backgroundColor:
-                        MaterialStatePropertyAll(BUTTON_BACKGROUND)),
-                child: const Text(
-                  "Modificar",
-                  style: TextStyle(color: TEXT),
-                ),
-              ),
-            )
-          ],
-        ));
+          );
+        },)
+        // Column(
+        //   children: [
+        //     SizedBox(
+        //       height: MediaQuery.of(context).viewPadding.top,
+        //     ),
+        //     UpperAppBar(content: [
+        //       BackArrow(
+        //           route: MaterialPageRoute(
+        //         builder: (context) => const EventMainPage(),
+        //       )),
+        //       const Text('Editar evento', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+        //       const SizedBox(width: 50,)
+        //     ]),
+        //     Expanded(
+        //         flex: 4,
+        //         child: hasLocalImage
+        //             ? Image.file(File(filePath))
+        //             : Image.network(widget.eventData.eventImage)),
+        //     Flexible(
+        //       flex: 1,
+        //       child: ElevatedButton(
+        //           onPressed: () async {
+        //             FilePickerResult? result = await FilePicker.platform
+        //                 .pickFiles(type: FileType.media);
+        //             if (result != null) {
+        //               setState(() {
+        //                 filePath = result.files.single.path!;
+        //                 fileName = result.files.single.name!;
+        //                 hasLocalImage = true;
+        //               });
+        //             }
+        //           },
+        //           style: const ButtonStyle(
+        //               backgroundColor:
+        //                   MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+        //           child: const Text("Seleccionar foto",
+        //               style: TextStyle(color: TEXT))),
+        //     ),
+        //     Expanded(
+        //       flex: 1,
+        //       child: Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: TextField(
+        //           onTapOutside: (event) =>
+        //               FocusManager.instance.primaryFocus?.unfocus(),
+        //           controller: _titleController,
+        //           decoration:
+        //               const InputDecoration(hintText: "Introduce el título", hintStyle: TextStyle(color: TEXT)),
+        //           style: const TextStyle(color: TEXT),
+        //         ),
+        //       ),
+        //     ),
+        //     Expanded(
+        //       flex: 1,
+        //       child: Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: TextField(
+        //           onTapOutside: (event) =>
+        //               FocusManager.instance.primaryFocus?.unfocus(),
+        //           controller: _descriptionController,
+        //           decoration: InputDecoration(
+        //               hintText: "Introduce la descripción",
+        //               hintStyle: const TextStyle(color: TEXT),
+        //               counterText: '${_descriptionController.text.length}/150',
+        //               counterStyle: const TextStyle(color: FOCUS_ORANGE),
+        //             ),
+        //           maxLines: null,
+        //           maxLength: 150,
+        //           style: const TextStyle(color: TEXT),
+        //         ),
+        //       ),
+        //     ),
+        //     Expanded(
+        //       flex: 1,
+        //       child: Padding(
+        //         padding: const EdgeInsets.all(8.0),
+        //         child: TextField(
+        //           onTapOutside: (event) =>
+        //               FocusManager.instance.primaryFocus?.unfocus(),
+        //           controller: _dateController,
+        //           decoration: const InputDecoration(
+        //               labelText: "Introduce la fecha",
+        //               labelStyle: TextStyle(color: FOCUS_ORANGE),
+        //               prefixIcon: Icon((Icons.calendar_month), color: TEXT,)),
+        //           readOnly: true,
+        //           onTap: () {
+        //             selectDate();
+        //           },
+        //           style: const TextStyle(color: TEXT),
+        //         ),
+        //       ),
+        //     ),
+        //     Flexible(
+        //       flex: 1,
+        //       child: ElevatedButton(
+        //         onPressed: () {
+        //           if (eventDate == null) {
+        //             _showErrorDialogDate();
+        //           } else {
+        //             _showConfirmationDialog(user);
+        //           }
+        //         },
+        //         style: const ButtonStyle(
+        //             backgroundColor:
+        //                 MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+        //         child: const Text(
+        //           "Modificar",
+        //           style: TextStyle(color: TEXT),
+        //         ),
+        //       ),
+        //     )
+        //   ],
+        // )
+    );
   }
 
   Future<void> _showErrorDialogDate() async {

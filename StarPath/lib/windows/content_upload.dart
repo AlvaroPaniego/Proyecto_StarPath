@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/user.dart';
@@ -30,85 +31,180 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
     return Scaffold(
       // resizeToAvoidBottomInset: false,
       backgroundColor: BACKGROUND,
-      body: Column(
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).viewPadding.top,
-          ),
-          UpperAppBar(content: [
-            BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),),),
-          ]),
-          Expanded(
-            flex: 6,
-            child: isImageSelected
-                ? Image.file(File(filePath))
-                : const Center(
-                    child: Text(
-                      "Ninguna imagen seleccionada para subir",
-                      style: TextStyle(color: TEXT),
+      body: KeyboardVisibilityBuilder(builder: (p0, isKeyboardVisible) {
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).viewPadding.top,
+              ),
+              // UpperAppBar(content: [
+              //   BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),),),
+              // ]),
+              Container(
+                  decoration: const BoxDecoration(
+                      color: BUTTON_BAR_BACKGROUND,
+                      borderRadius:
+                      BorderRadius.vertical(bottom: Radius.circular(30.0))),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        BackArrow(
+                          route: MaterialPageRoute(
+                            builder: (context) => const MainPage(),
+                          ),
+                        ),
+                        const Text('Subir publicación', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                        const SizedBox(width: 40,)
+                      ],
                     ),
+                  )
+              ),
+              isImageSelected
+                  ? Image.file(File(filePath))
+                  : SizedBox(
+                    height: MediaQuery.of(context).size.height*0.4,
+                    child: const Center(
+                                    child: Text(
+                    "Ninguna imagen seleccionada para subir",
+                    style: TextStyle(color: TEXT),
+                                    ),
+                                  ),
                   ),
-          ),
-          Flexible(
-            flex: 1,
-            child: ElevatedButton(
-                onPressed: () async {
-                  FilePickerResult? result =
-                      await FilePicker.platform.pickFiles(type: FileType.media);
-                  if (result != null) {
-                    setState(() {
-                      filePath = result.files.single.path!; //nunca será nulo
-                      fileName = result.files.single.name!; //nunca será nulo
-                      isImageSelected = true;
-                    });
+              ElevatedButton(
+                  onPressed: () async {
+                    FilePickerResult? result =
+                    await FilePicker.platform.pickFiles(type: FileType.media);
+                    if (result != null) {
+                      setState(() {
+                        filePath = result.files.single.path!; //nunca será nulo
+                        fileName = result.files.single.name!; //nunca será nulo
+                        isImageSelected = true;
+                      });
+                    }
+                  },
+                  style: const ButtonStyle(
+                      backgroundColor:
+                      MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                  child: const Text("Seleccionar foto",
+                      style: TextStyle(color: TEXT))),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  onTapOutside: (event) =>
+                      FocusManager.instance.primaryFocus?.unfocus(),
+                  controller: _textController,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    labelStyle: const TextStyle(color: FOCUS_ORANGE),
+                    labelText: 'Introduce la descripcion para la publicacion',
+                    counterText: '${_textController.text.length}/150',
+                    counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                  ),
+                  maxLines: null,
+                  maxLength: 150,
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (!isImageSelected) {
+                    _showErrorDialog();
+                  } else {
+                    _showConfirmationDialog(user);
                   }
                 },
                 style: const ButtonStyle(
-                    backgroundColor:
-                        MaterialStatePropertyAll(BUTTON_BACKGROUND)),
-                child: const Text("Seleccionar foto",
-                    style: TextStyle(color: TEXT))),
-          ),
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                onTapOutside: (event) =>
-                    FocusManager.instance.primaryFocus?.unfocus(),
-                controller: _textController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  labelStyle: const TextStyle(color: FOCUS_ORANGE),
-                  labelText: 'Introduce la descripcion para la publicacion',
-                  counterText: '${_textController.text.length}/150',
-                  counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                    backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+                child: const Text(
+                  "Subir imagen",
+                  style: TextStyle(color: TEXT),
                 ),
-                maxLines: null,
-                maxLength: 150,
-              ),
-            ),
-          ),
-          Flexible(
-            flex: 1,
-            child: ElevatedButton(
-              onPressed: () {
-                if (!isImageSelected) {
-                  _showErrorDialog();
-                } else {
-                  _showConfirmationDialog(user);
-                }
-              },
-              style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
-              child: const Text(
-                "Subir imagen",
-                style: TextStyle(color: TEXT),
-              ),
-            ),
+              )
+            ],
           )
-        ],
-      ),
+        );
+      },)
+      // Column(
+      //   children: [
+      //     SizedBox(
+      //       height: MediaQuery.of(context).viewPadding.top,
+      //     ),
+      //     UpperAppBar(content: [
+      //       BackArrow(route: MaterialPageRoute(builder: (context) => const MainPage(),),),
+      //     ]),
+      //     Expanded(
+      //       flex: 6,
+      //       child: isImageSelected
+      //           ? Image.file(File(filePath))
+      //           : const Center(
+      //               child: Text(
+      //                 "Ninguna imagen seleccionada para subir",
+      //                 style: TextStyle(color: TEXT),
+      //               ),
+      //             ),
+      //     ),
+      //     Flexible(
+      //       flex: 1,
+      //       child: ElevatedButton(
+      //           onPressed: () async {
+      //             FilePickerResult? result =
+      //                 await FilePicker.platform.pickFiles(type: FileType.media);
+      //             if (result != null) {
+      //               setState(() {
+      //                 filePath = result.files.single.path!; //nunca será nulo
+      //                 fileName = result.files.single.name!; //nunca será nulo
+      //                 isImageSelected = true;
+      //               });
+      //             }
+      //           },
+      //           style: const ButtonStyle(
+      //               backgroundColor:
+      //                   MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+      //           child: const Text("Seleccionar foto",
+      //               style: TextStyle(color: TEXT))),
+      //     ),
+      //     Expanded(
+      //       flex: 2,
+      //       child: Padding(
+      //         padding: const EdgeInsets.all(8.0),
+      //         child: TextField(
+      //           onTapOutside: (event) =>
+      //               FocusManager.instance.primaryFocus?.unfocus(),
+      //           controller: _textController,
+      //           style: const TextStyle(color: Colors.white),
+      //           decoration: InputDecoration(
+      //             labelStyle: const TextStyle(color: FOCUS_ORANGE),
+      //             labelText: 'Introduce la descripcion para la publicacion',
+      //             counterText: '${_textController.text.length}/150',
+      //             counterStyle: const TextStyle(color: FOCUS_ORANGE),
+      //           ),
+      //           maxLines: null,
+      //           maxLength: 150,
+      //         ),
+      //       ),
+      //     ),
+      //     Flexible(
+      //       flex: 1,
+      //       child: ElevatedButton(
+      //         onPressed: () {
+      //           if (!isImageSelected) {
+      //             _showErrorDialog();
+      //           } else {
+      //             _showConfirmationDialog(user);
+      //           }
+      //         },
+      //         style: const ButtonStyle(
+      //             backgroundColor: MaterialStatePropertyAll(BUTTON_BACKGROUND)),
+      //         child: const Text(
+      //           "Subir imagen",
+      //           style: TextStyle(color: TEXT),
+      //         ),
+      //       ),
+      //     )
+      //   ],
+      // ),
     );
   }
 
