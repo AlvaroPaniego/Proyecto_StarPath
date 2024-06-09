@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:starpath/windows/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,7 +42,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         backgroundColor: BUTTON_BAR_BACKGROUND,
         leading: BackButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const Login(),), (route) => false);
           },
         ),
         title: const Text(

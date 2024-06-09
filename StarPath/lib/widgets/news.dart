@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,14 +10,20 @@ class News extends StatefulWidget {
   final String link;
   final String logo;
   final String imageNew;
-  const News({super.key, required this.newsTitle, required this.fecha, required this.lorem, required this.link, required this.logo, required this.imageNew});
+  const News(
+      {super.key,
+      required this.newsTitle,
+      required this.fecha,
+      required this.lorem,
+      required this.link,
+      required this.logo,
+      required this.imageNew});
 
   @override
   State<News> createState() => _NewsState();
 }
 
 class _NewsState extends State<News> {
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -31,7 +38,8 @@ class _NewsState extends State<News> {
           children: [
             Expanded(
               flex: 3,
-              child: Text(widget.newsTitle,
+              child: Text(
+                widget.newsTitle,
                 style: const TextStyle(
                   color: TEXT,
                 ),
@@ -39,7 +47,8 @@ class _NewsState extends State<News> {
             ),
             Expanded(
               flex: 1,
-              child: Text(widget.fecha,
+              child: Text(
+                widget.fecha,
                 style: const TextStyle(
                   color: TEXT,
                 ),
@@ -49,31 +58,28 @@ class _NewsState extends State<News> {
         ),
         leading: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6.0),
-          child: GestureDetector(
-            onTap: () async{
-              final url = Uri.parse(widget.link);
-              if (await canLaunchUrl(url)) {
-                await launchUrl(
-                url
-                );
-              }
-            },
-            child: ClipRRect(
+          child: ClipRRect(
               borderRadius: BorderRadius.circular(45.0),
-              child: Image.asset(widget.logo)
-            ),
-          ),
+              child: Image.asset(widget.logo)),
         ),
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(widget.lorem,
+            child: Text(
+              widget.lorem,
               style: const TextStyle(
                 color: TEXT,
               ),
             ),
           ),
-          Image.asset(widget.imageNew),
+          GestureDetector(
+              onTap: () async {
+                final url = Uri.parse(widget.link);
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url);
+                }
+              },
+              child: Image.asset(widget.imageNew)),
           // Padding(
           //   padding: const EdgeInsets.all(8.0),
           //   child: RichText(
