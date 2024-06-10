@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:starpath/model/PostData.dart';
 import 'package:starpath/widgets/up-down_votes.dart';
 import 'package:starpath/windows/comment_page.dart';
+import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/model/user.dart';
@@ -77,7 +78,6 @@ class _PostState extends State<Post> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Mostrar el botón Eliminar solo si el usuario actual es el autor del post
                       FutureBuilder<bool>(
                         future: isCurrentUserPostAuthor(currentUser!.id),
                         builder: (context, snapshot) {
@@ -176,7 +176,13 @@ class _PostState extends State<Post> {
   Future<void> _deletePost(String postId) async {
     try {
       await supabase.from('post').delete().eq('id_post', postId);
-      setState(() {});
+
+      // Navegar de regreso a la MainPage después de eliminar el post
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
     } catch (error) {
       print('Error al eliminar el post: $error');
     }

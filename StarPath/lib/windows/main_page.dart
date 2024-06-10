@@ -227,7 +227,6 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ).then((_) {
                       setState(() {
-                        // Aquí puedes recargar la página principal
                         futurePost = getPostAsync();
                       });
                     });

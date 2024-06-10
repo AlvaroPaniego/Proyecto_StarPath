@@ -1,10 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/model/PostData.dart';
 import 'package:starpath/model/comment.dart';
-import 'package:starpath/model/translate_data.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/back_arrow.dart';
@@ -17,6 +15,7 @@ import 'package:starpath/windows/main_page.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
+import 'package:starpath/model/translate_data.dart';
 
 class CommentPage extends StatefulWidget {
   final PostData post;
@@ -215,14 +214,16 @@ class _CommentPageState extends State<CommentPage> {
                       final bool isCurrentUserComment = currentUser != null &&
                           comment.userId == currentUser.id;
 
-                      return Column(
+                      return Row(
                         children: [
-                          CommentCard(
-                            comment: comment,
+                          Expanded(
+                            child: CommentCard(
+                              comment: comment,
+                            ),
                           ),
                           if (isCurrentUserComment)
                             IconButton(
-                              icon: Icon(Icons.delete),
+                              icon: Icon(Icons.delete, color: TEXT),
                               onPressed: () {
                                 _deleteComment(comment.commentId);
                               },
@@ -268,7 +269,6 @@ class _CommentPageState extends State<CommentPage> {
 
   Future<void> _deleteComment(String commentId) async {
     try {
-      // Mostrar el diálogo de confirmación
       bool confirmDelete = await showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -280,13 +280,13 @@ class _CommentPageState extends State<CommentPage> {
               CupertinoDialogAction(
                 child: Text('Cancelar'),
                 onPressed: () {
-                  Navigator.of(context).pop(false); // No eliminar
+                  Navigator.of(context).pop(false);
                 },
               ),
               CupertinoDialogAction(
                 child: Text('Eliminar'),
                 onPressed: () {
-                  Navigator.of(context).pop(true); // Confirmar eliminar
+                  Navigator.of(context).pop(true);
                 },
               ),
             ],
@@ -294,11 +294,11 @@ class _CommentPageState extends State<CommentPage> {
         },
       );
 
-      // Si el usuario confirma la eliminación, eliminar el comentario
       if (confirmDelete ?? false) {
         await supabase.from('comment').delete().eq('id_comment', commentId);
+
         setState(() {
-          // Actualizar la lista de comentarios después de eliminar el comentario
+          futureComments = _loadComments();
         });
       }
     } catch (error) {
@@ -336,8 +336,7 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   Future<String> getCommentUsernameAsync(String userId) async {
-    String userName =
-        "Cargando Usuario"; // texto temporal mientras se carga el nombre de usuario
+    String userName = "Cargando Usuario";
     var res = await supabase
         .from('user')
         .select("username")
