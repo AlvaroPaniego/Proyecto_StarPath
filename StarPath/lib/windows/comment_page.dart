@@ -16,6 +16,7 @@ import 'package:starpath/model/user.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/cupertino.dart';
 
 class CommentPage extends StatefulWidget {
   final PostData post;
@@ -157,6 +158,8 @@ class _CommentPageState extends State<CommentPage> {
   @override
   Widget build(BuildContext context) {
     bool hasValidImage = widget.post.content.isNotEmpty;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.user;
     return Scaffold(
       backgroundColor: BACKGROUND,
       body: Column(
@@ -208,8 +211,23 @@ class _CommentPageState extends State<CommentPage> {
                   return ListView.builder(
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
-                      return CommentCard(
-                        comment: comments[index],
+                      final comment = comments[index];
+                      final bool isCurrentUserComment = currentUser != null &&
+                          comment.userId == currentUser.id;
+
+                      return Column(
+                        children: [
+                          CommentCard(
+                            comment: comment,
+                          ),
+                          if (isCurrentUserComment)
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                _deleteComment(comment.commentId);
+                              },
+                            ),
+                        ],
                       );
                     },
                   );
@@ -246,6 +264,46 @@ class _CommentPageState extends State<CommentPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _deleteComment(String commentId) async {
+    try {
+      // Mostrar el diálogo de confirmación
+      bool confirmDelete = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Eliminar comentario'),
+            content:
+                Text('¿Estás seguro de que quieres eliminar este comentario?'),
+            actions: [
+              CupertinoDialogAction(
+                child: Text('Cancelar'),
+                onPressed: () {
+                  Navigator.of(context).pop(false); // No eliminar
+                },
+              ),
+              CupertinoDialogAction(
+                child: Text('Eliminar'),
+                onPressed: () {
+                  Navigator.of(context).pop(true); // Confirmar eliminar
+                },
+              ),
+            ],
+          );
+        },
+      );
+
+      // Si el usuario confirma la eliminación, eliminar el comentario
+      if (confirmDelete ?? false) {
+        await supabase.from('comment').delete().eq('id_comment', commentId);
+        setState(() {
+          // Actualizar la lista de comentarios después de eliminar el comentario
+        });
+      }
+    } catch (error) {
+      print('Error al eliminar el comentario: $error');
+    }
   }
 
   Future<void> translateComment(String comment, bool isEnglish) async {
