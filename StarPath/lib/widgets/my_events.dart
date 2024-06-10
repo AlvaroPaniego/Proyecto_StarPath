@@ -51,6 +51,7 @@ class _MyEventListState extends State<MyEventList> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 return Event(
+                  canShowLocation: false,
                   eventData: snapshot.data![index],
                   canEdit: true,
                 );

@@ -93,6 +93,7 @@ class _TodayEventListState extends State<TodayEventList> {
               itemCount: nearbyEvents.length,
               itemBuilder: (context, index) {
                 return Event(
+                  canShowLocation: false,
                   eventData: nearbyEvents[index],
                   canEdit: false,
                   userPosition: userPosition,

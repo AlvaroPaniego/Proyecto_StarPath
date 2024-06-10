@@ -69,6 +69,7 @@ class _UserEventListState extends State<UserEventList> {
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
                               return Event(
+                                canShowLocation: false,
                                 eventData: snapshot.data![index],
                                 canEdit: widget.userData.id_user == user.id,
                               );

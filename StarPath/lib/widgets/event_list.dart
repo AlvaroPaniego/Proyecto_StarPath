@@ -113,6 +113,7 @@ class _EventMainPageState extends State<EventMainList> {
                       return Event(
                         eventData: nearbyEvents[index],
                         canEdit: false,
+                        canShowLocation: true,
                         userPosition: userPosition,
                       );
                     },
