@@ -156,7 +156,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  void _changeEmail(BuildContext context) {
+  /*void _changeEmail(BuildContext context) {
     String newEmail = '';
     showDialog(
       context: context,
@@ -253,7 +253,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final emailRegex =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
-  }
+  } */
 
   void _deleteUser(BuildContext context) {
     showDialog(
