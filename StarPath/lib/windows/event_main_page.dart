@@ -97,23 +97,23 @@ class _EventMainPageState extends State<EventMainPage> {
                   ),
                   const PopupMenuItem<double>(
                     value: 10000,
-                    child: Text('5 km'),
-                  ),
-                  const PopupMenuItem<double>(
-                    value: 30000,
                     child: Text('10 km'),
                   ),
                   const PopupMenuItem<double>(
-                    value: 50000,
+                    value: 30000,
                     child: Text('30 km'),
                   ),
                   const PopupMenuItem<double>(
-                    value: 100000,
+                    value: 50000,
                     child: Text('50 km'),
                   ),
                   const PopupMenuItem<double>(
-                    value: 300000,
+                    value: 100000,
                     child: Text('100 km'),
+                  ),
+                  const PopupMenuItem<double>(
+                    value: 300000,
+                    child: Text('300 km'),
                   ),
                 ],
               ),

@@ -25,20 +25,22 @@ import 'package:starpath/windows/wiki_page.dart';
 import 'package:supabase/supabase.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  const MainPage({Key? key}) : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  Future<List<PostData>> futurePost = getPostAsync();
-  Future<UserData> userData = Future.value(UserData.empty());
-  late String userId;
+  late Future<List<PostData>> futurePost;
+  late Future<UserData> userData;
+
   @override
   void initState() {
     super.initState();
-    userId = context.read<UserProvider>().user!.id;
+    final userId = context.read<UserProvider>().user!.id;
+    futurePost = getPostAsync();
+    userData = getUserDataAsync(userId);
     supabase
         .channel('post_upvotes_changes')
         .onPostgresChanges(
@@ -69,17 +71,17 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    User user = context.watch<UserProvider>().user!;
-    userData = getUserDataAsync(user.id);
+    final user = context.watch<UserProvider>().user!;
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: BACKGROUND,
-        body: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).viewPadding.top,
-            ),
-            UpperAppBar(content: [
+      resizeToAvoidBottomInset: false,
+      backgroundColor: BACKGROUND,
+      body: Column(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).viewPadding.top,
+          ),
+          UpperAppBar(
+            content: [
               buildAvatarButton(),
               Expanded(
                 flex: 3,
@@ -87,8 +89,9 @@ class _MainPageState extends State<MainPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ClipRRect(
-                        borderRadius: BorderRadius.circular(5.0),
-                        child: Image.asset('assets/images/logo.png')),
+                      borderRadius: BorderRadius.circular(5.0),
+                      child: Image.asset('assets/images/logo.png'),
+                    ),
                     const Text(
                       'STARPATH',
                       style:
@@ -102,91 +105,102 @@ class _MainPageState extends State<MainPage> {
                 child: GestureDetector(
                   onTap: () {
                     Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SearchPage(),
-                        ),
-                        (route) => false);
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SearchPage(),
+                      ),
+                      (route) => false,
+                    );
                   },
                   child: const Icon(Icons.search),
                 ),
               )
-            ]),
-            Expanded(
-                flex: 8,
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FutureBuilder(
-                      future: futurePost,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          //print("hay ${snapshot.data!.length} datos");
-                          return ListView.builder(
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              return Post(postData: snapshot.data![index]);
-                            },
-                          );
-                        }
-                        return const Center(child: CircularProgressIndicator());
+            ],
+          ),
+          Expanded(
+            flex: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FutureBuilder<List<PostData>>(
+                future: futurePost,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return Post(postData: snapshot.data![index]);
                       },
-                    ))),
-            Expanded(
-                flex: 1,
-                child: Container(
-                  decoration: const BoxDecoration(
-                      color: BUTTON_BAR_BACKGROUND,
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(30.0))),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      const CameraButton(),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const WikiPage(),
-                              ));
-                        },
-                        child: const Icon(Icons.account_balance),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ExplorePage(),
-                              ));
-                        },
-                        child: const Icon(Icons.newspaper),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const EventMainPage(),
-                              ));
-                        },
-                        child: const Icon(Icons.calendar_month),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ChatListPage(),
-                              ));
-                        },
-                        child: const Icon(Icons.chat),
-                      ),
-                    ],
+                    );
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: BUTTON_BAR_BACKGROUND,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30.0)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const CameraButton(),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const WikiPage(),
+                        ),
+                      );
+                    },
+                    child: const Icon(Icons.account_balance),
                   ),
-                ))
-          ],
-        ));
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ExplorePage(),
+                        ),
+                      );
+                    },
+                    child: const Icon(Icons.newspaper),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EventMainPage(),
+                        ),
+                      );
+                    },
+                    child: const Icon(Icons.calendar_month),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatListPage(),
+                        ),
+                      );
+                    },
+                    child: const Icon(Icons.chat),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget buildAvatarButton() {
@@ -196,20 +210,36 @@ class _MainPageState extends State<MainPage> {
         position: PopupMenuPosition.under,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(45.0),
-          child: FutureBuilder(
+          child: FutureBuilder<UserData>(
             future: userData,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 if (snapshot.data!.profile_picture == "") {
                   return Image.asset("assets/images/placeholder-avatar.jpg");
                 }
-                return Container(
-                  decoration: BoxDecoration(
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditProfilePage(userData: snapshot.data!),
+                      ),
+                    ).then((_) {
+                      setState(() {
+                        futurePost = getPostAsync();
+                      });
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
                       image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: NetworkImage(snapshot.data!.profile_picture))),
+                        fit: BoxFit.cover,
+                        image: NetworkImage(snapshot.data!.profile_picture),
+                      ),
+                    ),
+                  ),
                 );
-                //Image.network(snapshot.data!.profile_picture );
               } else if (snapshot.hasError) {
                 return Image.asset("assets/images/placeholder-avatar.jpg");
               }
@@ -219,51 +249,55 @@ class _MainPageState extends State<MainPage> {
         ),
         itemBuilder: (context) => <PopupMenuEntry>[
           PopupMenuItem(
-              child: FutureBuilder(
-            future: userData,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return GestureDetector(
-                  onTap: () => Navigator.push(
+            child: FutureBuilder<UserData>(
+              future: userData,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return GestureDetector(
+                    onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
                             EditProfilePage(userData: snapshot.data!),
-                      )),
-                  child: const Text('Editar perfil'),
-                );
-              }
-              return const Text('Editar perfil');
-            },
-          )),
+                      ),
+                    ),
+                    child: const Text('Editar perfil'),
+                  );
+                }
+                return const Text('Editar perfil');
+              },
+            ),
+          ),
           PopupMenuItem(
-              child: FutureBuilder(
+              child: FutureBuilder<UserData>(
             future: userData,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return GestureDetector(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            UserProfilePage(userData: snapshot.data!),
-                      )),
-                  child: const Text('Ver perfil'),
-                );
+                    onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                UserProfilePage(userData: snapshot.data!),
+                          ),
+                        ),
+                    child: const Text('Ver perfil'));
               }
               return const Text('Ver perfil');
             },
           )),
           PopupMenuItem(
-              child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Login()),
-                      (Route<dynamic> route) => false,
-                    );
-                  },
-                  child: const Text("Cerrar sesion"))),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Login()),
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: const Text("Cerrar sesion"),
+            ),
+          ),
         ],
       ),
     );

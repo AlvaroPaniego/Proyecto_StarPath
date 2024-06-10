@@ -28,48 +28,51 @@ class _CommentCardState extends State<CommentCard> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           AvatarButton(
-            profilePictureFuture:
-            widget.comment.profilePictureFuture,
+            profilePictureFuture: widget.comment.profilePictureFuture,
             user: widget.comment.userData,
           ),
           Expanded(
             flex: 5,
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   FutureBuilder<String>(
-                    future:
-                    getCommentUsernameAsync(widget.comment.userId),
+                    future: getCommentUsernameAsync(widget.comment.userId),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return Text(
                           snapshot.data!,
                           style: const TextStyle(
-                            color: TEXT,
-                              fontWeight: FontWeight.bold),
+                              color: TEXT, fontWeight: FontWeight.bold),
                         );
                       } else {
                         return const Text(
-                          'Cargando Usuario', //texto temporal mientras se carga el nombre de usuario
+                          'Cargando Usuario',
                           style: TextStyle(
-                              color: TEXT,
-                              fontWeight: FontWeight.bold),
+                              color: TEXT, fontWeight: FontWeight.bold),
                         );
                       }
                     },
                   ),
                   const SizedBox(height: 4),
-                  Text(isAlreadyTranslated
-                      ? translatedComment
-                      : widget.comment.comment,
-                    style: const TextStyle(color: TEXT,),
+                  Text(
+                    isAlreadyTranslated
+                        ? translatedComment
+                        : widget.comment.comment,
+                    style: const TextStyle(
+                      color: TEXT,
+                    ),
                   ),
                   TextButton(
-                      onPressed:  () async => await translateComment(widget.comment.comment, isAlreadyTranslated),
-                      child: const Text('Traducir', style: TextStyle(color: FOCUS_ORANGE,))
-                  )
+                      onPressed: () async => await translateComment(
+                          widget.comment.comment, isAlreadyTranslated),
+                      child: const Text('Traducir',
+                          style: TextStyle(
+                            color: FOCUS_ORANGE,
+                          )))
                 ],
               ),
             ),
@@ -90,7 +93,8 @@ class _CommentCardState extends State<CommentCard> {
       ),
     );
   }
-  Future<void>translateComment(String comment, bool isEnglish) async{
+
+  Future<void> translateComment(String comment, bool isEnglish) async {
     var data = jsonEncode({
       'q': comment,
       'source': isEnglish ? 'EN' : 'ES',
@@ -98,15 +102,15 @@ class _CommentCardState extends State<CommentCard> {
     });
     print(data);
     final res = await http.post(
-        Uri.parse('https://deep-translate1.p.rapidapi.com/language/translate/v2'),
+        Uri.parse(
+            'https://deep-translate1.p.rapidapi.com/language/translate/v2'),
         headers: {
           'x-rapidapi-key': TRANSLATOR_API_KEY,
           'Content-Type': 'application/json',
           'X-RapidAPI-Host': 'deep-translate1.p.rapidapi.com',
         },
-        body: data
-    );
-    if(res.statusCode == 200){
+        body: data);
+    if (res.statusCode == 200) {
       final responseData = utf8.decode(res.bodyBytes);
       final jsonData = jsonDecode(responseData);
       var resComment = jsonData['data']['translations']['translatedText'];
@@ -118,9 +122,9 @@ class _CommentCardState extends State<CommentCard> {
       });
     }
   }
+
   Future<String> getCommentUsernameAsync(String userId) async {
-    String userName =
-        "Cargando Usuario"; // texto temporal mientras se carga el nombre de usuario
+    String userName = "Cargando Usuario";
     var res = await supabase
         .from('user')
         .select("username")

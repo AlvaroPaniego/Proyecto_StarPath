@@ -13,6 +13,8 @@ import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:starpath/windows/user_profile_page.dart';
+import 'package:starpath/windows/login.dart';
+import 'package:supabase/supabase.dart';
 
 class EditProfilePage extends StatefulWidget {
   final UserData userData;
@@ -152,7 +154,147 @@ class _EditProfilePageState extends State<EditProfilePage> {
       });
       userProvider.updateProfilePictureUrl(newUrl);
     }
-    // }
+  }
+
+  void _changeEmail(BuildContext context) {
+    String newEmail = '';
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('Cambiar Correo Electrónico'),
+          content: CupertinoTextField(
+            placeholder: 'Introduce la nueva dirección de email',
+            onChanged: (value) => newEmail = value,
+          ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Cancelar'),
+              onPressed: () => Navigator.pop(context),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              child: Text('Guardar'),
+              onPressed: () async {
+                if (!_isValidEmail(newEmail)) {
+                  Navigator.pop(context);
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return CupertinoAlertDialog(
+                        title: Text('Error'),
+                        content: Text('El correo electrónico no es válido.'),
+                        actions: [
+                          CupertinoDialogAction(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text('Aceptar'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                  return;
+                }
+
+                final userProvider = context.read<UserProvider>();
+                final user = userProvider.user;
+                if (user != null && user.email != null) {
+                  try {
+                    final UserResponse res = await supabase.auth.updateUser(
+                      UserAttributes(email: newEmail),
+                    );
+                    final User? updatedUser = res.user;
+                    if (updatedUser != null) {
+                      print('Correo electrónico actualizado correctamente');
+                      Navigator.pop(context);
+                      showCupertinoDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return CupertinoAlertDialog(
+                            title: Text('Correo Enviado'),
+                            content: Text(
+                                'Se ha enviado un correo electrónico a $newEmail. Serás redirigido a la ventana de login.'),
+                            actions: [
+                              CupertinoDialogAction(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Login()),
+                                  );
+                                },
+                                child: Text('Aceptar'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    } else {
+                      print('Error al actualizar el usuario');
+                    }
+                  } catch (error) {
+                    print('Error inesperado: $error');
+                  }
+                } else {
+                  print('Usuario no autenticado o falta información de email');
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  bool _isValidEmail(String email) {
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    return emailRegex.hasMatch(email);
+  }
+
+  void _deleteUser(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Eliminar Usuario'),
+          content: Text(
+              '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Cerrar el cuadro de diálogo
+              },
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                try {
+                  final userProvider = context.read<UserProvider>();
+                  final user = userProvider.user!;
+
+                  await supabase.from('user').delete().eq('id_user', user.id);
+                  await supabase.auth.signOut();
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Login(),
+                    ),
+                  );
+                } catch (error) {
+                  print('Error al eliminar la cuenta: $error');
+                }
+              },
+              child: Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -175,7 +317,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ),
             SizedBox(
               width: 50,
-            )
+            ),
           ]),
           Expanded(
             flex: 9,
@@ -262,6 +404,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         ElevatedButton(
                           onPressed: _saveProfile,
                           child: const Text('Actualizar'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => _changeEmail(context),
+                          child: const Text('Cambiar Correo Electrónico'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => _deleteUser(context),
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.red,
+                          ),
+                          child: const Text('Eliminar Cuenta'),
                         ),
                       ],
                     ),

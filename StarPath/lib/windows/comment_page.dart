@@ -1,10 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/model/PostData.dart';
 import 'package:starpath/model/comment.dart';
-import 'package:starpath/model/translate_data.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/avatar_button.dart';
 import 'package:starpath/widgets/back_arrow.dart';
@@ -16,6 +14,8 @@ import 'package:starpath/model/user.dart';
 import 'package:starpath/windows/main_page.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/cupertino.dart';
+import 'package:starpath/model/translate_data.dart';
 
 class CommentPage extends StatefulWidget {
   final PostData post;
@@ -157,6 +157,8 @@ class _CommentPageState extends State<CommentPage> {
   @override
   Widget build(BuildContext context) {
     bool hasValidImage = widget.post.content.isNotEmpty;
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final currentUser = userProvider.user;
     return Scaffold(
       backgroundColor: BACKGROUND,
       body: Column(
@@ -208,8 +210,25 @@ class _CommentPageState extends State<CommentPage> {
                   return ListView.builder(
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
-                      return CommentCard(
-                        comment: comments[index],
+                      final comment = comments[index];
+                      final bool isCurrentUserComment = currentUser != null &&
+                          comment.userId == currentUser.id;
+
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: CommentCard(
+                              comment: comment,
+                            ),
+                          ),
+                          if (isCurrentUserComment)
+                            IconButton(
+                              icon: Icon(Icons.delete, color: TEXT),
+                              onPressed: () {
+                                _deleteComment(comment.commentId);
+                              },
+                            ),
+                        ],
                       );
                     },
                   );
@@ -248,6 +267,45 @@ class _CommentPageState extends State<CommentPage> {
     );
   }
 
+  Future<void> _deleteComment(String commentId) async {
+    try {
+      bool confirmDelete = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Eliminar comentario'),
+            content:
+                Text('¿Estás seguro de que quieres eliminar este comentario?'),
+            actions: [
+              CupertinoDialogAction(
+                child: Text('Cancelar'),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              CupertinoDialogAction(
+                child: Text('Eliminar'),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmDelete ?? false) {
+        await supabase.from('comment').delete().eq('id_comment', commentId);
+
+        setState(() {
+          futureComments = _loadComments();
+        });
+      }
+    } catch (error) {
+      print('Error al eliminar el comentario: $error');
+    }
+  }
+
   Future<void> translateComment(String comment, bool isEnglish) async {
     var data = jsonEncode({
       'q': comment,
@@ -278,8 +336,7 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   Future<String> getCommentUsernameAsync(String userId) async {
-    String userName =
-        "Cargando Usuario"; // texto temporal mientras se carga el nombre de usuario
+    String userName = "Cargando Usuario";
     var res = await supabase
         .from('user')
         .select("username")
