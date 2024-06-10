@@ -12,13 +12,12 @@ import 'package:url_launcher/url_launcher.dart';
 class Event extends StatefulWidget {
   final EventData eventData;
   final bool canEdit;
-  final bool canShowLocation;
   final Position? userPosition;
   const Event({
     Key? key,
     required this.eventData,
     required this.canEdit,
-    this.userPosition, required this.canShowLocation,
+    this.userPosition,
   });
 
   @override
@@ -144,7 +143,7 @@ class _EventState extends State<Event> {
                             return const Text("Asistentes:");
                           },
                         ),
-                        widget.canShowLocation ? ElevatedButton(
+                       ElevatedButton(
                           onPressed: () {
                             _openGoogleMaps(
                               widget.eventData.latitude,
@@ -158,7 +157,7 @@ class _EventState extends State<Event> {
                             'Abrir en Google Maps',
                             style: TextStyle(color: TEXT),
                           ),
-                        ) : const SizedBox(),
+                        )
                       ],
                     ),
                   ),
