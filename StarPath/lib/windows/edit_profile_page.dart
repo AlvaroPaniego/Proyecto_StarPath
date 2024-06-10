@@ -156,7 +156,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
-  void _changeEmail(BuildContext context) {
+  /*void _changeEmail(BuildContext context) {
     String newEmail = '';
     showDialog(
       context: context,
@@ -247,13 +247,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
         );
       },
     );
-  }
+  } 
 
   bool _isValidEmail(String email) {
     final emailRegex =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailRegex.hasMatch(email);
-  }
+  } */
 
   void _deleteUser(BuildContext context) {
     showDialog(
@@ -405,10 +405,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           onPressed: _saveProfile,
                           child: const Text('Actualizar'),
                         ),
-                        ElevatedButton(
+                        /* ElevatedButton(
                           onPressed: () => _changeEmail(context),
                           child: const Text('Cambiar Correo Electrónico'),
-                        ),
+                        ), */
                         ElevatedButton(
                           onPressed: () => _deleteUser(context),
                           style: ElevatedButton.styleFrom(

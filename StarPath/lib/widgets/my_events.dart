@@ -25,7 +25,11 @@ class _MyEventListState extends State<MyEventList> {
     super.initState();
     final user = context.read<UserProvider>().user!;
     futureEvents = getEvents(user);
-    getUserDataAsync(user.id).then((value) => userData = value);
+    getUserDataAsync(user.id).then((value) {
+      setState(() {
+        userData = value;
+      });
+    });
   }
 
   @override
@@ -39,7 +43,7 @@ class _MyEventListState extends State<MyEventList> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.data!.isEmpty) {
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(
               child: Text(
                 'No has creado ningún evento.',
@@ -68,16 +72,17 @@ class _MyEventListState extends State<MyEventList> {
         .from('user')
         .select("id_user, username, profile_picture")
         .match({'id_user': id_user});
-    user.id_user = res.first['id_user'];
-    user.username = res.first['username'];
-    user.profile_picture = res.first['profile_picture'];
-    user.followers = '0';
+    if (res.isNotEmpty) {
+      user.id_user = res.first['id_user'];
+      user.username = res.first['username'];
+      user.profile_picture = res.first['profile_picture'];
+      user.followers = '0';
+    }
     return user;
   }
 
   Future<List<EventData>> getEvents(User user) async {
     List<EventData> eventList = [];
-    EventData eventData;
     DateFormat format = DateFormat.yMd();
 
     var res =
@@ -88,18 +93,26 @@ class _MyEventListState extends State<MyEventList> {
           .count()
           .eq('id_event', event['id']);
       var asistants = resFollowers.toString();
-      eventData = EventData(
-        idEvent: event['id'].toString(),
-        title: event['title'],
-        eventDate: format.format(DateTime.parse(event['time'])),
-        description: event['description'],
-        username: event['name_user'],
-        asistants: asistants.toString(),
-        eventImage: event['event_image'] ?? 'vacio',
-        latitude: event['latitude'] ?? 0.0,
-        longitude: event['longitude'] ?? 0.0,
-      );
-      eventList.add(eventData);
+      var locationRes = await supabase
+          .from('event_location')
+          .select('latitude, longitude')
+          .eq('id', event['id']);
+      if (locationRes.isNotEmpty) {
+        var locationData = locationRes.first;
+        eventList.add(EventData(
+          idEvent: event['id'].toString(),
+          title: event['title'],
+          eventDate: format.format(DateTime.parse(event['time'])),
+          description: event['description'],
+          username: event['name_user'],
+          asistants: asistants,
+          eventImage: event['event_image'] ?? 'vacio',
+          latitude: locationData['latitude'] ?? 0.0,
+          longitude: locationData['longitude'] ?? 0.0,
+        ));
+      } else {
+        print('El evento no tiene localización');
+      }
     }
     return eventList;
   }
