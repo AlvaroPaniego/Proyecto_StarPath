@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/events.dart';
+import 'package:starpath/model/user.dart';
 import 'package:starpath/model/user_data.dart';
 import 'package:starpath/widgets/back_arrow.dart';
 import 'package:starpath/widgets/event.dart';
 import 'package:starpath/widgets/upper_app_bar.dart';
 import 'package:starpath/windows/user_profile_page.dart';
+import 'package:supabase/supabase.dart';
 
 class UserEventList extends StatefulWidget {
   final UserData userData;
@@ -20,6 +23,7 @@ class _UserEventListState extends State<UserEventList> {
   Future<List<EventData>> futureEvents = Future.value([EventData.empty()]);
   @override
   Widget build(BuildContext context) {
+    User user = context.watch<UserProvider>().user!;
     futureEvents = getEvents(widget.userData);
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -66,7 +70,7 @@ class _UserEventListState extends State<UserEventList> {
                             itemBuilder: (context, index) {
                               return Event(
                                 eventData: snapshot.data![index],
-                                canEdit: true,
+                                canEdit: widget.userData.id_user == user.id,
                               );
                             },
                           );

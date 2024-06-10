@@ -247,7 +247,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         );
       },
     );
-  } 
+  }
 
   bool _isValidEmail(String email) {
     final emailRegex =
@@ -405,16 +405,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           onPressed: _saveProfile,
                           child: const Text('Actualizar'),
                         ),
-                        /* ElevatedButton(
-                          onPressed: () => _changeEmail(context),
-                          child: const Text('Cambiar Correo Electrónico'),
-                        ), */
+                        // ElevatedButton(
+                        //   onPressed: () => _changeEmail(context),
+                        //   child: const Text('Cambiar Correo Electrónico'),
+                        // ),
+                        const SizedBox(height: 50),
                         ElevatedButton(
                           onPressed: () => _deleteUser(context),
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.red,
+                            backgroundColor: Colors.red
+                            //primary: Colors.red,
                           ),
-                          child: const Text('Eliminar Cuenta'),
+                          child: const Text('Eliminar Cuenta',style: TextStyle(color: BLACK),),
                         ),
                       ],
                     ),

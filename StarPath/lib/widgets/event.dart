@@ -73,7 +73,7 @@ class _EventState extends State<Event> {
                 Flexible(
                   flex: 2,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25.0),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(25.0)),
                     child: hasValidImage
                         ? Image.network(widget.eventData.eventImage)
                         : Image.asset("assets/images/placeholder-image.jpg"),
@@ -143,7 +143,7 @@ class _EventState extends State<Event> {
                             return const Text("Asistentes:");
                           },
                         ),
-                        ElevatedButton(
+                       ElevatedButton(
                           onPressed: () {
                             _openGoogleMaps(
                               widget.eventData.latitude,
@@ -157,7 +157,7 @@ class _EventState extends State<Event> {
                             'Abrir en Google Maps',
                             style: TextStyle(color: TEXT),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),

@@ -125,6 +125,9 @@ class _MainPageState extends State<MainPage> {
                 future: futurePost,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
+                    if(snapshot.data!.isEmpty){
+                      return Center(child: Text("No ha publicaciones en la base de datos"),);
+                    }
                     return ListView.builder(
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
@@ -217,29 +220,31 @@ class _MainPageState extends State<MainPage> {
                 if (snapshot.data!.profile_picture == "") {
                   return Image.asset("assets/images/placeholder-avatar.jpg");
                 }
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            EditProfilePage(userData: snapshot.data!),
-                      ),
-                    ).then((_) {
-                      setState(() {
-                        futurePost = getPostAsync();
-                      });
-                    });
-                  },
-                  child: Container(
+                return
+                  // GestureDetector(
+                  // onTap: () {
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) =>
+                  //           EditProfilePage(userData: snapshot.data!),
+                  //     ),
+                  //   ).then((_) {
+                  //     setState(() {
+                  //       futurePost = getPostAsync();
+                  //     });
+                  //   });
+                  // },
+                  // child:
+                  Container(
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         fit: BoxFit.cover,
                         image: NetworkImage(snapshot.data!.profile_picture),
                       ),
                     ),
-                  ),
-                );
+                  );
+                // );
               } else if (snapshot.hasError) {
                 return Image.asset("assets/images/placeholder-avatar.jpg");
               }
@@ -321,16 +326,19 @@ Future<List<PostData>> getPostAsync() async {
       .from('post')
       .select("*")
       .match({'deleted': false}).order('created_at', ascending: false);
+  // print(res);
   if (res.isNotEmpty) {
     for (var data in res) {
       post = PostData();
       post.id_post = data['id_post'];
-      post.id_user = await getPostUsernameAsync(data['id_user']);
+      // post.id_user = await getPostUsernameAsync(data['id_user']);
+      post.id_user = data['id_user'];
       post.content = data['content'];
       post.description = data['description'];
       post.like = data['like'];
       post.dislike = data['dislike'];
       post.created_at = data['created_at'];
+      post.userData = await getUserDataAsync(data['id_user']);
 
       postList.add(post);
     }

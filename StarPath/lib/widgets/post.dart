@@ -28,20 +28,13 @@ class _PostState extends State<Post> {
     }
 
     final currentUser = context.watch<UserProvider>().user;
-    Future<bool> isCurrentUserPostAuthor(String currentUserId) async {
-      if (currentUserId != null) {
-        String username = await getUsername(currentUserId);
-        return widget.postData.id_user == username;
-      }
-      return false;
-    }
 
-    var idee = currentUser?.id;
+    // var idee = currentUser?.id;
     var ide = widget.postData.id_user;
-    print('Is current user the author: $isCurrentUserPostAuthor');
-    print('widget.postData.id_user: $ide');
-    print('currentUser.id: $idee');
-    print(getUsername(currentUser!.id));
+    // print('Is current user the author: $isCurrentUserPostAuthor');
+    // print('widget.postData.id_user: $ide');
+    // print('currentUser.id: $idee');
+    // print(getUsername(currentUser!.id));
 
     Future<String> futureCommentCount = Future.value("");
     String user = widget.postData.id_user,
@@ -49,7 +42,8 @@ class _PostState extends State<Post> {
 
     bool hasValidImage = widget.postData.content.isNotEmpty;
     futureCommentCount = getCommentCount(widget.postData.id_post);
-    Future<String> futureUsername = getUsername(currentUser!.id);
+    Future<String> futureUsername = getUsername(widget.postData.id_user);
+
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5.0),
@@ -100,17 +94,18 @@ class _PostState extends State<Post> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              FutureBuilder<String>(
-                                future: futureUsername,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    return Text(snapshot.data ?? '');
-                                  } else {
-                                    return Text(
-                                        'Cargando nombre de usuario...');
-                                  }
-                                },
-                              ),
+                              // FutureBuilder<String>(
+                              //   future: futureUsername,
+                              //   builder: (context, snapshot) {
+                              //     if (snapshot.hasData) {
+                              //       return Text(snapshot.data ?? '');
+                              //     } else {
+                              //       return Text(
+                              //           'Cargando nombre de usuario...');
+                              //     }
+                              //   },
+                              // ),
+                              Text(widget.postData.userData.username),
                               Text(description),
                             ],
                           ),
@@ -218,6 +213,7 @@ class _PostState extends State<Post> {
   }
 
   Future<String> getUsername(String userId) async {
+    print("id de usuario $userId");
     final response =
         await supabase.from('user').select('username').eq('id_user', userId);
 
@@ -228,5 +224,13 @@ class _PostState extends State<Post> {
     } else {
       return '';
     }
+  }
+  Future<bool> isCurrentUserPostAuthor(String currentUserId) async {
+    // if (currentUserId != null) {
+    //   String username = await getUsername(currentUserId);
+    //   return widget.postData.id_user == username;
+    // }
+    // return false;
+    return widget.postData.id_user == currentUserId;
   }
 }
