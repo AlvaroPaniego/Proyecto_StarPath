@@ -139,7 +139,7 @@ class _EventMainPageState extends State<EventMainList> {
     var eventsRes = await supabase
         .from('events')
         .select('id, time, title, description, name_user, event_image')
-        .filter('time', 'gte', dateToday);
+        .filter('time', 'gte', dateToday).order('time', ascending: true);
 
     DateFormat format = DateFormat.yMd();
     // Para cada evento su ubicación

@@ -5,4 +5,6 @@ class ChatData{
   String senderUser = 'vacio';
   String lastMessage = 'vacio';
   String lastMessageSender = 'vacio';
+  ChatData();
+  ChatData.onlyId(this.senderUser, this.receiverUser);
 }
