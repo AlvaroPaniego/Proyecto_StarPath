@@ -103,7 +103,7 @@ class _ContentUploadPageState extends State<ContentUploadPage> {
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     labelStyle: const TextStyle(color: FOCUS_ORANGE),
-                    labelText: 'Introduce la descripcion para la publicacion',
+                    labelText: 'Introduce la descripción para la publicación',
                     counterText: '${_textController.text.length}/150',
                     counterStyle: const TextStyle(color: FOCUS_ORANGE),
                   ),

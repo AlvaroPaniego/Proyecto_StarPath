@@ -174,7 +174,7 @@ class _CommentPageState extends State<CommentPage> {
                   ))
                 : const BackButton(),
             const Text(
-              'Comentarios de la publicacion',
+              'Comentarios de la publicación',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(

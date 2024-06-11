@@ -373,19 +373,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           decoration: const InputDecoration(
                             labelStyle: TextStyle(color: FOCUS_ORANGE),
                             labelText: 'Nombre de Usuario',
+                            counterStyle: const TextStyle(color: FOCUS_ORANGE),
                           ),
+                          maxLines: null,
+                          maxLength: 20,
                         ),
                         TextField(
                           controller: _bioController,
                           style: const TextStyle(color: Colors.white),
                           onTapOutside: (event) =>
                               FocusManager.instance.primaryFocus?.unfocus(),
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Biografía',
                             alignLabelWithHint: true,
-                            labelStyle: const TextStyle(color: FOCUS_ORANGE),
-                            counterText: '${_bioController.text.length}/150',
-                            counterStyle: const TextStyle(color: FOCUS_ORANGE),
+                            labelStyle: TextStyle(color: FOCUS_ORANGE),
+                            counterStyle: TextStyle(color: FOCUS_ORANGE),
                           ),
                           maxLines: null,
                           maxLength: 150,

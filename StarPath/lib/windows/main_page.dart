@@ -300,7 +300,7 @@ class _MainPageState extends State<MainPage> {
                   (Route<dynamic> route) => false,
                 );
               },
-              child: const Text("Cerrar sesion"),
+              child: const Text("Cerrar sesión"),
             ),
           ),
         ],
