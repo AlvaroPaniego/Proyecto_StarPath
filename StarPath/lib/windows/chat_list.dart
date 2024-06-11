@@ -61,18 +61,59 @@ class _ChatListPageState extends State<ChatListPage> {
   }
   Future<List<ChatData>> getChatData(User user) async{
     List<ChatData> listChatData = [];
+    List<String> senderList = [];
+    List<String> receiverList = [];
     ChatData chatData;
      try{
-       var res = await supabase.rpc('getuserchats', params: {'idloggeduser' : user.id});
-       for (var receiver in res) {
-         var lastMessageData = await getLastMessage(user.id, receiver);
-         chatData = ChatData();
-         chatData.senderUser = user.id;
-         chatData.receiverUser = await getUserDataAsync(receiver);
-         chatData.lastMessage = lastMessageData[0];
-         chatData.lastMessageSender = lastMessageData[1];
-         listChatData.add(chatData);
+       var res = await supabase.rpc('getbothuserchats', params: {'idloggeduser' : user.id});
+       // var res = await supabase.from('message').select('id_user_sender, id_user_receiver')
+       //     .or('id_user_sender.eq.${user.id}, id_user_receiver.eq.${user.id}');
+       var data = res as List;
+       var finalRes = data.toSet().toList();
+
+       for (int i = 0; i < finalRes.length; i++) {
+         if(!senderList.contains(finalRes[i]['id_user_receiver']) || !receiverList.contains(finalRes[i]['id_user_sender'])){
+           if(finalRes[i]['id_user_receiver'] == user.id){
+             var lastMessageData = await getLastMessage(user.id, finalRes[i]['id_user_sender']);
+             chatData = ChatData();
+             chatData.senderUser = user.id;
+             chatData.receiverUser = await getUserDataAsync(finalRes[i]['id_user_sender']);
+             chatData.lastMessage = lastMessageData[0];
+             chatData.lastMessageSender = lastMessageData[1];
+             listChatData.add(chatData);
+           }else if(finalRes[i]['id_user_sender'] == user.id){
+             var lastMessageData = await getLastMessage(user.id, finalRes[i]['id_user_receiver']);
+             chatData = ChatData();
+             chatData.senderUser = user.id;
+             chatData.receiverUser = await getUserDataAsync(finalRes[i]['id_user_receiver']);
+             chatData.lastMessage = lastMessageData[0];
+             chatData.lastMessageSender = lastMessageData[1];
+             listChatData.add(chatData);
+           }
+         }
+         senderList.add(finalRes[i]['id_user_sender']);
+         receiverList.add(finalRes[i]['id_user_receiver']);
        }
+       // for (var data in finalRes) {
+       //   if(data['id_user_receiver'] == user.id){
+       //     var lastMessageData = await getLastMessage(user.id, data['id_user_sender']);
+       //     chatData = ChatData();
+       //     chatData.senderUser = user.id;
+       //     chatData.receiverUser = await getUserDataAsync(data['id_user_sender']);
+       //     chatData.lastMessage = lastMessageData[0];
+       //     chatData.lastMessageSender = lastMessageData[1];
+       //     listChatData.add(chatData);
+       //   }else if(data['id_user_sender'] == user.id){
+       //     var lastMessageData = await getLastMessage(user.id, data['id_user_receiver']);
+       //     chatData = ChatData();
+       //     chatData.senderUser = user.id;
+       //     chatData.receiverUser = await getUserDataAsync(data['id_user_receiver']);
+       //     chatData.lastMessage = lastMessageData[0];
+       //     chatData.lastMessageSender = lastMessageData[1];
+       //     listChatData.add(chatData);
+       //   }
+       //
+       // }
      }catch (e) {
        print(e);
      }

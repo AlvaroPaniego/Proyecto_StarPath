@@ -391,7 +391,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           maxLength: 150,
                         ),
                         SwitchListTile(
-                          title: const Text('Perfil Público',
+                          title: const Text('Perfil privado',
                               style: TextStyle(color: Colors.white)),
                           value: _isPublic,
                           onChanged: (value) {

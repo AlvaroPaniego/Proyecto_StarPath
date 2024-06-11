@@ -119,8 +119,8 @@ Future<List<UserData>> getRandomUsers(String idUser) async{
   print(res.length);
   for (int i = 0; i < maxUsers; i++) {
     int randomUser = r.nextInt(res.length);
-    res.removeAt(randomUser);
     userList.add(UserData(res[randomUser]['id_user'], res[randomUser]['username'], res[randomUser]['profile_picture'], '0', res[randomUser]['privacy']));
+    res.removeAt(randomUser);
   }
   return userList;
 }
