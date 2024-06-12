@@ -69,10 +69,15 @@ class _CommentCardState extends State<CommentCard> {
                   TextButton(
                       onPressed: () async => await translateComment(
                           widget.comment.comment, isAlreadyTranslated),
-                      child: const Text('Traducir',
+                      child: !isAlreadyTranslated ? const Text('Traducir',
                           style: TextStyle(
                             color: FOCUS_ORANGE,
-                          )))
+                          ))
+                          : const Text('Original',
+                          style: TextStyle(
+                            color: FOCUS_ORANGE,
+                          ))
+                  )
                 ],
               ),
             ),

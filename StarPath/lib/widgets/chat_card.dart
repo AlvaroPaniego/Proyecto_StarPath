@@ -16,35 +16,35 @@ class ChatCard extends StatefulWidget {
 
 class _ChatCardState extends State<ChatCard> {
   Future<List<String>> futureFollowers = Future.value([]);
-  @override
-  void initState() {
-    futureFollowers = getLastMessage(widget.chatData.senderUser, widget.chatData.receiverUser.id_user);
-    super.initState();
-    supabase
-        .channel('last_message_changes')
-        .onPostgresChanges(
-      event: PostgresChangeEvent.all,
-      schema: 'public',
-      table: 'message',
-      callback: (payload) {
-        print('callback');
-        var idReceiver = payload.newRecord['id_user_receiver'];
-        var idSender = payload.newRecord['id_user_sender'];
-        if(isMessageInConversation(idSender, idReceiver, widget.chatData.senderUser, widget.chatData.receiverUser.id_user)){
-          setState(() {
-            futureFollowers = getLastMessage(widget.chatData.senderUser, widget.chatData.receiverUser.id_user);
-            print('Poniendo state');
-          });
-        }
-      },
-    ).subscribe();
-  }
-
-  @override
-  void dispose() {
-    supabase.channel('last_message_changes').unsubscribe();
-    super.dispose();
-  }
+  // @override
+  // void initState() {
+  //   futureFollowers = getLastMessage(widget.chatData.senderUser, widget.chatData.receiverUser.id_user);
+  //   super.initState();
+  //   supabase
+  //       .channel('last_message_changes')
+  //       .onPostgresChanges(
+  //     event: PostgresChangeEvent.all,
+  //     schema: 'public',
+  //     table: 'message',
+  //     callback: (payload) {
+  //       print('callback');
+  //       var idReceiver = payload.newRecord['id_user_receiver'];
+  //       var idSender = payload.newRecord['id_user_sender'];
+  //       if(isMessageInConversation(idSender, idReceiver, widget.chatData.senderUser, widget.chatData.receiverUser.id_user)){
+  //         setState(() {
+  //           futureFollowers = getLastMessage(widget.chatData.senderUser, widget.chatData.receiverUser.id_user);
+  //           print('Poniendo state');
+  //         });
+  //       }
+  //     },
+  //   ).subscribe();
+  // }
+  //
+  // @override
+  // void dispose() {
+  //   supabase.channel('last_message_changes').unsubscribe();
+  //   super.dispose();
+  // }
   @override
   Widget build(BuildContext context) {
     bool hasValidImage = widget.chatData.receiverUser.profile_picture != 'vacio';
@@ -95,25 +95,34 @@ class _ChatCardState extends State<ChatCard> {
               const Flexible(child: SizedBox(width: 10,)),
               Flexible(
                 flex: 3,
-                child: FutureBuilder(future: futureFollowers, builder: (context, snapshot) {
-                  if(snapshot.hasData && snapshot.data!.isNotEmpty){
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.chatData.receiverUser.username, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        Text('${snapshot.data![1]}: ${snapshot.data![0]}', style: const TextStyle(fontWeight: FontWeight.w300),)
-                      ],
-                    );
-                  }
-                  return const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text(': ', style: TextStyle(fontWeight: FontWeight.w300),)
-                    ],
-                  );
-                },)
+                child:
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.chatData.receiverUser.username, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text('${widget.chatData.lastMessageSender}: ${widget.chatData.lastMessage}', style: const TextStyle(fontWeight: FontWeight.w300),)
+                  ],
+                ),
+                // FutureBuilder(future: futureFollowers, builder: (context, snapshot) {
+                //   if(snapshot.hasData && snapshot.data!.isNotEmpty){
+                //     return Column(
+                //       mainAxisAlignment: MainAxisAlignment.center,
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         Text(widget.chatData.receiverUser.username, style: const TextStyle(fontWeight: FontWeight.bold)),
+                //         Text('${snapshot.data![1]}: ${snapshot.data![0]}', style: const TextStyle(fontWeight: FontWeight.w300),)
+                //       ],
+                //     );
+                //   }
+                //   return const Column(
+                //     crossAxisAlignment: CrossAxisAlignment.start,
+                //     children: [
+                //       Text('', style: TextStyle(fontWeight: FontWeight.bold)),
+                //       Text(': ', style: TextStyle(fontWeight: FontWeight.w300),)
+                //     ],
+                //   );
+                // },)
               )
             ],
           ),

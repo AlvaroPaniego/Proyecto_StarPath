@@ -115,7 +115,10 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       decoration: const InputDecoration(
                         hintText: "Introduce el título",
                         hintStyle: TextStyle(color: TEXT),
+                        counterStyle: const TextStyle(color: FOCUS_ORANGE),
                       ),
+                      maxLines: null,
+                      maxLength: 35,
                       style: const TextStyle(color: TEXT),
                     ),
                   ),

@@ -239,7 +239,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
                         FocusManager.instance.primaryFocus?.unfocus(),
                     controller: _textController,
                     maxLines: 5,
-                    maxLength: 150,
+                    maxLength: 70,
                     style: const TextStyle(color: BLACK, fontSize: 14.0),
                     decoration: const InputDecoration(
                       hintText: "Escribe tu biografía aquí",

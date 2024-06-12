@@ -74,7 +74,7 @@ class _ChatListPageState extends State<ChatListPage> {
        for (int i = 0; i < finalRes.length; i++) {
          if(!senderList.contains(finalRes[i]['id_user_receiver']) || !receiverList.contains(finalRes[i]['id_user_sender'])){
            if(finalRes[i]['id_user_receiver'] == user.id){
-             var lastMessageData = await getLastMessage(user.id, finalRes[i]['id_user_sender']);
+             var lastMessageData = await getLastMessage(finalRes[i]['id_user_sender'], finalRes[i]['id_user_receiver']);
              chatData = ChatData();
              chatData.senderUser = user.id;
              chatData.receiverUser = await getUserDataAsync(finalRes[i]['id_user_sender']);
@@ -124,7 +124,7 @@ class _ChatListPageState extends State<ChatListPage> {
     List<String> listData = [];
     var res = await supabase.from('message').select()
         .or('and(id_user_sender.eq.$idSender,id_user_receiver.eq.$idReceiver),and'
-        '(id_user_sender.eq.$idReceiver,id_user_receiver.eq.$idSender)');
+        '(id_user_sender.eq.$idReceiver,id_user_receiver.eq.$idSender)').order('created_at', ascending: true);
     listData.add(res.last['message']);
     var resUsername = await supabase
         .from('user')

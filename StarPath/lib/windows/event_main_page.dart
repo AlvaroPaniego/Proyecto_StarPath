@@ -119,6 +119,10 @@ class _EventMainPageState extends State<EventMainPage> {
               ),
             ),
             Expanded(
+                flex: 0,
+                child: Text("${_selectedDistance/1000} km")
+            ),
+            Expanded(
               flex: 3,
               child: Text(
                 'EVENTOS',

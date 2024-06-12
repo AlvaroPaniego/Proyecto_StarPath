@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 import 'package:starpath/misc/constants.dart';
 import 'package:starpath/model/message.dart';
@@ -39,13 +40,14 @@ class _ChatPageState extends State<ChatPage> {
         var idReceiver = payload.newRecord['id_user_receiver'];
         var idSender = payload.newRecord['id_user_sender'];
         if(isMessageInConversation(idSender, idReceiver, senderUser, widget.receiverUser)){
-          var senderUserAux = await getUserDataAsync(idSender);
-          var auxMessageList = await futureMessages;
+          // var senderUserAux = await getUserDataAsync(idSender);
+          // var auxMessageList = await futureMessages;
           setState(() {
-            auxMessageList.add(Message(senderUserAux.username, payload.newRecord['message'], idSender));
+            // auxMessageList.add(Message(senderUserAux.username, payload.newRecord['message'], idSender));
             // futureMessages.then((value) {
             //   value.add(Message(senderUserAux.username, payload.newRecord['message'], idSender));
             // });
+            futureMessages = getFutureMessagesAsync(idSender, idReceiver);
           });
           // print(_scrollController.position.maxScrollExtent);
             _scrollController.animateTo(0.0,
@@ -70,23 +72,24 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
         // resizeToAvoidBottomInset: false,
         backgroundColor: BACKGROUND,
-        body: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).viewPadding.top,
-            ),
-            UpperAppBar(
-                content: [
-                  BackArrow(route: MaterialPageRoute(builder: (context) => const ChatListPage(),)),
-                  Text(widget.receiverUser.username),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(45.0),
-                    child: hasValidImage
-                        ? Image.network(widget.receiverUser.profile_picture)
-                        : Image.asset("assets/images/placeholder-image.jpg"),
-                  )
-                ]),
-            Expanded(
+        body: KeyboardVisibilityBuilder(builder: (p0, isKeyboardVisible) {
+          return Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).viewPadding.top,
+              ),
+              UpperAppBar(
+                  content: [
+                    BackArrow(route: MaterialPageRoute(builder: (context) => const ChatListPage(),)),
+                    Text(widget.receiverUser.username),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(45.0),
+                      child: hasValidImage
+                          ? Image.network(widget.receiverUser.profile_picture)
+                          : Image.asset("assets/images/placeholder-image.jpg"),
+                    )
+                  ]),
+              Expanded(
                 flex: 8,
                 child: FutureBuilder(
                   future: futureMessages,
@@ -99,13 +102,13 @@ class _ChatPageState extends State<ChatPage> {
                       }
                       var finalMessages = snapshot.data!.reversed;
                       return ListView.builder(
-                        reverse: true,
-                        controller: _scrollController,
-                        itemCount: finalMessages.length,
-                        itemBuilder: (context, index) {
-                          return MessageBubble(messageData: finalMessages.elementAt(index),
-                              isSender: finalMessages.elementAt(index).sender_id != user.id);
-                        });
+                          reverse: true,
+                          controller: _scrollController,
+                          itemCount: finalMessages.length,
+                          itemBuilder: (context, index) {
+                            return MessageBubble(messageData: finalMessages.elementAt(index),
+                                isSender: finalMessages.elementAt(index).sender_id != user.id);
+                          });
                     }else if(snapshot.hasError){
                       return const Center(
                         child: Text("Error de conexion", style: TextStyle(color: TEXT),),
@@ -116,48 +119,139 @@ class _ChatPageState extends State<ChatPage> {
                     );
                   },
                 ),
-            ),
-            Expanded(
-                flex: 1,
-                child: Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-                    color: BUTTON_BAR_BACKGROUND
-                  ),
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: TextField(
-                          onTapOutside: (event) =>
-                              FocusManager.instance.primaryFocus?.unfocus(),
-                          autocorrect: true,
-                          controller: _messageController,
-                          decoration: InputDecoration(
-                            hintText: "Escribe un mensaje",
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(35.0)),
-                            filled: true,
-                            fillColor: Colors.white38
+              ),
+              Expanded(
+                  flex: isKeyboardVisible ?  2 : 1,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+                        color: BUTTON_BAR_BACKGROUND
+                    ),
+                    padding: const EdgeInsets.all(5.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 5,
+                          child: TextField(
+                            onTapOutside: (event) =>
+                                FocusManager.instance.primaryFocus?.unfocus(),
+                            autocorrect: true,
+                            controller: _messageController,
+                            decoration: InputDecoration(
+                              hintText: "Escribe un mensaje",
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(35.0)),
+                              filled: true,
+                              fillColor: Colors.white38,
+                            ),
+                            maxLines: null,
                           ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: IconButton(
-                            onPressed: () async{
-                              await sendMessageAsync(user.id,
-                                  widget.receiverUser.id_user,
-                                  _messageController.text.trim());
-                              _messageController.text = "";
-                            },
-                            icon: const Icon(Icons.send)),
-                      )
-                    ],
-                  ),
-                ))
-          ],
-        )
+                        Expanded(
+                          flex: 1,
+                          child: IconButton(
+                              onPressed: () async{
+                                await sendMessageAsync(user.id,
+                                    widget.receiverUser.id_user,
+                                    _messageController.text.trim());
+                                _messageController.text = "";
+                              },
+                              icon: const Icon(Icons.send)),
+                        )
+                      ],
+                    ),
+                  ))
+            ],
+          );
+        },)
+        // Column(
+        //   children: [
+        //     SizedBox(
+        //       height: MediaQuery.of(context).viewPadding.top,
+        //     ),
+        //     UpperAppBar(
+        //         content: [
+        //           BackArrow(route: MaterialPageRoute(builder: (context) => const ChatListPage(),)),
+        //           Text(widget.receiverUser.username),
+        //           ClipRRect(
+        //             borderRadius: BorderRadius.circular(45.0),
+        //             child: hasValidImage
+        //                 ? Image.network(widget.receiverUser.profile_picture)
+        //                 : Image.asset("assets/images/placeholder-image.jpg"),
+        //           )
+        //         ]),
+        //     Expanded(
+        //         flex: 8,
+        //         child: FutureBuilder(
+        //           future: futureMessages,
+        //           builder: (context, snapshot) {
+        //             if(snapshot.hasData){
+        //               if(snapshot.data!.isEmpty){
+        //                 return const Center(
+        //                   child: Text("Escribe para empezar la conversacion :)", style: TextStyle(color: TEXT),),
+        //                 );
+        //               }
+        //               var finalMessages = snapshot.data!.reversed;
+        //               return ListView.builder(
+        //                 reverse: true,
+        //                 controller: _scrollController,
+        //                 itemCount: finalMessages.length,
+        //                 itemBuilder: (context, index) {
+        //                   return MessageBubble(messageData: finalMessages.elementAt(index),
+        //                       isSender: finalMessages.elementAt(index).sender_id != user.id);
+        //                 });
+        //             }else if(snapshot.hasError){
+        //               return const Center(
+        //                 child: Text("Error de conexion", style: TextStyle(color: TEXT),),
+        //               );
+        //             }
+        //             return const Center(
+        //               child: CircularProgressIndicator(),
+        //             );
+        //           },
+        //         ),
+        //     ),
+        //     Expanded(
+        //         flex: 2,
+        //         child: Container(
+        //           decoration: const BoxDecoration(
+        //             borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+        //             color: BUTTON_BAR_BACKGROUND
+        //           ),
+        //           padding: const EdgeInsets.all(5.0),
+        //           child: Row(
+        //             children: [
+        //               Expanded(
+        //                 flex: 5,
+        //                 child: TextField(
+        //                   onTapOutside: (event) =>
+        //                       FocusManager.instance.primaryFocus?.unfocus(),
+        //                   autocorrect: true,
+        //                   controller: _messageController,
+        //                   decoration: InputDecoration(
+        //                     hintText: "Escribe un mensaje",
+        //                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(35.0)),
+        //                     filled: true,
+        //                     fillColor: Colors.white38,
+        //                   ),
+        //                   maxLines: null,
+        //                 ),
+        //               ),
+        //               Expanded(
+        //                 flex: 1,
+        //                 child: IconButton(
+        //                     onPressed: () async{
+        //                       await sendMessageAsync(user.id,
+        //                           widget.receiverUser.id_user,
+        //                           _messageController.text.trim());
+        //                       _messageController.text = "";
+        //                     },
+        //                     icon: const Icon(Icons.send)),
+        //               )
+        //             ],
+        //           ),
+        //         ))
+        //   ],
+        // )
     );
   }
 
@@ -195,7 +289,7 @@ Future<List<Message>> getFutureMessagesAsync(String id_userSender, String id_use
   try{
     res = await supabase.from('message').select()
         .or('and(id_user_sender.eq.$id_userSender,id_user_receiver.eq.$id_userReceiver),and'
-        '(id_user_sender.eq.$id_userReceiver,id_user_receiver.eq.$id_userSender)');
+        '(id_user_sender.eq.$id_userReceiver,id_user_receiver.eq.$id_userSender)').order('created_at', ascending: true);
   }catch (e){
     print(e);
   }
