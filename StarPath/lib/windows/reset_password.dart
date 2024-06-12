@@ -29,7 +29,7 @@ class _ResetPasswordState extends State<ResetPassword> {
       return 'La contraseña debe tener al menos 6 caracteres.';
     } else if (!RegExp(r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
         .hasMatch(value)) {
-      return 'La contraseña debe contener al menos un número \ny un carácter especial.';
+      return 'Obligatorio un número y un carácter especial.';
     }
     return null;
   }

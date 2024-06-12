@@ -131,8 +131,6 @@ class _CreateEventPageState extends State<CreateEventPage> {
                       decoration: InputDecoration(
                         hintText: "Introduce la descripción",
                         hintStyle: const TextStyle(color: TEXT),
-                        counterText:
-                            '${_descriptionController.text.length}/150',
                         counterStyle: const TextStyle(color: FOCUS_ORANGE),
                       ),
                       maxLines: null,

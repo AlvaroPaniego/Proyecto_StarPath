@@ -154,7 +154,7 @@ class _LoginState extends State<Login> {
                           } else if (!RegExp(
                                   r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
                               .hasMatch(value)) {
-                            return 'La contraseña debe contener al menos un número \ny un carácter especial';
+                            return 'Obligatorio un número y un carácter especial.';
                           }
                           return null;
                         },

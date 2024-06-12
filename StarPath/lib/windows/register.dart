@@ -30,7 +30,7 @@ class _RegisterState extends State<Register> {
       return 'La contraseña debe tener al menos 6 caracteres.';
     } else if (!RegExp(r'^(?=.*?[0-9])(?=.*?[!@#$%^&*()_+{}|:"<>?~.,]).{6,}$')
         .hasMatch(value)) {
-      return 'La contraseña debe contener al menos un número \ny un carácter especial.';
+      return 'Obligatorio un número y un carácter especial.';
     }
     return null;
   }
@@ -244,9 +244,9 @@ class _RegisterState extends State<Register> {
                       decoration: InputDecoration(
                         hintText: "Introduzca nombre de usuario",
                         hintStyle: const TextStyle(color: HINT),
-                        counterText: '${_usernameController.text.length}/20',
                         labelText: "Usuario",
                         labelStyle: const TextStyle(color: TEXT),
+                        counterStyle: TextStyle(color: FOCUS_ORANGE),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0),
                           borderSide:

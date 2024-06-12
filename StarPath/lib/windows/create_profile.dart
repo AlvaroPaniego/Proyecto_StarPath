@@ -244,7 +244,6 @@ class _NewProfilePageState extends State<NewProfilePage> {
                     decoration: const InputDecoration(
                       hintText: "Escribe tu biografía aquí",
                       border: InputBorder.none,
-                      counterText: '',
                     ),
                   ),
                 ),
