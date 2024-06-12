@@ -115,6 +115,8 @@ class _AstronomyWikiPageState extends State<WikiPage> {
                 ),
               ),
               TextField(
+                onTapOutside: (event) =>
+                    FocusManager.instance.primaryFocus?.unfocus(),
                 style: TextStyle(color: TEXT),
                 onChanged: (value) {
                   setState(() {

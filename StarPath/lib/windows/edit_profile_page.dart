@@ -106,7 +106,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     if (_profilePictureUrl != null) {
       userProvider.updateProfilePictureUrl(_profilePictureUrl!);
     }
-
+    widget.userData.username = username;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -390,7 +390,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             counterStyle: TextStyle(color: FOCUS_ORANGE),
                           ),
                           maxLines: null,
-                          maxLength: 150,
+                          maxLength: 70,
                         ),
                         SwitchListTile(
                           title: const Text('Perfil privado',
